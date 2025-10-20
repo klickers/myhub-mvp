@@ -1,4 +1,4 @@
-export default async function fetchFromClickUp(url: string) {
+export async function fetchFromClickUp(url: string) {
 	const options = {
 		method: "GET",
 		headers: {
