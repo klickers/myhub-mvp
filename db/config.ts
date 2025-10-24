@@ -13,8 +13,80 @@ const ClickupTask = defineTable({
 	//indexes: [{ on: ["clickupId"], unique: true }],
 })
 
+const Bucket = defineTable({
+	columns: {
+		id: column.number({ primaryKey: true }),
+		name: column.text(),
+		order: column.number(),
+	},
+})
+
+const Objective = defineTable({
+	columns: {
+		id: column.number({ primaryKey: true }),
+		bucketId: column.number({ references: () => Bucket.columns.id }),
+		name: column.text(),
+		startDate: column.date({ optional: true }),
+		dueDate: column.date({ optional: true }),
+		status: column.text({
+			enum: ["notstarted", "inprogress", "completed"],
+			default: "notstarted",
+		}),
+	},
+})
+
+const Week = defineTable({
+	columns: {
+		id: column.number({ primaryKey: true }),
+		year: column.number(),
+		weekNumber: column.number(),
+	},
+	indexes: [{ on: ["year", "weekNumber"], unique: true }],
+})
+
+const TimePerWeek = defineTable({
+	columns: {
+		id: column.number({ primaryKey: true }),
+		year: column.number(),
+		weekNumber: column.number(),
+		itemType: column.text({
+			enum: ["bucket", "objective"],
+			default: "objective",
+		}),
+		objectiveId: column.number({ references: () => Objective.columns.id }),
+		scheduledTime: column.number({ default: 0 }), // in minutes
+	},
+	foreignKeys: [
+		{
+			columns: ["year", "weekNumber"],
+			references: () => [Week.columns.year, Week.columns.weekNumber],
+		},
+	],
+	indexes: [
+		{ on: ["year", "weekNumber", "itemType", "objectiveId"], unique: true },
+	],
+})
+
+const Session = defineTable({
+	columns: {
+		id: column.number({ primaryKey: true }),
+		itemType: column.text({
+			enum: ["bucket", "objective"],
+			default: "objective",
+		}),
+		objectiveId: column.number({ references: () => Objective.columns.id }),
+		startTime: column.date(),
+		endTime: column.date({ optional: true }),
+	},
+})
 
 export default defineDb({
 	tables: {
+		ClickupTask,
+		Bucket,
+		Objective,
+		Week,
+		TimePerWeek,
+		Session,
 	},
 })

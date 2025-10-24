@@ -2,6 +2,68 @@
 import Layout from "@/layouts/Layout.astro"
 import { getWeek } from "date-fns"
 import { Icon } from "astro-icon/components"
+import {
+	db,
+	asc,
+	eq,
+	and,
+	inArray,
+	Bucket,
+	Objective,
+	TimePerWeek,
+} from "astro:db"
+import { minutesToDots } from "@/helpers/time/minutesToDots"
+
+const buckets = await db.select().from(Bucket).orderBy(asc(Bucket.order))
+const objectives = await db
+	.select()
+	.from(Objective)
+	.where(
+		inArray(
+			Objective.bucketId,
+			buckets.map((b) => b.id)
+		)
+	)
+
+const year = 2025,
+	weekNumber = 43
+const times = await db
+	.select()
+	.from(TimePerWeek)
+	.where(
+		and(
+			eq(TimePerWeek.year, year),
+			eq(TimePerWeek.weekNumber, weekNumber),
+			eq(TimePerWeek.itemType, "objective"),
+			inArray(
+				TimePerWeek.objectiveId,
+				objectives.map((o) => o.id)
+			)
+		)
+	)
+
+const timesByObjective: Record<number, number> = {}
+for (const t of times) {
+	timesByObjective[t.objectiveId] = t.scheduledTime
+}
+const objectivesByBucket: Record<number, any[]> = {}
+for (const obj of objectives) {
+	if (!objectivesByBucket[obj.bucketId]) objectivesByBucket[obj.bucketId] = []
+	objectivesByBucket[obj.bucketId].push({
+		...obj,
+		scheduledTime: timesByObjective[obj.id] ?? 0,
+	})
+}
+const bucketsWithObjectives = buckets.map((bucket) => ({
+	...bucket,
+	objectives: objectivesByBucket[bucket.id] ?? [],
+	totalScheduledTime: objectivesByBucket[bucket.id]
+		? objectivesByBucket[bucket.id].reduce(
+				(acc, { scheduledTime }) => acc + scheduledTime,
+				0
+			)
+		: 0,
+}))
 ---
 
 <Layout>
@@ -20,7 +82,15 @@ import { Icon } from "astro-icon/components"
 									id="planned-hours"
 									class="font-mono"
 								>
-									00:00
+									{
+										minutesToDots(
+											bucketsWithObjectives.reduce(
+												(acc, { totalScheduledTime }) =>
+													acc + totalScheduledTime,
+												0
+											)
+										)
+									}
 								</span>
 							</td>
 						</tr>
@@ -31,7 +101,7 @@ import { Icon } from "astro-icon/components"
 									id="weekly-hours"
 									class="font-mono"
 								>
-									40:00
+									00:00
 								</span>
 							</td>
 						</tr>
@@ -42,7 +112,7 @@ import { Icon } from "astro-icon/components"
 									id="buffer-hours"
 									class="font-mono"
 								>
-									6:00
+									00:00
 								</span>
 							</td>
 						</tr>
@@ -64,6 +134,40 @@ import { Icon } from "astro-icon/components"
 					<Icon name="pixelarticons:arrow-right" />
 				</button>
 			</div>
+		</div>
+		<div class="grid grid-cols-3 gap-6 mt-6 mb-20">
+			{
+				bucketsWithObjectives.map((bucket) => (
+					<div
+						class="p-6 bg-white border border-black"
+						style="box-shadow: 5px 5px 0px 0px black"
+					>
+						<div class="flex justify-between items-center mb-4">
+							<h2 class="text-lg font-semibold">{bucket.name}</h2>
+							<p class="font-mono">
+								{"00:00/" +
+									minutesToDots(bucket.totalScheduledTime)}
+							</p>
+						</div>
+						<div>
+							{bucket.objectives &&
+								bucket.objectives.map((obj) => (
+									<div class="mb-2 py-2 px-4 border border-black">
+										<div class="flex justify-between items-center">
+											<p>{obj.name}</p>
+											<p class="text-xs font-mono">
+												{"00:00/" +
+													minutesToDots(
+														obj.scheduledTime
+													)}
+											</p>
+										</div>
+									</div>
+								))}
+						</div>
+					</div>
+				))
+			}
 		</div>
 		<div
 			id="calendar"
