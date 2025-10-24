@@ -2,14 +2,14 @@
 import Layout from "@/layouts/Layout.astro"
 import { fetchFromClickUp } from "@/helpers/clickup/fetch"
 import { format, fromUnixTime, endOfWeek } from "date-fns"
-import { db, Task, lte } from "astro:db"
+import { db, ClickupTask, lte } from "astro:db"
 
 const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 
 let tasks = await db
 	.select()
-	.from(Task)
-	.where(lte(Task.dueDate, endOfWeek(new Date())))
+	.from(ClickupTask)
+	.where(lte(ClickupTask.dueDate, endOfWeek(new Date())))
 
 if (tasks.length === 0) {
 	// == REPEAT this block until all pages of tasks are fetched ==
@@ -35,11 +35,11 @@ if (tasks.length === 0) {
 			timeEstimate: task.time_estimate ?? 0,
 		}))
 	console.log(data.tasks[0])
-	await db.insert(Task).values(clickupTasks)
+	await db.insert(ClickupTask).values(clickupTasks)
 	tasks = await db
 		.select()
-		.from(Task)
-		.where(lte(Task.dueDate, endOfWeek(new Date())))
+		.from(ClickupTask)
+		.where(lte(ClickupTask.dueDate, endOfWeek(new Date())))
 }
 
 const totalTime = tasks.reduce(

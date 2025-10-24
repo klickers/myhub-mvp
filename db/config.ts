@@ -1,6 +1,6 @@
 import { column, defineTable, defineDb } from "astro:db"
 
-const Task = defineTable({
+const ClickupTask = defineTable({
 	columns: {
 		id: column.number({ primaryKey: true }),
 		clickupId: column.text({ unique: true, optional: true }),
@@ -16,6 +16,5 @@ const Task = defineTable({
 
 export default defineDb({
 	tables: {
-		Task,
 	},
 })
