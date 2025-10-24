@@ -86,6 +86,13 @@ const Session = defineTable({
 	},
 })
 
+const KeyValue = defineTable({
+	columns: {
+		key: column.text({ primaryKey: true }),
+		value: column.text(),
+	},
+})
+
 export default defineDb({
 	tables: {
 		ClickupTask,
@@ -94,5 +101,6 @@ export default defineDb({
 		Week,
 		TimePerWeek,
 		Session,
+		KeyValue,
 	},
 })

@@ -14,6 +14,13 @@ import {
 	TimePerWeek,
 } from "astro:db"
 import { minutesToDots } from "@/helpers/time/minutesToDots"
+import Buckets from "@/components/Buckets"
+import { actions } from "astro:actions"
+import { Session } from "astro:db"
+
+// =====================================
+// Get bucket and objectives
+// =====================================
 
 const buckets = await db.select().from(Bucket).orderBy(asc(Bucket.order))
 const objectives = await db
@@ -68,6 +75,23 @@ const bucketsWithObjectives = buckets.map((bucket) => ({
 			)
 		: 0,
 }))
+
+// =====================================
+// Get currently playing session
+// =====================================
+
+const isSessionPlaying = await Astro.callAction(actions.getKeyValue, {
+	key: "isSessionPlaying",
+})
+const activeItemId =
+	isSessionPlaying.data === "true"
+		? await Astro.callAction(actions.getKeyValue, {
+				key: "playingSessionObjectiveId",
+			})
+		: null
+const playingSessionObjectiveId = activeItemId
+	? parseInt(activeItemId.data as string)
+	: null
 ---
 
 <Layout>
@@ -140,38 +164,11 @@ const bucketsWithObjectives = buckets.map((bucket) => ({
 			</div>
 		</div>
 		<div class="grid grid-cols-3 gap-6 mt-6 mb-20">
-			{
-				bucketsWithObjectives.map((bucket) => (
-					<div
-						class="p-6 bg-white border border-black"
-						style="box-shadow: 5px 5px 0px 0px black"
-					>
-						<div class="flex justify-between items-center mb-4">
-							<h2 class="text-lg font-semibold">{bucket.name}</h2>
-							<p class="font-mono">
-								{"00:00/" +
-									minutesToDots(bucket.totalScheduledTime)}
-							</p>
-						</div>
-						<div>
-							{bucket.objectives &&
-								bucket.objectives.map((obj) => (
-									<div class="mb-2 py-2 px-4 border border-black">
-										<div class="flex justify-between items-center">
-											<p>{obj.name}</p>
-											<p class="text-xs font-mono">
-												{"00:00/" +
-													minutesToDots(
-														obj.scheduledTime
-													)}
-											</p>
-										</div>
-									</div>
-								))}
-						</div>
-					</div>
-				))
-			}
+			<Buckets
+				buckets={bucketsWithObjectives}
+				playingSessionObjectiveId={playingSessionObjectiveId}
+				client:load
+			/>
 		</div>
 		<div
 			id="calendar"
