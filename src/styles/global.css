@@ -9,4 +9,8 @@
 	html {
 		@apply font-default;
 	}
+
+	button {
+		@apply cursor-pointer;
+	}
 }

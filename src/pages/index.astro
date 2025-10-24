@@ -1,7 +1,171 @@
 ---
 import Layout from "@/layouts/Layout.astro"
+import { getWeek } from "date-fns"
 ---
 
 <Layout>
-	<main></main>
+	<main class="p-6 bg-cover">
+		<h1 class="text-5xl font-semibold mb-10">
+			Week <span id="week-number">{getWeek(new Date())}</span>
+		</h1>
+		<div class="flex justify-between items-end">
+			<div>
+				<table>
+					<tbody>
+						<tr>
+							<td>Planned Hours</td>
+							<td>
+								<span
+									id="planned-hours"
+									class="font-mono"
+								>
+									00:00
+								</span>
+							</td>
+						</tr>
+						<tr>
+							<td class="pr-2">Available Hours</td>
+							<td>
+								<span
+									id="weekly-hours"
+									class="font-mono"
+								>
+									40:00
+								</span>
+							</td>
+						</tr>
+						<tr>
+							<td>Buffer Hours</td>
+							<td>
+								<span
+									id="buffer-hours"
+									class="font-mono"
+								>
+									6:00
+								</span>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="flex gap-4">
+				<button id="prev-btn">Prev</button>
+				<button id="today-btn">Today</button>
+				<button id="next-btn">Next</button>
+			</div>
+		</div>
+		<div
+			id="calendar"
+			style="display:none"
+		>
+		</div>
+	</main>
 </Layout>
+
+<script>
+	import { Calendar, type EventApi } from "@fullcalendar/core"
+	import timeGridPlugin from "@fullcalendar/timegrid"
+	import googleCalendarPlugin from "@fullcalendar/google-calendar"
+	import { addDays, differenceInMinutes, getWeek } from "date-fns"
+	import { minutesToDots } from "@/helpers/time/minutesToDots"
+	import googleCalendarIds from "@/data/googleCalendarIds"
+
+	function getAvailableMinutes(events: EventApi[], businessHours: any[]) {
+		const totalWorkMinutes = businessHours.reduce(
+			(t, { daysOfWeek, startTime, endTime }) =>
+				t +
+				daysOfWeek.length *
+					(+endTime.slice(0, 2) * 60 +
+						+endTime.slice(3) -
+						(+startTime.slice(0, 2) * 60 + +startTime.slice(3))),
+			0
+		)
+
+		const workEventMinutes = events.reduce((sum, e) => {
+			if (!e.start || !e.end) return sum
+
+			let overlapMinutes = 0,
+				cur = new Date(e.start)
+			while (cur < e.end) {
+				const dayStart = new Date(cur)
+				dayStart.setHours(0, 0, 0, 0)
+				const dayEnd = addDays(dayStart, 1)
+				const eventStart = cur
+				const eventEnd = new Date(Math.min(+e.end, +dayEnd))
+				const day = eventStart.getDay()
+
+				for (const b of businessHours) {
+					if (!b.daysOfWeek.includes(day)) continue
+					const [sh, sm] = b.startTime.split(":").map(Number)
+					const [eh, em] = b.endTime.split(":").map(Number)
+					const bhStart = new Date(dayStart)
+					bhStart.setHours(sh, sm, 0, 0)
+					const bhEnd = new Date(dayStart)
+					bhEnd.setHours(eh, em, 0, 0)
+
+					const overlapStart = new Date(
+						Math.max(+eventStart, +bhStart)
+					)
+					const overlapEnd = new Date(Math.min(+eventEnd, +bhEnd))
+					if (overlapEnd > overlapStart)
+						overlapMinutes += differenceInMinutes(
+							overlapEnd,
+							overlapStart
+						)
+				}
+				cur = eventEnd
+			}
+			return sum + overlapMinutes
+		}, 0)
+		return totalWorkMinutes - workEventMinutes
+	}
+
+	const businessHours = [
+		{ daysOfWeek: [0, 1, 2, 3, 4], startTime: "10:00", endTime: "23:00" },
+		{ daysOfWeek: [5], startTime: "10:00", endTime: "17:00" },
+		{ daysOfWeek: [6], startTime: "19:00", endTime: "23:00" },
+	]
+
+	document.addEventListener("DOMContentLoaded", function () {
+		let calendarEl: HTMLElement = document.getElementById("calendar")!
+		let calendar = new Calendar(calendarEl, {
+			plugins: [timeGridPlugin, googleCalendarPlugin],
+			googleCalendarApiKey: import.meta.env.PUBLIC_GCAL_API_KEY,
+			eventSources: [...googleCalendarIds],
+			businessHours,
+			datesSet(info) {
+				document.getElementById("week-number")!.innerText = String(
+					getWeek(info.start)
+				)
+			},
+			eventsSet: (events) => {
+				const bufferMinutes = 6 * 60,
+					availableMinutes = getAvailableMinutes(
+						events,
+						businessHours
+					)
+				document.getElementById("weekly-hours")!.innerText =
+					minutesToDots(availableMinutes - bufferMinutes)
+				document.getElementById("buffer-hours")!.innerText =
+					minutesToDots(bufferMinutes)
+			},
+		})
+		calendar.render()
+
+		document
+			.getElementById("prev-btn")!
+			.addEventListener("click", function () {
+				calendar.prev()
+			})
+		document
+			.getElementById("today-btn")!
+			.addEventListener("click", function () {
+				calendar.today()
+			})
+		document
+			.getElementById("next-btn")!
+			.addEventListener("click", function () {
+				calendar.next()
+			})
+	})
+</script>

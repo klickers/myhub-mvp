@@ -11,6 +11,9 @@
   "dependencies": {
     "@astrojs/db": "^0.18.0",
     "@astrojs/react": "^4.4.0",
+    "@fullcalendar/core": "^6.1.19",
+    "@fullcalendar/google-calendar": "^6.1.19",
+    "@fullcalendar/timegrid": "^6.1.19",
     "@tailwindcss/vite": "^4.1.14",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
