@@ -1,8 +1,210 @@
 ---
-import Layout from "../layouts/Layout.astro"
+import Layout from "@/layouts/Layout.astro"
+import { fetchFromClickUp } from "@/helpers/clickup/fetch"
+import { format, fromUnixTime, endOfWeek } from "date-fns"
+import { db, Task, lte } from "astro:db"
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+
+let tasks = await db
+	.select()
+	.from(Task)
+	.where(lte(Task.dueDate, endOfWeek(new Date())))
+
+if (tasks.length === 0) {
+	// == REPEAT this block until all pages of tasks are fetched ==
+	const data = await fetchFromClickUp(
+		"/team/" +
+			import.meta.env.CLICKUP_TEAM_ID +
+			"/task?order_by=due_date&reverse=true&subtasks=true"
+		// TODO: if due date same, order by start date
+	)
+	const clickupTasks = data.tasks
+		// .filter(
+		// 	(task: any) =>
+		// 		task.due_date !== null && task.due_date <= endOfWeek(new Date())
+		// )
+		.map((task: any) => ({
+			clickupId: task.id,
+			name: task.name,
+			status: task.status.type,
+			startDate: task.start_date
+				? fromUnixTime(task.start_date / 1000)
+				: null,
+			dueDate: task.due_date ? fromUnixTime(task.due_date / 1000) : null,
+			timeEstimate: task.time_estimate ?? 0,
+		}))
+	console.log(data.tasks[0])
+	await db.insert(Task).values(clickupTasks)
+	tasks = await db
+		.select()
+		.from(Task)
+		.where(lte(Task.dueDate, endOfWeek(new Date())))
+}
+
+const totalTime = tasks.reduce(
+	(acc: number, task: any) => acc + (task.timeEstimate || 0),
+	0
+)
+
+const buffer = 1 * (1000 * 60 * 60) // 1 hour buffer per day
+let weekTime = [
+		{
+			totalTime: 10 * (1000 * 60 * 60),
+			timeAvailable: 10 * (1000 * 60 * 60) - buffer,
+			tasks: [],
+		},
+		{
+			totalTime: 10 * (1000 * 60 * 60),
+			timeAvailable: 10 * (1000 * 60 * 60) - buffer,
+			tasks: [],
+		},
+		{
+			totalTime: 10 * (1000 * 60 * 60),
+			timeAvailable: 10 * (1000 * 60 * 60) - buffer,
+			tasks: [],
+		},
+		{
+			totalTime: 10 * (1000 * 60 * 60),
+			timeAvailable: 10 * (1000 * 60 * 60) - buffer,
+			tasks: [],
+		},
+		{
+			totalTime: 10 * (1000 * 60 * 60),
+			timeAvailable: 10 * (1000 * 60 * 60) - buffer,
+			tasks: [],
+		},
+		{
+			totalTime: 8 * (1000 * 60 * 60),
+			timeAvailable: 8 * (1000 * 60 * 60) - buffer,
+			tasks: [],
+		},
+		{
+			totalTime: 5 * (1000 * 60 * 60),
+			timeAvailable: 5 * (1000 * 60 * 60) - buffer,
+			tasks: [],
+		},
+	],
+	tasksToSchedule = []
+
+for (const task of tasks) {
+	if (task.timeEstimate > 2.5 * (1000 * 60 * 60)) {
+		if (task.timeEstimate % (2 * (1000 * 60 * 60)) === 0) {
+			let chunks = task.timeEstimate / (2 * (1000 * 60 * 60))
+			for (let i = 0; i < chunks; i++)
+				tasksToSchedule.push({
+					...task,
+					timeToSchedule: 2 * (1000 * 60 * 60),
+				})
+		} else {
+			let chunks = task.timeEstimate / (1000 * 60 * 60)
+			while (chunks > 4) {
+				tasksToSchedule.push({
+					...task,
+					timeToSchedule: 2 * (1000 * 60 * 60),
+				})
+				chunks -= 2
+			}
+			if (chunks > 2.5) {
+				tasksToSchedule.push({
+					...task,
+					timeToSchedule: (chunks / 2) * (1000 * 60 * 60),
+				})
+				tasksToSchedule.push({
+					...task,
+					timeToSchedule: (chunks / 2) * (1000 * 60 * 60),
+				})
+			} else {
+				tasksToSchedule.push({
+					...task,
+					timeToSchedule: chunks * (1000 * 60 * 60),
+				})
+			}
+		}
+	} else if (task.timeEstimate > 0)
+		tasksToSchedule.push({ ...task, timeToSchedule: task.timeEstimate })
+}
+
+for (const task of tasksToSchedule) {
+	if (task.timeEstimate > 0) {
+		for (let day of weekTime) {
+			if (
+				day.timeAvailable >= task.timeToSchedule &&
+				day.tasks.filter((t) => t.clickupId === task.clickupId)
+					.length === 0
+			) {
+				day.tasks.push(task)
+				day.timeAvailable -= task.timeToSchedule
+				break
+			}
+		}
+		// console.log("Couldn't schedule " + task.name)
+	}
+}
 ---
 
-<Layout />
+<Layout>
+	<main>
+		<div class="flex gap-10 mb-20 overflow-x-scroll p-6">
+			{
+				weekTime.map((day, index) => (
+					<div class="w-1/5 flex-none">
+						<div class="flex justify-between items-center">
+							<p class="uppercase font-semibold">
+								{daysOfWeek[index]}
+							</p>
+							<p class="text-sm">
+								{(day.totalTime - day.timeAvailable) /
+									(1000 * 60 * 60)}{" "}
+								/ {day.totalTime / (1000 * 60 * 60)} h
+							</p>
+						</div>
+						{day.tasks.map((task) => (
+							<div class="mb-1 text-sm rounded-lg p-1.5 bg-slate-100">
+								<p>{task.name}</p>
+								<p class="text-xs text-slate-700">
+									<span>
+										Planned:{" "}
+										{task.timeToSchedule / (1000 * 60 * 60)}
+										h
+									</span>
+								</p>
+							</div>
+						))}
+					</div>
+				))
+			}
+		</div>
+		<p>{totalTime / (1000 * 60 * 60)}hr</p>
+		<table>
+			<tbody>
+				{
+					tasks.map((task) => (
+						<tr>
+							<td>
+								<a
+									href={
+										"https://app.clickup.com/t/" +
+										task.clickupId
+									}
+									target="_blank"
+								>
+									{task.name}
+								</a>
+							</td>
+							<td>
+								&nbsp;
+								{task.dueDate && format(task.dueDate, "MMM dd")}
+							</td>
+							<td>
+								&nbsp;
+								{task.timeEstimate / (1000 * 60 * 60)}
+								hr
+							</td>
+						</tr>
+					))
+				}
+			</tbody>
+		</table>
+	</main>
+</Layout>
