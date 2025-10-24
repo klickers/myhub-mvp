@@ -29,7 +29,13 @@ const Objective = defineTable({
 		startDate: column.date({ optional: true }),
 		dueDate: column.date({ optional: true }),
 		status: column.text({
-			enum: ["notstarted", "inprogress", "completed"],
+			enum: [
+				"notstarted",
+				"archived",
+				"inprogress",
+				"onhold",
+				"completed",
+			],
 			default: "notstarted",
 		}),
 	},

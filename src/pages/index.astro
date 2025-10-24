@@ -8,6 +8,7 @@ import {
 	eq,
 	and,
 	inArray,
+	notInArray,
 	Bucket,
 	Objective,
 	TimePerWeek,
@@ -19,9 +20,12 @@ const objectives = await db
 	.select()
 	.from(Objective)
 	.where(
-		inArray(
-			Objective.bucketId,
-			buckets.map((b) => b.id)
+		and(
+			inArray(
+				Objective.bucketId,
+				buckets.map((b) => b.id)
+			),
+			notInArray(Objective.status, ["archived", "completed"])
 		)
 	)
 
