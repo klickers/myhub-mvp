@@ -1,6 +1,7 @@
 ---
 import Layout from "@/layouts/Layout.astro"
 import { getWeek } from "date-fns"
+import { Icon } from "astro-icon/components"
 ---
 
 <Layout>
@@ -49,9 +50,19 @@ import { getWeek } from "date-fns"
 				</table>
 			</div>
 			<div class="flex gap-4">
-				<button id="prev-btn">Prev</button>
+				<button
+					id="prev-btn"
+					class="text-xl"
+				>
+					<Icon name="pixelarticons:arrow-left" />
+				</button>
 				<button id="today-btn">Today</button>
-				<button id="next-btn">Next</button>
+				<button
+					id="next-btn"
+					class="text-xl"
+				>
+					<Icon name="pixelarticons:arrow-right" />
+				</button>
 			</div>
 		</div>
 		<div
