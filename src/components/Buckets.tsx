@@ -1,31 +1,37 @@
-import React, { useState } from "react"
+import React, { useEffect } from "react"
 import SessionPlayer from "@/components/SessionPlayer"
 import { minutesToDots } from "@/helpers/time/minutesToDots"
+import { useStore } from "@nanostores/react"
+import { buckets } from "@/stores/buckets"
+import { playingSession } from "@/stores/playingSession"
+import { actions } from "astro:actions"
 
-interface Props {
-	buckets: {
-		id: number
-		name: string
-		totalScheduledTime: number
-		totalUsedTime: number
-		objectives: {
-			id: number
-			name: string
-			scheduledTime: number
-			usedTime: number
-		}[]
-	}[]
-	playingSessionObjectiveId: number | null
-}
+const Buckets: React.FC = () => {
+	const $buckets = useStore(buckets)
 
-const Buckets: React.FC<Props> = ({ buckets, playingSessionObjectiveId }) => {
-	const [activeItemId, setActiveItemId] = useState(playingSessionObjectiveId)
-
-	const handleActivate = (id: number) => setActiveItemId(id)
+	useEffect(() => {
+		const initPlayingSession = async () => {
+			const id = await actions.getKeyValue.orThrow({
+					key: "playingSessionId",
+				}),
+				isPlaying = await actions.getKeyValue.orThrow({
+					key: "isSessionPlaying",
+				}),
+				objectiveId = await actions.getKeyValue.orThrow({
+					key: "playingSessionObjectiveId",
+				})
+			playingSession.set({
+				id: parseInt(id || "0"),
+				isPlaying: isPlaying === "true" ? true : false,
+				objectiveId: parseInt(objectiveId || "0"),
+			})
+		}
+		initPlayingSession()
+	}, [])
 
 	return (
-		<>
-			{buckets.map((bucket) => (
+		<div className="grid grid-cols-3 gap-6 mt-6 mb-20">
+			{Object.values($buckets).map((bucket) => (
 				<div
 					key={bucket.id}
 					className="p-6 bg-white border border-black"
@@ -58,8 +64,6 @@ const Buckets: React.FC<Props> = ({ buckets, playingSessionObjectiveId }) => {
 										<SessionPlayer
 											itemType="objective"
 											itemId={obj.id}
-											isPlaying={activeItemId === obj.id}
-											setActiveItemid={handleActivate}
 										/>
 									</div>
 								</div>
@@ -68,7 +72,7 @@ const Buckets: React.FC<Props> = ({ buckets, playingSessionObjectiveId }) => {
 					</div>
 				</div>
 			))}
-		</>
+		</div>
 	)
 }
 
