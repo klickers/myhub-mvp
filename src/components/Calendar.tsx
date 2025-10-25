@@ -17,6 +17,7 @@ import { calendarApi, weekNumber } from "@/stores/calendar"
 import { actions } from "astro:actions"
 import { buckets } from "@/stores/buckets"
 import { weeklyMinutes } from "@/stores/weeklyHours"
+import businessHours from "@/data/businessHours"
 
 function getAvailableMinutes(events: EventApi[], businessHours: any[]) {
 	const totalWorkMinutes = businessHours.reduce(
@@ -65,12 +66,6 @@ function getAvailableMinutes(events: EventApi[], businessHours: any[]) {
 	}, 0)
 	return totalWorkMinutes - workEventMinutes
 }
-
-const businessHours = [
-	{ daysOfWeek: [0, 1, 2, 3, 4], startTime: "10:00", endTime: "23:00" },
-	{ daysOfWeek: [5], startTime: "10:00", endTime: "17:00" },
-	{ daysOfWeek: [6], startTime: "19:00", endTime: "23:00" },
-]
 
 export default function Calendar() {
 	const calendarRef = useRef<FullCalendar | null>(null)
