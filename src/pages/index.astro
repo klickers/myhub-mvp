@@ -3,24 +3,6 @@ import Layout from "@/layouts/Layout.astro"
 import Buckets from "@/components/Buckets"
 import Calendar from "@/components/Calendar"
 import WeeklyHeader from "@/components/WeeklyHeader"
-import { actions } from "astro:actions"
-
-// =====================================
-// Get currently playing session
-// =====================================
-
-const isSessionPlaying = await Astro.callAction(actions.getKeyValue, {
-	key: "isSessionPlaying",
-})
-const activeItemId =
-	isSessionPlaying.data === "true"
-		? await Astro.callAction(actions.getKeyValue, {
-				key: "playingSessionObjectiveId",
-			})
-		: null
-const playingSessionObjectiveId = activeItemId
-	? parseInt(activeItemId.data as string)
-	: null
 ---
 
 <Layout>
