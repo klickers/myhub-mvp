@@ -1,31 +1,35 @@
 {
-  "name": "myhubmvp",
-  "type": "module",
-  "version": "0.0.1",
-  "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview",
-    "astro": "astro"
-  },
-  "dependencies": {
-    "@astrojs/db": "^0.18.0",
-    "@astrojs/react": "^4.4.0",
-    "@fullcalendar/core": "^6.1.19",
-    "@fullcalendar/google-calendar": "^6.1.19",
-    "@fullcalendar/timegrid": "^6.1.19",
-    "@iconify-json/pixelarticons": "^1.2.2",
-    "@tailwindcss/vite": "^4.1.14",
-    "@types/react": "^19.2.2",
-    "@types/react-dom": "^19.2.2",
-    "astro": "^5.14.6",
-    "astro-icon": "^1.1.5",
-    "date-fns": "^4.1.0",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0",
-    "tailwindcss": "^4.1.14"
-  },
-  "devDependencies": {
-    "@iconify/react": "^6.0.2"
-  }
+	"name": "myhubmvp",
+	"type": "module",
+	"version": "0.0.1",
+	"scripts": {
+		"dev": "astro dev",
+		"build": "astro build",
+		"preview": "astro preview",
+		"astro": "astro"
+	},
+	"dependencies": {
+		"@astrojs/db": "^0.18.0",
+		"@astrojs/node": "^9.5.0",
+		"@astrojs/react": "^4.4.0",
+		"@fullcalendar/core": "^6.1.19",
+		"@fullcalendar/google-calendar": "^6.1.19",
+		"@fullcalendar/react": "^6.1.19",
+		"@fullcalendar/timegrid": "^6.1.19",
+		"@iconify-json/pixelarticons": "^1.2.2",
+		"@nanostores/react": "^1.0.0",
+		"@tailwindcss/vite": "^4.1.14",
+		"@types/react": "^19.2.2",
+		"@types/react-dom": "^19.2.2",
+		"astro": "^5.14.5",
+		"astro-icon": "^1.1.5",
+		"date-fns": "^4.1.0",
+		"nanostores": "^1.0.1",
+		"react": "^19.2.0",
+		"react-dom": "^19.2.0",
+		"tailwindcss": "^4.1.14"
+	},
+	"devDependencies": {
+		"@iconify/react": "^6.0.2"
+	}
 }
