@@ -111,6 +111,12 @@ const bucketsWithObjectives = buckets.map((bucket) => ({
 				0
 			)
 		: 0,
+	totalUsedTime: objectivesByBucket[bucket.id]
+		? objectivesByBucket[bucket.id].reduce(
+				(acc, { usedTime }) => acc + usedTime,
+				0
+			)
+		: 0,
 }))
 
 // =====================================

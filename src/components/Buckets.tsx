@@ -7,6 +7,7 @@ interface Props {
 		id: number
 		name: string
 		totalScheduledTime: number
+		totalUsedTime: number
 		objectives: {
 			id: number
 			name: string
@@ -33,7 +34,8 @@ const Buckets: React.FC<Props> = ({ buckets, playingSessionObjectiveId }) => {
 					<div className="flex justify-between items-center mb-4">
 						<h2 className="text-lg font-semibold">{bucket.name}</h2>
 						<p className="font-mono">
-							{"00:00/" +
+							{minutesToDots(bucket.totalUsedTime) +
+								"/" +
 								minutesToDots(bucket.totalScheduledTime)}
 						</p>
 					</div>
