@@ -79,19 +79,19 @@ export default function Calendar() {
 		calendarApi.set(calendarRef.current?.getApi())
 	}, [])
 
-	useEffect(() => {
+	const setBuckets = async () => {
 		if ($calendarApi) {
-			const initBuckets = async () => {
-				const fullBuckets = await actions.getFullBucketsByWeek.orThrow({
-					year: getYear($calendarApi.getDate()),
-					weekNumber: getWeek($calendarApi.getDate()),
-					weekStart: startOfWeek($calendarApi.getDate()),
-					weekEnd: endOfWeek($calendarApi.getDate()),
-				})
-				buckets.set(fullBuckets)
-			}
-			initBuckets()
+			const fullBuckets = await actions.getFullBucketsByWeek.orThrow({
+				year: getYear($calendarApi?.getDate()),
+				weekNumber: getWeek($calendarApi.getDate()),
+				weekStart: startOfWeek($calendarApi.getDate()),
+				weekEnd: endOfWeek($calendarApi.getDate()),
+			})
+			buckets.set(fullBuckets)
 		}
+	}
+	useEffect(() => {
+		setBuckets()
 	}, [$calendarApi])
 
 	return (
@@ -104,6 +104,7 @@ export default function Calendar() {
 				businessHours
 				datesSet={(info) => {
 					weekNumber.set(getWeek(info.start))
+					setBuckets()
 				}}
 				eventsSet={(events) => {
 					const bufferMinutes = 1.5 * 6 * 60,
