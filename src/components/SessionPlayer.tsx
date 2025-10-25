@@ -32,6 +32,7 @@ const SessionPlayer: React.FC<Props> = ({ itemType, itemId }) => {
 				id: 0,
 				isPlaying: false,
 				objectiveId: 0,
+				startTime: null,
 			})
 		} else if (error)
 			console.error("Error retrieving ending session:", error)
@@ -56,10 +57,15 @@ const SessionPlayer: React.FC<Props> = ({ itemType, itemId }) => {
 				key: "playingSessionObjectiveId",
 				value: itemId.toString(),
 			})
+			await actions.setKeyValue({
+				key: "playingSessionStartTime",
+				value: new Date().toISOString(),
+			})
 			playingSession.set({
 				id: data[0].id,
 				isPlaying: true,
 				objectiveId: itemId,
+				startTime: new Date(),
 			})
 		}
 	}
@@ -71,6 +77,7 @@ const SessionPlayer: React.FC<Props> = ({ itemType, itemId }) => {
 				await endCurrentSession()
 				await startSession()
 			}
+			// TODO: update $bucket.objectives.sessions to include new session
 		} else await startSession()
 	}
 
