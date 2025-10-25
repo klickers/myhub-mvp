@@ -49,7 +49,6 @@ const Buckets: React.FC<Props> = ({ buckets, playingSessionObjectiveId }) => {
 									<p>{obj.name}</p>
 									<div className="flex gap-2">
 										<p className="text-xs font-mono">
-											{/* TODO: show added time from the week */}
 											{minutesToDots(obj.usedTime) +
 												"/" +
 												minutesToDots(
