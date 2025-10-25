@@ -7,7 +7,12 @@ interface Props {
 		id: number
 		name: string
 		totalScheduledTime: number
-		objectives: { id: number; name: string; scheduledTime: number }[]
+		objectives: {
+			id: number
+			name: string
+			scheduledTime: number
+			usedTime: number
+		}[]
 	}[]
 	playingSessionObjectiveId: number | null
 }
@@ -42,7 +47,9 @@ const Buckets: React.FC<Props> = ({ buckets, playingSessionObjectiveId }) => {
 									<p>{obj.name}</p>
 									<div className="flex gap-2">
 										<p className="text-xs font-mono">
-											{"00:00/" +
+											{/* TODO: show added time from the week */}
+											{minutesToDots(obj.usedTime) +
+												"/" +
 												minutesToDots(
 													obj.scheduledTime
 												)}

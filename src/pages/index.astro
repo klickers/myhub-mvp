@@ -1,22 +1,31 @@
 ---
 import Layout from "@/layouts/Layout.astro"
-import { getWeek } from "date-fns"
+import {
+	differenceInMinutes,
+	endOfWeek,
+	getWeek,
+	getYear,
+	startOfWeek,
+} from "date-fns"
 import { Icon } from "astro-icon/components"
 import {
 	db,
 	asc,
 	eq,
+	lte,
+	gte,
 	and,
 	inArray,
 	notInArray,
 	Bucket,
 	Objective,
 	TimePerWeek,
+	Session,
 } from "astro:db"
 import { minutesToDots } from "@/helpers/time/minutesToDots"
 import Buckets from "@/components/Buckets"
 import { actions } from "astro:actions"
-import { Session } from "astro:db"
+import { isNotNull } from "astro:db"
 
 // =====================================
 // Get bucket and objectives
@@ -36,8 +45,11 @@ const objectives = await db
 		)
 	)
 
-const year = 2025,
-	weekNumber = 43
+// TODO: repull times when week changes
+const year = getYear(new Date()),
+	weekNumber = getWeek(new Date()),
+	weekStart = startOfWeek(new Date()),
+	weekEnd = endOfWeek(new Date())
 const times = await db
 	.select()
 	.from(TimePerWeek)
@@ -52,10 +64,27 @@ const times = await db
 			)
 		)
 	)
+const sessions = await db
+	.select()
+	.from(Session)
+	.where(
+		and(
+			eq(Session.itemType, "objective"),
+			gte(Session.startTime, weekStart),
+			lte(Session.startTime, weekEnd),
+			isNotNull(Session.endTime)
+		)
+	)
 
 const timesByObjective: Record<number, number> = {}
 for (const t of times) {
 	timesByObjective[t.objectiveId] = t.scheduledTime
+}
+const sessionsByObjective: Record<number, any[]> = {}
+for (const ses of sessions) {
+	if (!sessionsByObjective[ses.objectiveId!])
+		sessionsByObjective[ses.objectiveId!] = []
+	sessionsByObjective[ses.objectiveId!].push(ses)
 }
 const objectivesByBucket: Record<number, any[]> = {}
 for (const obj of objectives) {
@@ -63,6 +92,14 @@ for (const obj of objectives) {
 	objectivesByBucket[obj.bucketId].push({
 		...obj,
 		scheduledTime: timesByObjective[obj.id] ?? 0,
+		sessions: sessionsByObjective[obj.id] ?? [],
+		usedTime: sessionsByObjective[obj.id]
+			? sessionsByObjective[obj.id].reduce(
+					(acc, { startTime, endTime }) =>
+						acc + differenceInMinutes(endTime, startTime),
+					0
+				)
+			: 0,
 	})
 }
 const bucketsWithObjectives = buckets.map((bucket) => ({
