@@ -8,7 +8,7 @@ import { availableMinutesByDay } from "@/stores/weeklyHours"
 import daysOfWeek from "@/helpers/daysOfWeek"
 import { minutesToDots } from "@/helpers/time/minutesToDots"
 
-export default function WeeklyHeader() {
+export default function Dailies() {
 	const $calendarApi = useStore(calendarApi)
 	const $sessionsByDay = useStore(sessionsByDay)
 	const $availableMinutesByDay = useStore(availableMinutesByDay)
@@ -31,7 +31,7 @@ export default function WeeklyHeader() {
 		<>
 			<div className="flex justify-between items-end">
 				{$sessionsByDay.map((sessions, index) => (
-					<div>
+					<div key={index}>
 						<p>{daysOfWeek[index]}</p>
 						<p className="font-mono">
 							{minutesToDots(
