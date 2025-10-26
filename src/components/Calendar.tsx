@@ -83,6 +83,13 @@ export default function Calendar() {
 				weekEnd: endOfWeek($calendarApi.getDate()),
 			})
 			buckets.set(fullBuckets)
+			weeklyMinutes.set({
+				...weeklyMinutes.get(),
+				planned: fullBuckets.reduce(
+					(acc, { totalScheduledTime }) => acc + totalScheduledTime,
+					0
+				),
+			})
 		}
 	}
 	useEffect(() => {
@@ -102,15 +109,13 @@ export default function Calendar() {
 					setBuckets()
 				}}
 				eventsSet={(events) => {
-					const bufferMinutes = 1.5 * 6 * 60,
-						availableMinutes = getAvailableMinutes(
-							events,
-							businessHours
-						)
+					const availableMinutes = getAvailableMinutes(
+						events,
+						businessHours
+					)
 					weeklyMinutes.set({
 						...weeklyMinutes.get(),
-						available: availableMinutes - bufferMinutes,
-						buffer: bufferMinutes,
+						available: availableMinutes,
 					})
 				}}
 			/>
