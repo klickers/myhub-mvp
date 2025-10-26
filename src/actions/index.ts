@@ -197,4 +197,26 @@ export const server = {
 			}))
 		},
 	}),
+	// ===============================
+	// Session
+	// ===============================
+	getSessionsByWeek: defineAction({
+		input: z.object({
+			weekStart: z.coerce.date(),
+			weekEnd: z.coerce.date(),
+		}),
+		handler: async ({ weekStart, weekEnd }) => {
+			return await db
+				.select()
+				.from(Session)
+				.where(
+					and(
+						eq(Session.itemType, "objective"),
+						gte(Session.startTime, weekStart),
+						lte(Session.startTime, weekEnd),
+						isNotNull(Session.endTime)
+					)
+				)
+		},
+	}),
 }

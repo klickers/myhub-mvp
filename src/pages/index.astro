@@ -2,6 +2,7 @@
 import Layout from "@/layouts/Layout.astro"
 import Buckets from "@/components/Buckets"
 import Calendar from "@/components/Calendar"
+import Dailies from "@/components/Dailies"
 import WeeklyHeader from "@/components/WeeklyHeader"
 ---
 
@@ -10,5 +11,6 @@ import WeeklyHeader from "@/components/WeeklyHeader"
 		<WeeklyHeader client:load />
 		<Calendar client:load />
 		<Buckets client:load />
+		<Dailies client:load />
 	</main>
 </Layout>

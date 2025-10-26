@@ -11,3 +11,5 @@ export const formattedWeeklyHours = computed(weeklyMinutes, (hours) => ({
 	available: minutesToDots(hours.available),
 	buffer: minutesToDots(hours.available - hours.planned),
 }))
+
+export const availableMinutesByDay = atom<number[]>([])

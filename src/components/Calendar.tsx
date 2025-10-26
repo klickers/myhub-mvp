@@ -16,25 +16,30 @@ import { useStore } from "@nanostores/react"
 import { calendarApi, weekNumber } from "@/stores/calendar"
 import { actions } from "astro:actions"
 import { buckets } from "@/stores/buckets"
-import { weeklyMinutes } from "@/stores/weeklyHours"
+import { availableMinutesByDay, weeklyMinutes } from "@/stores/weeklyHours"
 import businessHours from "@/data/businessHours"
 
 function getAvailableMinutes(events: EventApi[], businessHours: any[]) {
-	const totalWorkMinutes = businessHours.reduce(
-		(t, { daysOfWeek, startTime, endTime }) =>
-			t +
-			daysOfWeek.length *
-				(+endTime.slice(0, 2) * 60 +
-					+endTime.slice(3) -
-					(+startTime.slice(0, 2) * 60 + +startTime.slice(3))),
-		0
-	)
+	// Step 1: Total work minutes per day and overall
+	const totalWorkMinutesByDay = Array(7).fill(0)
+	for (const { daysOfWeek, startTime, endTime } of businessHours) {
+		const startMinutes = +startTime.slice(0, 2) * 60 + +startTime.slice(3)
+		const endMinutes = +endTime.slice(0, 2) * 60 + +endTime.slice(3)
+		const duration = endMinutes - startMinutes
+		for (const day of daysOfWeek) {
+			totalWorkMinutesByDay[day] += duration
+		}
+	}
+	const totalWorkMinutes = totalWorkMinutesByDay.reduce((a, b) => a + b, 0)
 
-	const workEventMinutes = events.reduce((sum, e) => {
-		if (!e.start || !e.end) return sum
+	// Step 2: Minutes occupied by events per day
+	const workEventMinutesByDay = Array(7).fill(0)
+	let totalEventMinutes = 0
 
-		let overlapMinutes = 0,
-			cur = new Date(e.start)
+	for (const e of events) {
+		if (!e.start || !e.end) continue
+
+		let cur = new Date(e.start)
 		while (cur < e.end) {
 			const dayStart = new Date(cur)
 			dayStart.setHours(0, 0, 0, 0)
@@ -54,17 +59,26 @@ function getAvailableMinutes(events: EventApi[], businessHours: any[]) {
 
 				const overlapStart = new Date(Math.max(+eventStart, +bhStart))
 				const overlapEnd = new Date(Math.min(+eventEnd, +bhEnd))
-				if (overlapEnd > overlapStart)
-					overlapMinutes += differenceInMinutes(
+				if (overlapEnd > overlapStart) {
+					const overlapMinutes = differenceInMinutes(
 						overlapEnd,
 						overlapStart
 					)
+					workEventMinutesByDay[day] += overlapMinutes
+					totalEventMinutes += overlapMinutes
+				}
 			}
 			cur = eventEnd
 		}
-		return sum + overlapMinutes
-	}, 0)
-	return totalWorkMinutes - workEventMinutes
+	}
+
+	// Step 3: Compute available minutes
+	const availableMinutesByDay = totalWorkMinutesByDay.map(
+		(total, i) => total - workEventMinutesByDay[i]
+	)
+	const availableMinutes = totalWorkMinutes - totalEventMinutes
+
+	return { availableMinutes, availableMinutesByDay }
 }
 
 export default function Calendar() {
@@ -109,14 +123,13 @@ export default function Calendar() {
 					setBuckets()
 				}}
 				eventsSet={(events) => {
-					const availableMinutes = getAvailableMinutes(
-						events,
-						businessHours
-					)
+					// TODO: make sure overlap calculation is working properly (see Friday)
+					const mins = getAvailableMinutes(events, businessHours)
 					weeklyMinutes.set({
 						...weeklyMinutes.get(),
-						available: availableMinutes,
+						available: mins.availableMinutes,
 					})
+					availableMinutesByDay.set(mins.availableMinutesByDay)
 				}}
 			/>
 		</div>
