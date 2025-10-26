@@ -21,6 +21,20 @@ export default function WeeklyHeader() {
 					<table>
 						<tbody>
 							<tr>
+								<td>Used Hours</td>
+								<td>
+									<span className="font-mono">
+										{minutesToDots(
+											Object.values($buckets).reduce(
+												(acc, { totalUsedTime }) =>
+													acc + totalUsedTime,
+												0
+											)
+										)}
+									</span>
+								</td>
+							</tr>
+							<tr>
 								<td>Planned Hours</td>
 								<td>
 									<span className="font-mono">
