@@ -83,6 +83,7 @@ const Session = defineTable({
 		objectiveId: column.number({ references: () => Objective.columns.id }),
 		startTime: column.date(),
 		endTime: column.date({ optional: true }),
+		notes: column.text({ optional: true }),
 	},
 })
 
