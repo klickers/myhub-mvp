@@ -39,6 +39,19 @@ function getAvailableMinutes(events: EventApi[], businessHours: any[]) {
 	for (const e of events) {
 		if (!e.start || !e.end) continue
 
+		// TODO: optimize loop and functions
+
+		const start = new Date(e.start)
+		const end = new Date(e.end)
+		const isAllDay =
+			start.getHours() === 0 &&
+			start.getMinutes() === 0 &&
+			start.getSeconds() === 0 &&
+			end.getHours() === 0 &&
+			end.getMinutes() === 0 &&
+			end.getSeconds() === 0
+		if (isAllDay) continue
+
 		let cur = new Date(e.start)
 		while (cur < e.end) {
 			const dayStart = new Date(cur)
