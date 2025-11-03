@@ -5,5 +5,5 @@ export type Session = {
 	taskId: number | null
 	startTime: Date
 	endTime: Date | null
-	notes: string
+	notes: string | null
 }
