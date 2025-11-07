@@ -43,6 +43,41 @@ const Objective = defineTable({
 	},
 })
 
+const Block = defineTable({
+	columns: {
+		id: column.number({ primaryKey: true }),
+		name: column.text(),
+		objectiveId: column.number({ references: () => Objective.columns.id }),
+		year: column.number(),
+		weekNumber: column.number(),
+		status: column.text({
+			enum: [
+				"notstarted",
+				"archived",
+				"inprogress",
+				"onhold",
+				"completed",
+			],
+			default: "notstarted",
+		}),
+		scheduledTime: column.number({ default: 0 }), // in minutes
+	},
+	// foreignKeys: [
+	// 	// {
+	// 	// 	columns: ["year", "weekNumber"],
+	// 	// 	references: () => [Week.columns.year, Week.columns.weekNumber],
+	// 	// },
+	// 	{
+	// 		columns: ["year", "weekNumber", "objectiveId"],
+	// 		references: () => [
+	// 			TimePerWeek.columns.year,
+	// 			TimePerWeek.columns.weekNumber,
+	// 			TimePerWeek.columns.objectiveId,
+	// 		],
+	// 	},
+	// ],
+})
+
 const Week = defineTable({
 	columns: {
 		id: column.number({ primaryKey: true }),
@@ -101,6 +136,7 @@ export default defineDb({
 		ClickupTask,
 		Bucket,
 		Objective,
+		Block,
 		Week,
 		TimePerWeek,
 		Session,
