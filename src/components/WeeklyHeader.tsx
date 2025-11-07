@@ -1,7 +1,7 @@
 import { Icon } from "@iconify/react"
 import { useStore } from "@nanostores/react"
 import { calendarApi, weekNumber } from "@/stores/calendar"
-import { formattedWeeklyHours } from "@/stores/weeklyHours"
+import { formattedWeeklyHours, plannedUntilToday } from "@/stores/weeklyHours"
 import { minutesToDots } from "@/helpers/time/minutesToDots"
 import { buckets } from "@/stores/buckets"
 
@@ -10,6 +10,7 @@ export default function WeeklyHeader() {
 	const $weekNumber = useStore(weekNumber)
 	const $weeklyHours = useStore(formattedWeeklyHours)
 	const $buckets = useStore(buckets)
+	const $plannedUntilToday = useStore(plannedUntilToday)
 
 	return (
 		<>
@@ -31,6 +32,14 @@ export default function WeeklyHeader() {
 												0
 											)
 										)}
+									</span>
+								</td>
+							</tr>
+							<tr>
+								<td>Planned (till today)</td>
+								<td>
+									<span className="font-mono">
+										{minutesToDots($plannedUntilToday)}
 									</span>
 								</td>
 							</tr>

@@ -1,5 +1,6 @@
 import { minutesToDots } from "@/helpers/time/minutesToDots"
 import { atom, computed } from "nanostores"
+import { getDay } from "date-fns"
 
 export const weeklyMinutes = atom({
 	planned: 0,
@@ -13,3 +14,12 @@ export const formattedWeeklyHours = computed(weeklyMinutes, (hours) => ({
 }))
 
 export const availableMinutesByDay = atom<number[]>([])
+
+export const plannedUntilToday = computed(
+	availableMinutesByDay,
+	(availByDay) => {
+		let tot = 0
+		for (let i = 0; i <= getDay(new Date()); i++) tot += availByDay[i]
+		return tot
+	}
+)

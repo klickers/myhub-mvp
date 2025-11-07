@@ -13,4 +13,12 @@
 	button {
 		@apply cursor-pointer;
 	}
+
+	table {
+		tr {
+			td:first-child {
+				@apply pr-1;
+			}
+		}
+	}
 }
