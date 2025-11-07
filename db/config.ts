@@ -17,6 +17,7 @@ const Bucket = defineTable({
 	columns: {
 		id: column.number({ primaryKey: true }),
 		name: column.text(),
+		slug: column.text({ unique: true }),
 		order: column.number(),
 	},
 })
@@ -26,6 +27,7 @@ const Objective = defineTable({
 		id: column.number({ primaryKey: true }),
 		bucketId: column.number({ references: () => Bucket.columns.id }),
 		name: column.text(),
+		slug: column.text({ unique: true }),
 		startDate: column.date({ optional: true }),
 		dueDate: column.date({ optional: true }),
 		status: column.text({
