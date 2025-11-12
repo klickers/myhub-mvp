@@ -174,4 +174,13 @@ export const server = {
 			})
 		},
 	}),
+	// ===============================
+	// Google Calendar IDs
+	// ===============================
+	getGoogleCalendarIds: defineAction({
+		input: undefined,
+		handler: async () => {
+			return await prisma.googleCalendarId.findMany()
+		},
+	}),
 }

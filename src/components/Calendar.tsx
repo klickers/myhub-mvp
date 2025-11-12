@@ -11,13 +11,13 @@ import {
 	getYear,
 	startOfWeek,
 } from "date-fns"
-import googleCalendarIds from "@/data/googleCalendarIds"
 import { useStore } from "@nanostores/react"
 import { calendarApi, weekNumber } from "@/stores/calendar"
 import { actions } from "astro:actions"
 import { buckets } from "@/stores/buckets"
 import { availableMinutesByDay, weeklyMinutes } from "@/stores/weeklyHours"
 import businessHours from "@/data/businessHours"
+import { googleCalendarIds } from "@/stores/googleCalendarIds"
 
 function getAvailableMinutes(events: EventApi[], businessHours: any[]) {
 	// Step 1: Total work minutes per day and overall
@@ -98,8 +98,25 @@ export default function Calendar() {
 	const calendarRef = useRef<FullCalendar | null>(null)
 	const $calendarApi = useStore(calendarApi)
 	useEffect(() => {
-		calendarApi.set(calendarRef.current?.getApi())
+		if (calendarRef.current) calendarApi.set(calendarRef.current.getApi())
 	}, [])
+
+	const $googleCalendarIds = useStore(googleCalendarIds)
+	const setGoogleCalendarIds = async () => {
+		if (!$calendarApi) return
+		if ($googleCalendarIds.length == 0) {
+			const ids = await actions.getGoogleCalendarIds.orThrow()
+			googleCalendarIds.set(ids)
+			ids.forEach(({ id }) => {
+				$calendarApi.addEventSource({
+					googleCalendarId: id,
+				})
+			})
+		}
+	}
+	useEffect(() => {
+		setGoogleCalendarIds()
+	}, [$calendarApi])
 
 	const setBuckets = async () => {
 		if ($calendarApi) {
@@ -121,7 +138,7 @@ export default function Calendar() {
 	}
 	useEffect(() => {
 		setBuckets()
-	}, [$calendarApi])
+	}, [$calendarApi, $googleCalendarIds])
 
 	return (
 		<div className="hidden">
@@ -129,7 +146,6 @@ export default function Calendar() {
 				ref={calendarRef}
 				plugins={[timeGridPlugin, googleCalendarPlugin]}
 				googleCalendarApiKey={import.meta.env.PUBLIC_GCAL_API_KEY}
-				eventSources={[...googleCalendarIds]}
 				businessHours
 				datesSet={(info) => {
 					weekNumber.set(getWeek(info.start))
