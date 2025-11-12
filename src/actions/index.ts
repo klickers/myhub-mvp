@@ -1,22 +1,7 @@
 import { defineAction } from "astro:actions"
-import {
-	db,
-	Session,
-	KeyValue,
-	eq,
-	Bucket,
-	asc,
-	Objective,
-	and,
-	inArray,
-	notInArray,
-	TimePerWeek,
-	gte,
-	lte,
-	isNotNull,
-} from "astro:db"
-import { z } from "astro:schema"
+import { z } from "zod"
 import { differenceInMinutes } from "date-fns"
+import prisma from "@/helpers/prisma"
 
 export const server = {
 	// ===============================
@@ -33,7 +18,7 @@ export const server = {
 				startTime: new Date(),
 			}
 			if (itemType === "objective") data.objectiveId = itemId
-			return await db.insert(Session).values(data).returning()
+			return await prisma.session.create({ data })
 		},
 	}),
 	endSession: defineAction({
@@ -41,11 +26,10 @@ export const server = {
 			sessionId: z.number(),
 		}),
 		handler: async ({ sessionId }) => {
-			return await db
-				.update(Session)
-				.set({ endTime: new Date() })
-				.where(eq(Session.id, sessionId))
-				.returning()
+			return await prisma.session.update({
+				where: { id: sessionId },
+				data: { endTime: new Date() },
+			})
 		},
 	}),
 	// ===============================
@@ -56,12 +40,8 @@ export const server = {
 			key: z.string(),
 		}),
 		handler: async ({ key }) => {
-			const result = await db
-				.select()
-				.from(KeyValue)
-				.where(eq(KeyValue.key, key))
-				.limit(1)
-			return result.length > 0 ? result[0].value : null
+			const result = await prisma.keyValue.findUnique({ where: { key } })
+			return result?.value ?? null
 		},
 	}),
 	setKeyValue: defineAction({
@@ -70,22 +50,18 @@ export const server = {
 			value: z.string(),
 		}),
 		handler: async ({ key, value }) => {
-			const existing = await db
-				.select()
-				.from(KeyValue)
-				.where(eq(KeyValue.key, key))
-				.limit(1)
-			if (existing.length > 0) {
-				return await db
-					.update(KeyValue)
-					.set({ value })
-					.where(eq(KeyValue.key, key))
-					.returning()
+			const existing = await prisma.keyValue.findUnique({
+				where: { key },
+			})
+			if (existing) {
+				return await prisma.keyValue.update({
+					where: { key },
+					data: { value },
+				})
 			} else {
-				return await db
-					.insert(KeyValue)
-					.values({ key, value })
-					.returning()
+				return await prisma.keyValue.create({
+					data: { key, value },
+				})
 			}
 		},
 	}),
@@ -95,7 +71,7 @@ export const server = {
 	getBuckets: defineAction({
 		input: undefined,
 		handler: async () => {
-			return await db.select().from(Bucket).orderBy(asc(Bucket.order))
+			return await prisma.bucket.findMany({ orderBy: { order: "asc" } })
 		},
 	}),
 	getFullBucketsByWeek: defineAction({
@@ -107,53 +83,36 @@ export const server = {
 		}),
 		handler: async ({ year, weekNumber, weekStart, weekEnd }) => {
 			// getBuckets()
-			const buckets = await db
-				.select()
-				.from(Bucket)
-				.orderBy(asc(Bucket.order))
+			const buckets = await prisma.bucket.findMany({
+				orderBy: { order: "asc" },
+			})
 			// getActiveObjectives()
-			const objectives = await db
-				.select()
-				.from(Objective)
-				.where(
-					and(
-						inArray(
-							Objective.bucketId,
-							buckets.map((b) => b.id)
-						),
-						notInArray(Objective.status, ["archived", "completed"])
-					)
-				)
+			const objectives = await prisma.objective.findMany({
+				where: {
+					bucketId: { in: buckets.map((b) => b.id) },
+					status: { notIn: ["archived", "completed"] },
+				},
+			})
 			// getObjectiveTimesByWeek()
-			const times = await db
-				.select()
-				.from(TimePerWeek)
-				.where(
-					and(
-						eq(TimePerWeek.year, year),
-						eq(TimePerWeek.weekNumber, weekNumber),
-						eq(TimePerWeek.itemType, "objective"),
-						inArray(
-							TimePerWeek.objectiveId,
-							objectives.map((o) => o.id)
-						)
-					)
-				)
+			const times = await prisma.timePerWeek.findMany({
+				where: {
+					year,
+					weekNumber,
+					itemType: "objective",
+					objectiveId: { in: objectives.map((o) => o.id) },
+				},
+			})
 			// getSessionsByWeek
-			const sessions = await db
-				.select()
-				.from(Session)
-				.where(
-					and(
-						eq(Session.itemType, "objective"),
-						gte(Session.startTime, weekStart),
-						lte(Session.startTime, weekEnd),
-						isNotNull(Session.endTime)
-					)
-				)
+			const sessions = await prisma.session.findMany({
+				where: {
+					itemType: "objective",
+					startTime: { gte: weekStart, lte: weekEnd },
+					endTime: { not: null },
+				},
+			})
 			const timesByObjective: Record<number, number> = {}
 			for (const t of times) {
-				timesByObjective[t.objectiveId] = t.scheduledTime
+				timesByObjective[t.objectiveId!] = t.scheduledTime
 			}
 			const sessionsByObjective: Record<number, any[]> = {}
 			for (const ses of sessions) {
@@ -206,17 +165,13 @@ export const server = {
 			weekEnd: z.coerce.date(),
 		}),
 		handler: async ({ weekStart, weekEnd }) => {
-			return await db
-				.select()
-				.from(Session)
-				.where(
-					and(
-						eq(Session.itemType, "objective"),
-						gte(Session.startTime, weekStart),
-						lte(Session.startTime, weekEnd),
-						isNotNull(Session.endTime)
-					)
-				)
+			return await prisma.session.findMany({
+				where: {
+					itemType: "objective",
+					startTime: { gte: weekStart, lte: weekEnd },
+					endTime: { not: null },
+				},
+			})
 		},
 	}),
 }
