@@ -4,7 +4,7 @@
 	"version": "0.0.1",
 	"scripts": {
 		"dev": "astro dev --remote",
-		"build": "astro build --remote",
+		"build": "prisma generate && astro build --remote",
 		"postinstall": "prisma generate",
 		"preview": "astro preview",
 		"astro": "astro"
