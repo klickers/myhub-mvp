@@ -1,109 +1,109 @@
 generator client {
-	provider = "prisma-client"
-	output   = "../src/generated/prisma"
+    provider = "prisma-client"
+    output   = "../src/generated/prisma"
 }
 
 datasource db {
-	provider  = "postgresql"
-	url       = env("DATABASE_URL")
-	directUrl = env("DIRECT_URL")
+    provider  = "postgresql"
+    url       = env("DATABASE_URL")
+    directUrl = env("DIRECT_URL")
 }
 
 model Bucket {
-	id     Int      @id @default(autoincrement())
-	name   String
-	slug   String   @unique
-	order  Int
+    id    Int    @id @default(autoincrement())
+    name  String
+    slug  String @unique
+    order Int
 
-	objectives Objective[]
+    objectives Objective[]
 }
 
 model Objective {
-	id         Int       @id @default(autoincrement())
-	bucketId   Int
-	name       String
-	slug       String    @unique
-	startDate  DateTime? 
-	dueDate    DateTime?
-	status     Status    @default(notstarted)
+    id        Int       @id @default(autoincrement())
+    bucketId  Int
+    name      String
+    slug      String    @unique
+    startDate DateTime?
+    dueDate   DateTime?
+    status    Status    @default(notstarted)
 
-	bucket     Bucket    @relation(fields: [bucketId], references: [id])
-	blocks     Block[]
-	sessions   Session[]
-	timePerWeeks TimePerWeek[]
+    bucket       Bucket        @relation(fields: [bucketId], references: [id])
+    blocks       Block[]
+    sessions     Session[]
+    timePerWeeks TimePerWeek[]
 }
 
 model Block {
-	id            Int       @id @default(autoincrement())
-	name          String
-	year          Int
-	weekNumber    Int
-	objectiveId   Int
-	status        Status     @default(notstarted)
-	scheduledTime Int        @default(0)
+    id            Int    @id @default(autoincrement())
+    name          String
+    year          Int
+    weekNumber    Int
+    objectiveId   Int
+    status        Status @default(notstarted)
+    scheduledTime Int    @default(0)
 
-	objective     Objective  @relation(fields: [objectiveId], references: [id])
-	week          Week       @relation(fields: [year, weekNumber], references: [year, weekNumber])
+    objective Objective @relation(fields: [objectiveId], references: [id])
+    week      Week      @relation(fields: [year, weekNumber], references: [year, weekNumber])
 
-	@@index([year, weekNumber, objectiveId])
+    @@index([year, weekNumber, objectiveId])
 }
 
 model Week {
-	id           Int   @id @default(autoincrement())
-	year         Int
-	weekNumber   Int
+    id         Int @id @default(autoincrement())
+    year       Int
+    weekNumber Int
 
-	blocks       Block[]
-	timePerWeeks TimePerWeek[]
+    blocks       Block[]
+    timePerWeeks TimePerWeek[]
 
-	@@unique([year, weekNumber])
+    @@unique([year, weekNumber])
 }
 
 model TimePerWeek {
-	id            Int      @id @default(autoincrement())
-	year          Int
-	weekNumber    Int
-	itemType      ItemType @default(objective)
-	objectiveId   Int?
-	scheduledTime Int      @default(0)
+    id            Int      @id @default(autoincrement())
+    year          Int
+    weekNumber    Int
+    itemType      ItemType @default(objective)
+    objectiveId   Int?
+    scheduledTime Int      @default(0)
 
-	objective     Objective?   @relation(fields: [objectiveId], references: [id])
-	week          Week         @relation(fields: [year, weekNumber], references: [year, weekNumber])
+    objective Objective? @relation(fields: [objectiveId], references: [id])
+    week      Week       @relation(fields: [year, weekNumber], references: [year, weekNumber])
 
-	@@unique([year, weekNumber, itemType, objectiveId])
+    @@unique([year, weekNumber, itemType, objectiveId])
 }
 
 model Session {
-	id          Int      @id @default(autoincrement())
-	itemType    ItemType @default(objective)
-	objectiveId Int?
-	startTime   DateTime
-	endTime     DateTime?
-	notes       String?
+    id          Int       @id @default(autoincrement())
+    itemType    ItemType  @default(objective)
+    objectiveId Int?
+    startTime   DateTime
+    endTime     DateTime?
+    notes       String?
 
-	objective   Objective?  @relation(fields: [objectiveId], references: [id])
+    objective Objective? @relation(fields: [objectiveId], references: [id])
 }
 
 model KeyValue {
-	key   String @id
-	value String
+    key   String @id
+    value String
 }
 
 model GoogleCalendarId {
-	id   String @id
-	name String?
+    id   String  @id
+    name String?
 }
 
 enum Status {
-	notstarted
-	archived
-	inprogress
-	onhold
-	completed
+    notstarted
+    archived
+    inprogress
+    onhold
+    completed
 }
 
 enum ItemType {
-	bucket
-	objective
-	block
+    bucket
+    objective
+    block
 }
