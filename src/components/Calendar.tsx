@@ -16,8 +16,8 @@ import { calendarApi, weekNumber } from "@/stores/calendar"
 import { actions } from "astro:actions"
 import { buckets } from "@/stores/buckets"
 import { availableMinutesByDay, weeklyMinutes } from "@/stores/weeklyHours"
-import businessHours from "@/data/businessHours"
 import { googleCalendarIds } from "@/stores/googleCalendarIds"
+import { businessHours } from "@/stores/businessHours"
 
 function getAvailableMinutes(events: EventApi[], businessHours: any[]) {
 	// Step 1: Total work minutes per day and overall
@@ -118,6 +118,18 @@ export default function Calendar() {
 		setGoogleCalendarIds()
 	}, [$calendarApi])
 
+	const $businessHours = useStore(businessHours)
+	const setBusinessHours = async () => {
+		if (!$calendarApi) return
+		if ($businessHours.length == 0) {
+			const bHours = await actions.getBusinessHours.orThrow()
+			businessHours.set(bHours)
+		}
+	}
+	useEffect(() => {
+		setBusinessHours()
+	}, [$calendarApi])
+
 	const setBuckets = async () => {
 		if ($calendarApi) {
 			const fullBuckets = await actions.getFullBucketsByWeek.orThrow({
@@ -153,7 +165,7 @@ export default function Calendar() {
 				}}
 				eventsSet={(events) => {
 					// TODO: make sure overlap calculation is working properly (see Friday)
-					const mins = getAvailableMinutes(events, businessHours)
+					const mins = getAvailableMinutes(events, $businessHours)
 					weeklyMinutes.set({
 						...weeklyMinutes.get(),
 						available: mins.availableMinutes,

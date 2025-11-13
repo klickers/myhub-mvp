@@ -183,4 +183,13 @@ export const server = {
 			return await prisma.googleCalendarId.findMany()
 		},
 	}),
+	// ===============================
+	// Business Hours
+	// ===============================
+	getBusinessHours: defineAction({
+		input: undefined,
+		handler: async () => {
+			return await prisma.businessHours.findMany()
+		},
+	}),
 }

@@ -94,6 +94,13 @@ model GoogleCalendarId {
     name String?
 }
 
+model BusinessHours {
+    id         Int    @id @default(autoincrement())
+    daysOfWeek Int[]
+    startTime  String
+    endTime    String
+}
+
 enum Status {
     notstarted
     archived
