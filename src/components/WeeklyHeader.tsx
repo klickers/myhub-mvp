@@ -4,6 +4,7 @@ import { calendarApi, weekNumber } from "@/stores/calendar"
 import { formattedWeeklyHours, plannedUntilToday } from "@/stores/weeklyHours"
 import { minutesToDots } from "@/helpers/time/minutesToDots"
 import { buckets } from "@/stores/buckets"
+import { isThisWeek } from "date-fns"
 
 export default function WeeklyHeader() {
 	const $calendarApi = useStore(calendarApi)
@@ -76,14 +77,23 @@ export default function WeeklyHeader() {
 						</tbody>
 					</table>
 				</div>
-				<div className="flex gap-4">
+				<div className="flex gap-3">
 					<button
 						className="text-xl"
 						onClick={() => $calendarApi?.prev()}
 					>
 						<Icon icon="pixelarticons:arrow-left" />
 					</button>
-					<button onClick={() => $calendarApi?.today()}>Today</button>
+					<button
+						onClick={() => $calendarApi?.today()}
+						className={
+							$calendarApi && isThisWeek($calendarApi?.getDate())
+								? "px-1 border border-black bg-black text-white"
+								: "px-1 border border-black"
+						}
+					>
+						Today
+					</button>
 					<button
 						className="text-xl"
 						onClick={() => $calendarApi?.next()}
