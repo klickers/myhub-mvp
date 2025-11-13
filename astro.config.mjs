@@ -3,7 +3,7 @@ import { defineConfig } from "astro/config"
 import tailwindcss from "@tailwindcss/vite"
 import react from "@astrojs/react"
 import icon from "astro-icon"
-import node from "@astrojs/node"
+import vercel from "@astrojs/vercel"
 
 // https://astro.build/config
 export default defineConfig({
@@ -11,8 +11,6 @@ export default defineConfig({
 		plugins: [tailwindcss()],
 	},
 	integrations: [react(), icon()],
-	adapter: node({
-		mode: "standalone",
-	}),
+	adapter: vercel(),
 	output: "server",
 })

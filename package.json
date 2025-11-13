@@ -12,6 +12,7 @@
 		"@astrojs/db": "^0.18.0",
 		"@astrojs/node": "^9.5.0",
 		"@astrojs/react": "^4.4.0",
+		"@astrojs/vercel": "^9.0.0",
 		"@fullcalendar/core": "^6.1.19",
 		"@fullcalendar/google-calendar": "^6.1.19",
 		"@fullcalendar/react": "^6.1.19",
