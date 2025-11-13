@@ -1,0 +1,31 @@
+---
+import Layout from "@/layouts/Layout.astro"
+
+if (Astro.request.method === "POST") {
+	try {
+		const data = await Astro.request.formData()
+		const entered = data.get("password")
+		if (entered === import.meta.env.APP_PASSWORD) {
+			Astro.cookies.set("auth", import.meta.env.APP_PASSWORD)
+			return Astro.redirect("/")
+		}
+	} catch (error) {
+		if (error instanceof Error) console.error(error.message)
+	}
+}
+---
+
+<Layout>
+	<form
+		method="POST"
+		action="/login"
+	>
+		<input
+			type="password"
+			name="password"
+			placeholder="Password"
+			autofocus
+		/>
+		<button type="submit">Login</button>
+	</form>
+</Layout>
