@@ -51,7 +51,7 @@ const SessionPlayer: React.FC<Props> = ({ itemType, itemId }) => {
 			})
 			await actions.setKeyValue({
 				key: "playingSessionId",
-				value: data[0].id.toString(),
+				value: data.id.toString(),
 			})
 			await actions.setKeyValue({
 				key: "playingSessionObjectiveId",
@@ -62,7 +62,7 @@ const SessionPlayer: React.FC<Props> = ({ itemType, itemId }) => {
 				value: new Date().toISOString(),
 			})
 			playingSession.set({
-				id: data[0].id,
+				id: data.id,
 				isPlaying: true,
 				objectiveId: itemId,
 				startTime: new Date(),
