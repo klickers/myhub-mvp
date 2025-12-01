@@ -52,11 +52,11 @@ const Buckets: React.FC = () => {
 				)
 				if (obj) {
 					updated[obj.id] = secondsToDots(
-						obj.usedTime * 60 +
-							differenceInSeconds(
-								new Date(),
-								$playingSession.startTime!
-							)
+						//obj.usedTime * 60 +
+						differenceInSeconds(
+							new Date(),
+							$playingSession.startTime!
+						)
 					)
 				}
 				return updated
@@ -66,7 +66,7 @@ const Buckets: React.FC = () => {
 	}, [$playingSession, $buckets])
 
 	return (
-		<div className="grid grid-cols-3 gap-6 mt-6 mb-20">
+		<div className="grid grid-cols-3 gap-6 mt-6 mb-10">
 			{Object.values($buckets).map((bucket) => (
 				<div
 					key={bucket.id}
@@ -96,7 +96,17 @@ const Buckets: React.FC = () => {
 									className="mb-2 py-2 pl-4 pr-3 border border-black"
 								>
 									<div className="flex justify-between items-center">
-										<p>{obj.name}</p>
+										<div className="font-mono text-xs pr-3">
+											{obj.id < 10
+												? "0" + obj.id
+												: obj.id}
+										</div>
+										<a
+											href={"/objectives/" + obj.slug}
+											className="flex-1"
+										>
+											<p>{obj.name}</p>
+										</a>
 										<div className="flex gap-2">
 											<p className="text-xs font-mono">
 												{usedTime +
