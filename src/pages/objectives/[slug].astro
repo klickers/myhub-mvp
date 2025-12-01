@@ -1,0 +1,31 @@
+---
+import prisma from "@/helpers/prisma"
+import Layout from "@/layouts/Layout.astro"
+
+const { slug } = Astro.params
+
+const objective = await prisma.objective.findUnique({
+	where: { slug },
+	include: {
+		// blocks: true,
+		// sessions: true,
+		// bucket: true,
+		timePerWeeks: {
+			orderBy: [{ year: "desc" }, { weekNumber: "desc" }],
+		},
+	},
+})
+
+if (!objective) return Astro.redirect("/")
+---
+
+<Layout>
+	<div><h1>{objective.name}</h1></div>
+	<div>
+		<h2 class="text-2xl font-semibold mb-3">Times Per Week</h2>
+		<!-- TODO: add/update, show tracked time per week -->
+	<div>
+		<!-- TODO: create/add block button + function -->
+		<!-- TODO: sessions timeline summary (for the objective) -->
+	</div>
+</Layout>

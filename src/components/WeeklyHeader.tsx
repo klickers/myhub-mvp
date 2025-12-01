@@ -15,7 +15,7 @@ export default function WeeklyHeader() {
 
 	return (
 		<>
-			<h1 className="text-5xl font-semibold mb-10">
+			<h1>
 				Week <span>{$weekNumber}</span>
 			</h1>
 			<div className="flex justify-between items-end">

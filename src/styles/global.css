@@ -10,6 +10,10 @@
 		@apply font-default;
 	}
 
+	h1 {
+		@apply text-5xl font-semibold mb-10;
+	}
+
 	button {
 		@apply cursor-pointer;
 	}
