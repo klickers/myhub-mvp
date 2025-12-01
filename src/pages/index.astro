@@ -8,7 +8,13 @@ import WeeklyHeader from "@/components/WeeklyHeader"
 
 <Layout>
 	<WeeklyHeader client:load />
-	<Calendar client:load />
-	<Buckets client:load />
-	<Dailies client:load />
+	<div class="flex gap-20">
+		<div class="w-2/3 pt-10">
+			<Dailies client:load />
+		</div>
+		<div class="w-1/3">
+			<Calendar client:load />
+			<Buckets client:load />
+		</div>
+	</div>
 </Layout>

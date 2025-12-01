@@ -66,7 +66,7 @@ const Buckets: React.FC = () => {
 	}, [$playingSession, $buckets])
 
 	return (
-		<div className="grid grid-cols-3 gap-6 mt-6 mb-10">
+		<div className="grid grid-cols-1 gap-6 mt-6 mb-10">
 			{Object.values($buckets).map((bucket) => (
 				<div
 					key={bucket.id}

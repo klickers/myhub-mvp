@@ -13,7 +13,7 @@ export default function Dailies() {
 
 	return (
 		<>
-			<div className="flex justify-between items-end">
+			<div className="grid grid-cols-4 gap-6">
 				{$sessionsByDay.map((sessions, index) => (
 					<div key={index}>
 						<p>{daysOfWeek[index]}</p>
