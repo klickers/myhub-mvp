@@ -1,31 +1,15 @@
-import { useEffect } from "react"
-import { actions } from "astro:actions"
-import { startOfWeek, endOfWeek, differenceInMinutes } from "date-fns"
+import { differenceInMinutes } from "date-fns"
 import { useStore } from "@nanostores/react"
-import { calendarApi } from "@/stores/calendar"
-import { sessions, sessionsByDay } from "@/stores/sessions"
+import { sessionsByDay } from "@/stores/sessions"
 import { availableMinutesByDay } from "@/stores/weeklyHours"
 import daysOfWeek from "@/helpers/daysOfWeek"
 import { minutesToDots } from "@/helpers/time/minutesToDots"
 
 export default function Dailies() {
-	const $calendarApi = useStore(calendarApi)
 	const $sessionsByDay = useStore(sessionsByDay)
 	const $availableMinutesByDay = useStore(availableMinutesByDay)
 
 	// TODO: make sure sessions update with calendar update
-	const setSessions = async () => {
-		if ($calendarApi) {
-			const sessionsByWeek = await actions.getSessionsByWeek.orThrow({
-				weekStart: startOfWeek($calendarApi.getDate()),
-				weekEnd: endOfWeek($calendarApi.getDate()),
-			})
-			sessions.set(sessionsByWeek)
-		}
-	}
-	useEffect(() => {
-		setSessions()
-	}, [$calendarApi])
 
 	return (
 		<>

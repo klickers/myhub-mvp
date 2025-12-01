@@ -15,6 +15,7 @@ import { useStore } from "@nanostores/react"
 import { calendarApi, weekNumber } from "@/stores/calendar"
 import { actions } from "astro:actions"
 import { buckets } from "@/stores/buckets"
+import { sessions } from "@/stores/sessions"
 import { availableMinutesByDay, weeklyMinutes } from "@/stores/weeklyHours"
 import { googleCalendarIds } from "@/stores/googleCalendarIds"
 import { businessHours } from "@/stores/businessHours"
@@ -152,6 +153,19 @@ export default function Calendar() {
 		setBuckets()
 	}, [$calendarApi, $googleCalendarIds])
 
+	const setSessions = async () => {
+		if ($calendarApi) {
+			const sessionsByWeek = await actions.getSessionsByWeek.orThrow({
+				weekStart: startOfWeek($calendarApi.getDate()),
+				weekEnd: endOfWeek($calendarApi.getDate()),
+			})
+			sessions.set(sessionsByWeek)
+		}
+	}
+	useEffect(() => {
+		setSessions()
+	}, [$calendarApi])
+
 	return (
 		<div className="hidden">
 			<FullCalendar
@@ -162,6 +176,7 @@ export default function Calendar() {
 				datesSet={(info) => {
 					weekNumber.set(getWeek(info.start))
 					setBuckets()
+					setSessions()
 				}}
 				eventsSet={(events) => {
 					// TODO: make sure overlap calculation is working properly (see Friday)
