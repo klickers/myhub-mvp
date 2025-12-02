@@ -17,7 +17,10 @@ export default function CreateTimePerWeek({
 }: CreateTimePerWeekProps) {
 	const [formState, setFormState] = useState({
 		year: getYear(new Date()),
-		weekNumber: nextWeek || getWeek(new Date()),
+		weekNumber:
+			nextWeek && nextWeek > getWeek(new Date())
+				? nextWeek
+				: getWeek(new Date()),
 		scheduledTime: 0,
 	})
 
