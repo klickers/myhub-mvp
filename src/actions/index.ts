@@ -9,7 +9,7 @@ export const server = {
 	// ===============================
 	startSession: defineAction({
 		input: z.object({
-			itemType: z.enum(["bucket", "objective"]),
+			itemType: z.enum(["objective", "task"]),
 			itemId: z.number(),
 		}),
 		handler: async ({ itemType, itemId }) => {

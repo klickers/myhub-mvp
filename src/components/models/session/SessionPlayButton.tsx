@@ -5,7 +5,7 @@ import { actions } from "astro:actions"
 import { playingSession } from "@/stores/playingSession"
 
 interface Props {
-	itemType: "bucket" | "objective"
+	itemType: "objective" | "task"
 	itemId: number
 }
 
