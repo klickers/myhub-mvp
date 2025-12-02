@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react"
-import SessionPlayButton from "@/components/SessionPlayButton"
+import SessionPlayButton from "@/components/models/session/SessionPlayButton"
 import { minutesToDots } from "@/helpers/time/minutesToDots"
 import { useStore } from "@nanostores/react"
 import { buckets } from "@/stores/buckets"
