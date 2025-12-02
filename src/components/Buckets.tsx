@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react"
-import SessionPlayer from "@/components/SessionPlayer"
+import SessionPlayButton from "@/components/SessionPlayButton"
 import { minutesToDots } from "@/helpers/time/minutesToDots"
 import { useStore } from "@nanostores/react"
 import { buckets } from "@/stores/buckets"
@@ -115,7 +115,7 @@ const Buckets: React.FC = () => {
 														obj.scheduledTime
 													)}
 											</p>
-											<SessionPlayer
+											<SessionPlayButton
 												itemType="objective"
 												itemId={obj.id}
 											/>

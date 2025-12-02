@@ -9,7 +9,7 @@ interface Props {
 	itemId: number
 }
 
-const SessionPlayer: React.FC<Props> = ({ itemType, itemId }) => {
+const SessionPlayButton: React.FC<Props> = ({ itemType, itemId }) => {
 	const $playingSession = useStore(playingSession)
 	const isCurrentlyPlaying =
 		$playingSession.isPlaying && $playingSession.objectiveId == itemId
@@ -94,4 +94,4 @@ const SessionPlayer: React.FC<Props> = ({ itemType, itemId }) => {
 	)
 }
 
-export default SessionPlayer
+export default SessionPlayButton
