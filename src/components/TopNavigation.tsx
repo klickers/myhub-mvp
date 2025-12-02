@@ -12,6 +12,7 @@ export default function TopNavigation({ currentPath }: TopNavigationProps) {
 			{links.map(({ href, label, icon }) => (
 				<a
 					href={href}
+					key={label}
 					className={
 						"text-sm font-semibold uppercase flex gap-1 px-2 pt-2 pb-1" +
 						(currentPath === href ? " bg-gray-200" : "")
