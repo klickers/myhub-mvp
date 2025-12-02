@@ -29,24 +29,22 @@ model Objective {
     status    Status    @default(notstarted)
 
     bucket       Bucket        @relation(fields: [bucketId], references: [id])
-    blocks       Block[]
+    tasks        Task[]
     sessions     Session[]
     timePerWeeks TimePerWeek[]
 }
 
-model Block {
-    id            Int    @id @default(autoincrement())
+model Task {
+    id            Int       @id @default(autoincrement())
     name          String
-    year          Int
-    weekNumber    Int
     objectiveId   Int
-    status        Status @default(notstarted)
-    scheduledTime Int    @default(0)
+    status        Status    @default(notstarted)
+    estimatedTime Int       @default(0)
+    deadline      DateTime?
 
-    objective Objective @relation(fields: [objectiveId], references: [id])
-    week      Week      @relation(fields: [year, weekNumber], references: [year, weekNumber])
-
-    @@index([year, weekNumber, objectiveId])
+    objective    Objective     @relation(fields: [objectiveId], references: [id])
+    timePerWeeks TimePerWeek[]
+    sessions     Session[]
 }
 
 model Week {
@@ -54,7 +52,6 @@ model Week {
     year       Int
     weekNumber Int
 
-    blocks       Block[]
     timePerWeeks TimePerWeek[]
 
     @@unique([year, weekNumber])
@@ -66,23 +63,28 @@ model TimePerWeek {
     weekNumber    Int
     itemType      ItemType @default(objective)
     objectiveId   Int?
+    taskId        Int?
     scheduledTime Int      @default(0)
+    completed     Boolean  @default(false)
 
     objective Objective? @relation(fields: [objectiveId], references: [id])
+    task      Task?      @relation(fields: [taskId], references: [id])
     week      Week       @relation(fields: [year, weekNumber], references: [year, weekNumber])
 
-    @@unique([year, weekNumber, itemType, objectiveId])
+    @@unique([year, weekNumber, itemType, objectiveId, taskId])
 }
 
 model Session {
     id          Int       @id @default(autoincrement())
     itemType    ItemType  @default(objective)
     objectiveId Int?
+    taskId      Int?
     startTime   DateTime
     endTime     DateTime?
     notes       String?
 
     objective Objective? @relation(fields: [objectiveId], references: [id])
+    task      Task?      @relation(fields: [taskId], references: [id])
 }
 
 model KeyValue {
@@ -113,5 +115,5 @@ enum Status {
 enum ItemType {
     bucket
     objective
-    block
+    task
 }
