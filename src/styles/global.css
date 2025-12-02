@@ -25,4 +25,32 @@
 			}
 		}
 	}
+
+	form {
+		input {
+			@apply px-2 py-1 border border-black;
+
+			&:focus {
+				@apply outline-none ring-1 ring-black;
+			}
+		}
+	}
+}
+
+@layer components {
+	.button {
+		@apply inline-block cursor-pointer duration-300;
+
+		&.button--primary {
+			@apply px-4 py-1 border border-black;
+
+			&:hover {
+				@apply bg-black text-white;
+			}
+
+			&:disabled {
+				@apply border-gray-600 text-gray-600 cursor-not-allowed;
+			}
+		}
+	}
 }

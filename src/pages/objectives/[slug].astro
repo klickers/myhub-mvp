@@ -1,6 +1,7 @@
 ---
 import prisma from "@/helpers/prisma"
 import Layout from "@/layouts/Layout.astro"
+import TimePerWeekList from "@/components/models/timePerWeek/TimePerWeekList"
 
 const { slug } = Astro.params
 
@@ -21,11 +22,21 @@ if (!objective) return Astro.redirect("/")
 
 <Layout>
 	<div><h1>{objective.name}</h1></div>
-	<div>
-		<h2 class="text-2xl font-semibold mb-3">Times Per Week</h2>
-		<!-- TODO: add/update, show tracked time per week -->
-	<div>
-		<!-- TODO: create/add block button + function -->
-		<!-- TODO: sessions timeline summary (for the objective) -->
+	<div class="flex gap-20">
+		<div class="w-1/2">
+			<h2 class="text-2xl font-semibold mb-3">Times Per Week</h2>
+			<TimePerWeekList
+				initial={objective.timePerWeeks}
+				itemType="objective"
+				id={objective.id}
+				nextWeek={objective.timePerWeeks[0].weekNumber + 1}
+				client:load
+			/>
+			<!-- TODO: update time in a week function -->
+		</div>
+		<div class="w-1/2">
+			<!-- TODO: create/add block button + function -->
+			<!-- TODO: sessions timeline summary (for the objective) -->
+		</div>
 	</div>
 </Layout>

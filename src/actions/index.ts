@@ -157,6 +157,119 @@ export const server = {
 		},
 	}),
 	// ===============================
+	// Week
+	// ===============================
+	getWeek: defineAction({
+		input: z.object({
+			year: z.number(),
+			weekNumber: z.number(),
+		}),
+		handler: async ({ year, weekNumber }) => {
+			const result = await prisma.week.findUnique({
+				where: { year_weekNumber: { year, weekNumber } },
+				// include: {
+				// 	timePerWeeks: true,
+				// },
+			})
+			return result ?? null
+		},
+	}),
+	createWeek: defineAction({
+		input: z.object({
+			year: z.number(),
+			weekNumber: z.number(),
+		}),
+		handler: async ({ year, weekNumber }) => {
+			return await prisma.week.create({
+				data: {
+					year,
+					weekNumber,
+				},
+			})
+		},
+	}),
+	getOrCreateWeek: defineAction({
+		input: z.object({
+			year: z.number(),
+			weekNumber: z.number(),
+		}),
+		handler: async ({ year, weekNumber }) => {
+			return await prisma.week.upsert({
+				where: { year_weekNumber: { year, weekNumber } },
+				create: { year, weekNumber },
+				update: {},
+			})
+		},
+	}),
+	// ===============================
+	// Time Per Week
+	// ===============================
+	createTimePerWeek: defineAction({
+		input: z
+			.object({
+				year: z.number().int().positive(),
+				weekNumber: z.number().int().min(1).max(53),
+				itemType: z.enum(["bucket", "objective", "task"]),
+				scheduledTime: z.number().int().min(0),
+				objectiveId: z.number().int().optional(),
+				taskId: z.number().int().optional(),
+			})
+			.refine(
+				(data) =>
+					(data.objectiveId && !data.taskId) ||
+					(!data.objectiveId && data.taskId),
+				{
+					message:
+						"You must provide exactly one of objectiveId or taskId",
+					path: ["objectiveId", "taskId"],
+				}
+			),
+		handler: async (request) => {
+			const {
+				year,
+				weekNumber,
+				itemType,
+				scheduledTime,
+				objectiveId,
+				taskId,
+			} = request
+
+			// validation
+			if (!year || !weekNumber)
+				throw new Error("Missing required fields: year, weekNumber")
+			if (!itemType) throw new Error("Missing required field: itemType")
+			if (scheduledTime == null)
+				throw new Error("Missing required field: scheduledTime")
+
+			// check for objectiveId or taskId
+			const hasObjective = typeof objectiveId === "number"
+			const hasTask = typeof taskId === "number"
+			if (hasObjective === hasTask)
+				throw new Error(
+					"You must provide exactly one of objectiveId or taskId."
+				)
+
+			// insert data
+			const data: any = {
+				year,
+				weekNumber,
+				itemType,
+				scheduledTime,
+				// completed: false,
+			}
+			if (hasObjective) data.objectiveId = objectiveId
+			if (hasTask) data.taskId = taskId
+			// try {
+			// 	const record = await prisma.timePerWeek.create({ data })
+			// 	return { success: true, record }
+			// } catch (err: any) {
+			// 	console.error(err)
+			// 	throw new Error("Failed to create TimePerWeek entry.")
+			// }
+			return await prisma.timePerWeek.create({ data })
+		},
+	}),
+	// ===============================
 	// Session
 	// ===============================
 	getSessionsByWeek: defineAction({
