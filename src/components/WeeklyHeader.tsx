@@ -37,7 +37,7 @@ export default function WeeklyHeader() {
 								</td>
 							</tr>
 							<tr>
-								<td>Planned (till today)</td>
+								<td>Available (till today)</td>
 								<td>
 									<span className="font-mono">
 										{minutesToDots($plannedUntilToday)}
