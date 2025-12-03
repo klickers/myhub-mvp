@@ -3,6 +3,8 @@ import SessionPlayButton from "./SessionPlayButton"
 import { actions } from "astro:actions"
 import { useStore } from "@nanostores/react"
 import { playingSession } from "@/stores/playingSession"
+import { secondsToDots } from "@/helpers/time/secondsToDots"
+import { differenceInSeconds } from "date-fns"
 
 interface Objective {
 	id: number
@@ -24,6 +26,7 @@ const SessionPlayer: React.FC<Props> = ({ objectives, tasks }) => {
 	const [itemId, setItemId] = useState<number | null>(null)
 	const [notes, setNotes] = useState("")
 	const [lastSaved, setLastSaved] = useState<string | null>(null)
+	const [usedTime, setUsedTime] = useState<string>("00:00:00")
 
 	const $playingSession = useStore(playingSession)
 	const autosaveTimer = useRef<NodeJS.Timeout | null>(null)
@@ -86,6 +89,21 @@ const SessionPlayer: React.FC<Props> = ({ objectives, tasks }) => {
 		}
 	}, [notes, $playingSession])
 
+	// ---------------------------------------------------
+	// Update timer display
+	// ---------------------------------------------------
+	useEffect(() => {
+		if (!$playingSession.startTime || !$playingSession.objectiveId) return
+		const interval = setInterval(() => {
+			setUsedTime(
+				secondsToDots(
+					differenceInSeconds(new Date(), $playingSession.startTime!)
+				)
+			)
+		}, 1000)
+		return () => clearInterval(interval)
+	}, [$playingSession])
+
 	const itemList = itemType === "objective" ? objectives : tasks
 
 	const isSessionPlaying = $playingSession.isPlaying && $playingSession.id
@@ -128,10 +146,13 @@ const SessionPlayer: React.FC<Props> = ({ objectives, tasks }) => {
 				</select>
 
 				{itemId && (
-					<SessionPlayButton
-						itemType={itemType}
-						itemId={itemId}
-					/>
+					<>
+						<p className="text-xs font-mono">{usedTime}</p>
+						<SessionPlayButton
+							itemType={itemType}
+							itemId={itemId}
+						/>
+					</>
 				)}
 			</div>
 

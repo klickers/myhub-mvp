@@ -12,7 +12,7 @@ const Buckets: React.FC = () => {
 	const $buckets = useStore(buckets)
 	const $playingSession = useStore(playingSession)
 
-	const [liveUsedTime, setLiveUsedTime] = useState<Record<number, string>>({})
+	const [sessionUsedTime, setSessionUsedTime] = useState<string>("00:00:00")
 
 	useEffect(() => {
 		const initPlayingSession = async () => {
@@ -39,31 +39,20 @@ const Buckets: React.FC = () => {
 		initPlayingSession()
 	}, [])
 
+	// ---------------------------------------------------
+	// Update timer display
+	// ---------------------------------------------------
 	useEffect(() => {
 		if (!$playingSession.startTime || !$playingSession.objectiveId) return
 		const interval = setInterval(() => {
-			setLiveUsedTime((prev) => {
-				const updated = { ...prev }
-				const bucketObjs = Object.values($buckets).flatMap(
-					(b) => b.objectives
+			setSessionUsedTime(
+				secondsToDots(
+					differenceInSeconds(new Date(), $playingSession.startTime!)
 				)
-				const obj = bucketObjs.find(
-					(o) => o.id === $playingSession.objectiveId
-				)
-				if (obj) {
-					updated[obj.id] = secondsToDots(
-						//obj.usedTime * 60 +
-						differenceInSeconds(
-							new Date(),
-							$playingSession.startTime!
-						)
-					)
-				}
-				return updated
-			})
+			)
 		}, 1000)
 		return () => clearInterval(interval)
-	}, [$playingSession, $buckets])
+	}, [$playingSession])
 
 	return (
 		<div className="grid grid-cols-1 gap-6 mt-6 mb-10">
@@ -86,7 +75,7 @@ const Buckets: React.FC = () => {
 							const usedTime =
 								$playingSession.objectiveId === obj.id &&
 								$playingSession.startTime
-									? liveUsedTime[obj.id] ??
+									? sessionUsedTime ??
 									  secondsToDots(obj.usedTime * 60)
 									: minutesToDots(obj.usedTime)
 
