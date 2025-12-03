@@ -157,16 +157,18 @@ const SessionPlayer: React.FC<Props> = ({ objectives, tasks }) => {
 			</div>
 
 			{isSessionPlaying && (
-				<div className="flex flex-col gap-1">
+				<div className="flex flex-col gap-1 relative">
 					<textarea
 						value={notes}
 						onChange={(e) => setNotes(e.target.value)}
 						placeholder="Notes..."
-						className="p-2 h-24 border border-black"
+						className="p-2 h-24 border border-black focus:outline-none"
 					/>
 
 					{lastSaved && (
-						<div className="text-xs">Saved at {lastSaved}</div>
+						<div className="text-xs absolute bottom-2 left-2 text-gray-500">
+							saved at {lastSaved}
+						</div>
 					)}
 				</div>
 			)}
