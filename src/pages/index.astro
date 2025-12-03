@@ -6,6 +6,7 @@ import Dailies from "@/components/Dailies"
 import WeeklyTitle from "@/components/WeeklyTitle"
 import WeeklyHeader from "@/components/WeeklyHeader"
 import WeeklyCalendarControls from "@/components/WeeklyCalendarControls"
+import SessionPlayer from "@/components/models/session/SessionPlayer"
 import prisma from "@/helpers/prisma"
 
 const objectives = await prisma.objective.findMany({
@@ -29,8 +30,13 @@ const tasks = await prisma.task.findMany({})
 		<WeeklyTitle client:load />
 		<WeeklyCalendarControls client:load />
 	</div>
-	<div class="flex gap-20">
+	<div class="flex gap-20 items-center">
 		<WeeklyHeader client:load />
+		<SessionPlayer
+			objectives={objectives}
+			tasks={tasks}
+			client:load
+		/>
 	</div>
 	<!-- TODO: add small daily calendar -->
 	<div class="flex gap-20">

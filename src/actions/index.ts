@@ -32,6 +32,28 @@ export const server = {
 			})
 		},
 	}),
+	getSession: defineAction({
+		input: z.object({
+			id: z.number(),
+		}),
+		handler: async ({ id }) => {
+			return prisma.session.findUnique({
+				where: { id },
+			})
+		},
+	}),
+	updateSessionNotes: defineAction({
+		input: z.object({
+			id: z.number(),
+			notes: z.string().optional(),
+		}),
+		handler: async ({ id, notes }) => {
+			return await prisma.session.update({
+				where: { id },
+				data: { notes },
+			})
+		},
+	}),
 	// ===============================
 	// KeyValue
 	// ===============================
