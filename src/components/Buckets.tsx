@@ -72,6 +72,9 @@ const Buckets: React.FC = () => {
 					</div>
 					<div>
 						{bucket.objectives.map((obj) => {
+							// TODO: gray out objective if either TimesPerWeek marked completed
+							// OR no scheduled time
+
 							const usedTime =
 								$playingSession.objectiveId === obj.id &&
 								$playingSession.startTime
