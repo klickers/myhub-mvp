@@ -78,6 +78,7 @@ const SessionPlayButton: React.FC<Props> = ({ itemType, itemId }) => {
 				await startSession()
 			}
 			// TODO: update $bucket.objectives.sessions to include new session
+			// TODO: clear editor
 		} else await startSession()
 	}
 

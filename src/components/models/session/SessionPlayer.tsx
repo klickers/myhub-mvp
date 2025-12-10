@@ -60,10 +60,13 @@ const SessionPlayer: React.FC<Props> = ({ objectives, tasks }) => {
 			}
 
 			// Set notes
-			if (data.notesJson && data.notesJson !== lastSentNotes.current) {
+			if ((data.notesJson as Array<any>).length == 0) {
+				setNotes([])
+				lastSentNotes.current = []
+				editor.tf.reset()
+			} else if (data.notesJson !== lastSentNotes.current) {
 				setNotes(data.notesJson as Prisma.JsonArray)
 				lastSentNotes.current = data.notesJson as Prisma.JsonArray
-
 				editor.children = data.notesJson as Value
 			}
 		}
