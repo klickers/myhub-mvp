@@ -58,6 +58,10 @@
 			}
 		}
 	}
+
+	.editor {
+		@apply border border-black;
+	}
 }
 
 @theme inline {
