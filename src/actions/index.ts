@@ -54,6 +54,18 @@ export const server = {
 			})
 		},
 	}),
+	updateSessionNotesJson: defineAction({
+		input: z.object({
+			id: z.number(),
+			notesJson: z.array(z.any()).optional(),
+		}),
+		handler: async ({ id, notesJson }) => {
+			return await prisma.session.update({
+				where: { id },
+				data: { notesJson },
+			})
+		},
+	}),
 	// ===============================
 	// KeyValue
 	// ===============================

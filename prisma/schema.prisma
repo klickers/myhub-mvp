@@ -82,6 +82,7 @@ model Session {
     startTime   DateTime
     endTime     DateTime?
     notes       String?
+    notesJson   Json?
 
     objective Objective? @relation(fields: [objectiveId], references: [id])
     task      Task?      @relation(fields: [taskId], references: [id])

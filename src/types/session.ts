@@ -1,3 +1,5 @@
+import type { Prisma } from "@/generated/prisma/client"
+
 export type Session = {
 	id: number
 	itemType: "objective" | "bucket" | "block"
@@ -6,4 +8,5 @@ export type Session = {
 	startTime: Date
 	endTime: Date | null
 	notes: string | null
+	notesJson: Prisma.JsonValue | null
 }

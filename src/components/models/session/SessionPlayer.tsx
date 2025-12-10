@@ -6,6 +6,12 @@ import { playingSession } from "@/stores/playingSession"
 import { secondsToDots } from "@/helpers/time/secondsToDots"
 import { differenceInSeconds } from "date-fns"
 
+import { Plate, usePlateEditor, type TPlateEditor } from "platejs/react"
+import { Editor, EditorContainer } from "@/components/editor/ui/editor"
+import { EditorKit } from "@/components/editor/editor-kit"
+import type { Prisma } from "@/generated/prisma/client"
+import { type Value } from "platejs"
+
 interface Objective {
 	id: number
 	name: string
@@ -24,13 +30,13 @@ interface Props {
 const SessionPlayer: React.FC<Props> = ({ objectives, tasks }) => {
 	const [itemType, setItemType] = useState<"objective" | "task">("objective")
 	const [itemId, setItemId] = useState<number | null>(null)
-	const [notes, setNotes] = useState("")
+	const [notes, setNotes] = useState<Prisma.JsonArray>([])
 	const [lastSaved, setLastSaved] = useState<string | null>(null)
 	const [usedTime, setUsedTime] = useState<string>("00:00:00")
 
 	const $playingSession = useStore(playingSession)
 	const autosaveTimer = useRef<NodeJS.Timeout | null>(null)
-	const lastSentNotes = useRef<string>("")
+	const lastSentNotes = useRef<Prisma.JsonArray>([])
 
 	// ---------------------------------------------------
 	// Load existing session (itemType, itemId, notes)
@@ -54,9 +60,14 @@ const SessionPlayer: React.FC<Props> = ({ objectives, tasks }) => {
 			}
 
 			// Set notes
-			if (data.notes && data.notes !== lastSentNotes.current) {
-				setNotes(data.notes)
-				lastSentNotes.current = data.notes
+			if ((data.notesJson as Array<any>).length == 0) {
+				setNotes([])
+				lastSentNotes.current = []
+				editor.tf.reset()
+			} else if (data.notesJson !== lastSentNotes.current) {
+				setNotes(data.notesJson as Prisma.JsonArray)
+				lastSentNotes.current = data.notesJson as Prisma.JsonArray
+				editor.children = data.notesJson as Value
 			}
 		}
 
@@ -74,10 +85,9 @@ const SessionPlayer: React.FC<Props> = ({ objectives, tasks }) => {
 
 		autosaveTimer.current = setTimeout(async () => {
 			if (!$playingSession.id) return
-
-			await actions.updateSessionNotes({
+			await actions.updateSessionNotesJson({
 				id: $playingSession.id,
-				notes: notes.trim(),
+				notesJson: notes as Prisma.JsonArray,
 			})
 
 			lastSentNotes.current = notes
@@ -107,6 +117,11 @@ const SessionPlayer: React.FC<Props> = ({ objectives, tasks }) => {
 	const itemList = itemType === "objective" ? objectives : tasks
 
 	const isSessionPlaying = $playingSession.isPlaying && $playingSession.id
+
+	const editor = usePlateEditor({
+		plugins: EditorKit,
+		value: notes as Value,
+	})
 
 	return (
 		<div className="flex flex-col gap-2 border border-black p-4">
@@ -155,8 +170,7 @@ const SessionPlayer: React.FC<Props> = ({ objectives, tasks }) => {
 					</>
 				)}
 			</div>
-
-			{isSessionPlaying && (
+			{/* {isSessionPlaying && (
 				<div className="flex flex-col gap-1 relative">
 					<textarea
 						value={notes}
@@ -164,6 +178,26 @@ const SessionPlayer: React.FC<Props> = ({ objectives, tasks }) => {
 						placeholder="Notes..."
 						className="p-2 h-24 border border-black focus:outline-none"
 					/>
+
+					{lastSaved && (
+						<div className="text-xs absolute bottom-2 left-2 text-gray-500">
+							saved at {lastSaved}
+						</div>
+					)}
+				</div>
+			)} */}
+			{isSessionPlaying && (
+				<div className="relative">
+					<Plate
+						onValueChange={({ value }) => {
+							setNotes(value as Prisma.JsonArray)
+						}}
+						editor={editor}
+					>
+						<EditorContainer className="editor">
+							<Editor placeholder="Notes here..." />
+						</EditorContainer>
+					</Plate>
 
 					{lastSaved && (
 						<div className="text-xs absolute bottom-2 left-2 text-gray-500">
