@@ -1,80 +1,20 @@
 ---
 import Layout from "@/layouts/Layout.astro"
-import { Icon } from "astro-icon/components"
-
-const links = [
-	{ name: "Home", href: "/", icon: "mingcute:home-4-fill", selected: true },
-	{
-		name: "Guild Hall",
-		href: "#!",
-		icon: "mingcute:building-4-fill",
-		selected: false,
-	},
-	// {
-	// 	name: "Alchemy Lab",
-	// 	href: "#!",
-	// 	icon: "mingcute:flask-3-fill",
-	// 	selected: false,
-	// },
-	// {
-	// 	name: "Library",
-	// 	href: "#!",
-	// 	icon: "mingcute:book-5-fill",
-	// 	selected: false,
-	// },
-	// {
-	// 	name: "Archives",
-	// 	href: "#!",
-	// 	icon: "mingcute:book-3-fill",
-	// 	selected: false,
-	// },
-]
 ---
 
 <Layout>
-		<aside
-			class="w-[260px] flex-none bg-white border-r border-gray-300 py-8 px-6 space-y-6"
-		>
-			<div class="card card--profile flex items-center gap-3">
-				<div class="w-12 h-12 rounded-full bg-gray-300"></div>
-				<div class="leading-none">
-					<p class="font-semibold mb-1">Catherine</p>
-					<p><small class="text-gray-600">11000 XP</small></p>
-				</div>
+	<div class="flex gap-8">
+		<div class="w-full">
+			<h1 class="mb-3">Good morning, Catherine</h1>
+			<p class="text-gray-600 ml-0.5">Today will be amazing.</p>
+			<div class="flex gap-4 mt-8">
+				<div class="card">Calendar</div>
+				<div class="card">Agenda</div>
 			</div>
-			<nav class="space-y-1">
-				{
-					links.map((link) => (
-						<a
-							href={link.href}
-							class={
-								"duration-300 px-4 py-2 flex gap-2 items-center rounded-xl" +
-								(link.selected
-									? " bg-black text-white hover:bg-black"
-									: " hover:bg-gray-100")
-							}
-						>
-							<Icon name={link.icon} />
-							<span>{link.name}</span>
-						</a>
-					))
-				}
-			</nav>
-		</aside>
-	<div class="flex w-full min-h-screen gap-8 mb-10">
-		<main class="w-full pl-6 pr-8 py-8 flex gap-8">
-			<div class="w-full">
-				<h1 class="mb-3">Good morning, Catherine</h1>
-				<p class="text-gray-600 ml-0.5">Today will be amazing.</p>
-				<div class="flex gap-4 mt-8">
-					<div class="card">Calendar</div>
-					<div class="card">Agenda</div>
-				</div>
-			</div>
-			<div class="space-y-4 w-[220px] flex-none">
-				<div class="card">Inspiring Quote</div>
-				<div class="card">Errands</div>
-			</div>
-		</main>
+		</div>
+		<div class="space-y-4 w-[220px] flex-none">
+			<div class="card">Inspiring Quote</div>
+			<div class="card">Errands</div>
+		</div>
 	</div>
 </Layout>

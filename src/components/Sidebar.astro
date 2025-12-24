@@ -1,0 +1,61 @@
+---
+import { Icon } from "astro-icon/components"
+
+const links = [
+	{ name: "Home", href: "/", icon: "mingcute:home-4-fill", selected: true },
+	{
+		name: "Guild Hall",
+		href: "#!",
+		icon: "mingcute:building-4-fill",
+		selected: false,
+	},
+	// {
+	// 	name: "Alchemy Lab",
+	// 	href: "#!",
+	// 	icon: "mingcute:flask-3-fill",
+	// 	selected: false,
+	// },
+	// {
+	// 	name: "Library",
+	// 	href: "#!",
+	// 	icon: "mingcute:book-5-fill",
+	// 	selected: false,
+	// },
+	// {
+	// 	name: "Archives",
+	// 	href: "#!",
+	// 	icon: "mingcute:book-3-fill",
+	// 	selected: false,
+	// },
+]
+---
+
+<aside
+	class="fixed h-screen w-[260px] flex-none bg-white border-r border-gray-300 py-8 px-6 space-y-6"
+>
+	<div class="card card--profile flex items-center gap-3">
+		<div class="w-12 h-12 rounded-full bg-gray-300"></div>
+		<div class="leading-none">
+			<p class="font-semibold mb-1">Catherine</p>
+			<p><small class="text-gray-600">11000 XP</small></p>
+		</div>
+	</div>
+	<nav class="space-y-1">
+		{
+			links.map((link) => (
+				<a
+					href={link.href}
+					class={
+						"duration-300 px-4 py-2 flex gap-2 items-center rounded-xl" +
+						(link.selected
+							? " bg-black text-white hover:bg-black"
+							: " hover:bg-gray-100")
+					}
+				>
+					<Icon name={link.icon} />
+					<span>{link.name}</span>
+				</a>
+			))
+		}
+	</nav>
+</aside>

@@ -1,5 +1,6 @@
 ---
 import "@/styles/global.css"
+import Sidebar from "@/components/Sidebar.astro"
 
 const path = Astro.url.pathname
 ---
@@ -24,6 +25,11 @@ const path = Astro.url.pathname
 		<title>MyHub</title>
 	</head>
 	<body class="bg-gray-50">
-		<slot />
+		<div class="flex w-full min-h-screen mb-10">
+			<Sidebar />
+			<main class="ml-[260px] w-full pl-10 pr-8 py-8">
+				<slot />
+			</main>
+		</div>
 	</body>
 </html>
