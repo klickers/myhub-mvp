@@ -1,6 +1,5 @@
 ---
 import "@/styles/global.css"
-import TopNavigation from "@/components/TopNavigation"
 
 const path = Astro.url.pathname
 ---
@@ -25,12 +24,6 @@ const path = Astro.url.pathname
 		<title>MyHub</title>
 	</head>
 	<body>
-		<TopNavigation
-			currentPath={path}
-			client:load
-		/>
-		<main class="mt-20 p-6 bg-cover">
-			<slot />
-		</main>
+		<slot />
 	</body>
 </html>

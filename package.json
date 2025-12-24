@@ -23,6 +23,7 @@
 		"@fullcalendar/google-calendar": "^6.1.19",
 		"@fullcalendar/react": "^6.1.19",
 		"@fullcalendar/timegrid": "^6.1.19",
+		"@iconify-json/mingcute": "^1.2.6",
 		"@iconify-json/pixelarticons": "^1.2.2",
 		"@nanostores/react": "^1.0.0",
 		"@neondatabase/serverless": "^1.0.2",
