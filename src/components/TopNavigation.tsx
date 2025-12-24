@@ -4,7 +4,7 @@ interface TopNavigationProps {
 	currentPath: string
 }
 
-const links = [{ href: "/", label: "Home", icon: "pixelarticons:home" }]
+const links = [{ href: "/old", label: "Home", icon: "pixelarticons:home" }]
 
 export default function TopNavigation({ currentPath }: TopNavigationProps) {
 	return (

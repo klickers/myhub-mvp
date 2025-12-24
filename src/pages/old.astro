@@ -1,0 +1,51 @@
+---
+import Layout from "@/layouts/LayoutOld.astro"
+import Buckets from "@/components/Buckets"
+import Calendar from "@/components/Calendar"
+import Dailies from "@/components/Dailies"
+import WeeklyTitle from "@/components/WeeklyTitle"
+import WeeklyHeader from "@/components/WeeklyHeader"
+import WeeklyCalendarControls from "@/components/WeeklyCalendarControls"
+import SessionPlayer from "@/components/models/session/SessionPlayer"
+import prisma from "@/helpers/prisma"
+
+const objectives = await prisma.objective.findMany({
+	orderBy: [
+		{
+			bucket: {
+				order: "asc",
+			},
+		},
+		{
+			id: "asc",
+		},
+	],
+})
+
+const tasks = await prisma.task.findMany({})
+---
+
+<Layout>
+	<div class="flex items-center justify-between mb-10">
+		<WeeklyTitle client:load />
+		<WeeklyCalendarControls client:load />
+	</div>
+	<div class="flex gap-20 items-center">
+		<WeeklyHeader client:load />
+		<SessionPlayer
+			objectives={objectives}
+			tasks={tasks}
+			client:load
+		/>
+	</div>
+	<!-- TODO: add small daily calendar -->
+	<div class="flex gap-20">
+		<div class="w-2/3 pt-10">
+			<Dailies client:load />
+		</div>
+		<div class="w-1/3">
+			<Calendar client:load />
+			<Buckets client:load />
+		</div>
+	</div>
+</Layout>
