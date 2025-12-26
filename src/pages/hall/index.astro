@@ -12,25 +12,29 @@ import { Icon } from "astro-icon/components"
 					href="#!"
 					class="card duration-300 hover:shadow-md"
 				>
-					<p class="font-semibold">
-						76993 - Human Neuroscience Methods
-					</p>
-					<div class="mt-1 flex justify-between items-center">
-						<div class="flex gap-1 items-center">
-							<div class="h-4 w-4 rounded-full bg-gray-300"></div>
-							<p class="text-gray-600 text-xs">STEMester</p>
-						</div>
-						<p
-							class="text-xs text-gray-600 flex items-center gap-1"
-						>
-							<Icon name="mingcute:calendar-fill" /> Jan 3, 2026
+					<div class="card__content">
+						<p class="font-semibold">
+							76993 - Human Neuroscience Methods
 						</p>
-					</div>
-					<div class="mt-4 relative">
-						<div class="h-2 w-full rounded-full bg-gray-200"></div>
-						<div
-							class="h-2 w-3/4 rounded-full bg-emerald-400 absolute top-0"
-						>
+						<div class="mt-1 flex justify-between items-center">
+							<div class="flex gap-1 items-center">
+								<div class="h-4 w-4 rounded-full bg-gray-300">
+								</div>
+								<p class="text-gray-600 text-xs">STEMester</p>
+							</div>
+							<p
+								class="text-xs text-gray-600 flex items-center gap-1"
+							>
+								<Icon name="mingcute:calendar-fill" /> Jan 3, 2026
+							</p>
+						</div>
+						<div class="mt-4 relative">
+							<div class="h-2 w-full rounded-full bg-gray-200">
+							</div>
+							<div
+								class="h-2 w-3/4 rounded-full bg-emerald-400 absolute top-0"
+							>
+							</div>
 						</div>
 					</div>
 				</a>
@@ -43,7 +47,7 @@ import { Icon } from "astro-icon/components"
 					href="#!"
 					class="card duration-300 hover:shadow-md"
 				>
-					<div class="flex gap-2 items-center">
+					<div class="card__content flex gap-2 items-center">
 						<div class="h-10 w-10 rounded-full bg-gray-300"></div>
 						<div>
 							<p class="font-semibold">STEMester</p>
