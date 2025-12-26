@@ -1,0 +1,77 @@
+---
+import Layout from "@/layouts/Layout.astro"
+import ContractCard from "@/components/guild-hall/ContractCard.astro"
+import PersonaCard from "@/components/guild-hall/PersonaCard.astro"
+import { Icon } from "astro-icon/components"
+---
+
+<Layout>
+	<div class="flex gap-8 min-h-screen">
+		<div class="w-full">
+			<div class="sticky top-8 float-right">
+				<a
+					href="#!"
+					class="inline-block p-1"
+				>
+					<Icon name="mingcute:play-fill" />
+				</a>
+				<a
+					href="#!"
+					class="inline-block text-white p-1 rounded-sm bg-gray-950"
+				>
+					<Icon name="mingcute:settings-5-fill" />
+				</a>
+			</div>
+			<p class="mb-3 text-gray-600 text-sm">
+				<a
+					href="/hall"
+					class="flex gap-1 items-center"
+				>
+					<Icon name="mingcute:arrow-left-fill" />Back to Guild Hall
+				</a>
+			</p>
+			<!-- TODO: double click to edit contract name -->
+			<h1 class="mb-3">76993 - Human Neuroscience Methods</h1>
+			<p>Some description of this contract and so on</p>
+			<div class="mt-10">
+				<!-- TODO: in progress, upcoming, on hold -->
+				<h2 class="font-semibold text-2xl mb-4">Active Assignments</h2>
+				<div class="space-y-3">
+					<div class="card">
+						<div class="card__content">
+							<div class="flex justify-between items-center">
+								<p class="font-semibold">EEG Assignment 1</p>
+								<p class="text-xs text-gray-600">
+									Due Feb 15, 2026
+								</p>
+							</div>
+						</div>
+					</div>
+					<div class="card">
+						<div class="card__content">
+							<div class="flex justify-between items-center">
+								<p class="font-semibold">EEG Assignment 2</p>
+								<p class="text-xs text-gray-600">
+									Due Feb 15, 2026
+								</p>
+							</div>
+						</div>
+					</div>
+					<div class="card">
+						<div class="card__content">
+							<div class="flex justify-between items-center">
+								<p class="font-semibold">EEG Assignment 3</p>
+								<p class="text-xs text-gray-600">
+									Due Feb 15, 2026
+								</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="space-y-4 w-[260px] flex-none">
+			<div class="sticky top-8"><PersonaCard /></div>
+		</div>
+	</div>
+</Layout>
