@@ -1,0 +1,40 @@
+---
+import { Icon } from "astro-icon/components"
+
+interface Props {
+	isGuild?: boolean
+}
+
+const { isGuild = false } = Astro.props
+---
+
+<!-- TODO: in progress, upcoming, on hold -->
+<a
+	href="#!"
+	class="card duration-300 hover:shadow-md"
+>
+	<div class="card__content">
+		<p class="font-semibold">76993 - Human Neuroscience Methods</p>
+		<div class="mt-1 flex justify-between items-center">
+			{
+				!isGuild ? (
+					<div class="flex gap-1 items-center">
+						<div class="h-4 w-4 rounded-full bg-gray-300" />
+						<p class="text-gray-600 text-xs">STEMester</p>
+					</div>
+				) : null
+			}
+			<p class="text-xs text-gray-600 flex items-center gap-1">
+				<Icon name="mingcute:calendar-fill" /> Jan 3, 2026
+			</p>
+		</div>
+		{
+			!isGuild ? (
+				<div class="mt-4 relative">
+					<div class="h-2 w-full rounded-full bg-gray-200" />
+					<div class="h-2 w-3/4 rounded-full bg-emerald-400 absolute top-0" />
+				</div>
+			) : null
+		}
+	</div>
+</a>

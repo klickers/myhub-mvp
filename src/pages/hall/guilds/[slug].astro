@@ -1,0 +1,87 @@
+---
+import Layout from "@/layouts/Layout.astro"
+import ContractCard from "@/components/guild-hall/ContractCard.astro"
+import { Icon } from "astro-icon/components"
+---
+
+<Layout>
+	<div class="flex gap-8">
+		<div class="w-full">
+			<div class="sticky top-8 float-right">
+				<a
+					href="#!"
+					class="inline-block p-1"
+				>
+					<Icon name="mingcute:play-fill" />
+				</a>
+				<a
+					href="#!"
+					class="inline-block text-white p-1 rounded-sm bg-gray-950"
+				>
+					<Icon name="mingcute:settings-5-fill" />
+				</a>
+			</div>
+			<p class="mb-3 text-gray-600 text-sm">
+				<a
+					href="/hall"
+					class="flex gap-1 items-center"
+				>
+					<Icon name="mingcute:arrow-left-fill" />Back to Guild Hall
+				</a>
+			</p>
+			<!-- TODO: double click to edit guild name -->
+			<h1 class="mb-3">STEMester</h1>
+			<p>Some description of this guild and so on</p>
+			<div class="mt-10">
+				<!-- TODO: in progress, upcoming, on hold -->
+				<h2 class="font-semibold text-2xl mb-4">Active Contracts</h2>
+				<div class="grid grid-cols-2 gap-4">
+					<ContractCard isGuild />
+					<ContractCard isGuild />
+					<ContractCard isGuild />
+				</div>
+			</div>
+			<div class="mt-10">
+				<h2 class="font-semibold text-2xl mb-4">Previous Contracts</h2>
+				<div class="grid grid-cols-2 gap-4">
+					<ContractCard isGuild />
+					<ContractCard isGuild />
+				</div>
+			</div>
+		</div>
+		<div class="space-y-4 w-[260px] flex-none">
+			<div class="card sticky top-8">
+				<div
+					class="border-b border-gray-300 h-64 overflow-hidden relative"
+				>
+					<img
+						src="/prof-zeno.png"
+						class="object-cover"
+					/>
+					<a
+						href="#!"
+						class="absolute right-4 top-4 text-white p-1 rounded-sm bg-gray-950"
+					>
+						<Icon name="mingcute:edit-2-fill" />
+					</a>
+				</div>
+				<div class="card__content">
+					<p class="text-xs">Guild Master</p>
+					<p class="font-semibold">Professor Zeno</p>
+					<p class="text-sm mt-2 mb-4">
+						A description of Professor Zeno, his personality, etc.
+					</p>
+					<p class="flex">
+						<a
+							href="#!"
+							class="flex items-center gap-1 py-1 px-3 text-sm bg-gray-100 w-auto rounded-xl"
+						>
+							<Icon name="mingcute:chat-3-fill" />Chat
+						</a>
+					</p>
+					<!-- TODO: chat history somewhere? -->
+				</div>
+			</div>
+		</div>
+	</div>
+</Layout>

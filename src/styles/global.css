@@ -65,7 +65,7 @@
 	}
 
 	.card {
-		@apply w-full bg-white rounded-xl border border-gray-300;
+		@apply w-full bg-white rounded-xl border border-gray-300 overflow-hidden;
 
 		.card__content {
 			@apply px-6 py-4;
