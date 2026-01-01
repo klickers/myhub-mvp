@@ -8,16 +8,31 @@ const guilds = await Astro.callAction(actions.guild.list, {})
 const result = Astro.getActionResult(actions.contract.create)
 if (result && !result.error)
 	return Astro.redirect(`/hall/contracts/${result.data.slug}`)
+
+const guildSlug = Astro.url.searchParams.get("guildSlug")
 ---
 
 <Layout>
 	<p class="mb-3 text-gray-600 text-sm">
-		<a
-			href="/hall"
-			class="flex gap-1 items-center"
-		>
-			<Icon name="mingcute:arrow-left-fill" />Back to Guild Hall
-		</a>
+		{
+			guildSlug ? (
+				<a
+					href={`/hall/guilds/${guildSlug}`}
+					class="flex gap-1 items-center"
+				>
+					<Icon name="mingcute:arrow-left-fill" />
+					Back to Guild
+				</a>
+			) : (
+				<a
+					href="/hall"
+					class="flex gap-1 items-center"
+				>
+					<Icon name="mingcute:arrow-left-fill" />
+					Back to Guild Hall
+				</a>
+			)
+		}
 	</p>
 	<h1>New Contract</h1>
 	<form
@@ -65,7 +80,16 @@ if (result && !result.error)
 
 		<select name="guildId">
 			<option value="">No guild</option>
-			{guilds.data?.map((g) => <option value={g.id}>{g.name}</option>)}
+			{
+				guilds.data?.map((g) => (
+					<option
+						value={g.id}
+						selected={guildSlug && g.slug == guildSlug}
+					>
+						{g.name}
+					</option>
+				))
+			}
 		</select>
 
 		<div>
