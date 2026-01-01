@@ -1,10 +1,16 @@
 ---
 import Layout from "@/layouts/Layout.astro"
-import ContractCard from "@/components/guild-hall/ContractCard.astro"
 import PersonaCard from "@/components/guild-hall/PersonaCard.astro"
 import { Icon } from "astro-icon/components"
+import { actions } from "astro:actions"
+
+const contract = await Astro.callAction(actions.contract.getBySlug, {
+	slug: Astro.params.slug as string,
+})
+if (!contract.data) return Astro.redirect("/hall")
 ---
 
+<!-- TODO: link to attached guild somewhere -->
 <Layout>
 	<div class="flex gap-8 min-h-screen">
 		<div class="w-full">
@@ -31,8 +37,10 @@ import { Icon } from "astro-icon/components"
 				</a>
 			</p>
 			<!-- TODO: double click to edit contract name -->
-			<h1 class="mb-3">76993 - Human Neuroscience Methods</h1>
-			<p>Some description of this contract and so on</p>
+			<h1 class="mb-3">{contract.data.name}</h1>
+			<p>
+				{contract.data.description ?? <em>Put a description here.</em>}
+			</p>
 			<div class="mt-10">
 				<!-- TODO: in progress, upcoming, on hold -->
 				<h2 class="font-semibold text-2xl mb-4">Active Assignments</h2>

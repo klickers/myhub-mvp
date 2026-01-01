@@ -69,6 +69,7 @@ export const contract = {
 		handler: async ({ slug }) => {
 			return prisma.contract.findUnique({
 				where: { slug },
+				include: { guild: true },
 			})
 		},
 	}),
