@@ -8,9 +8,7 @@ import { actions } from "astro:actions"
 const guild = await Astro.callAction(actions.guild.getBySlug, {
 	slug: Astro.params.slug as string,
 })
-if (!guild.data) {
-	return Astro.redirect("/hall")
-}
+if (!guild.data) return Astro.redirect("/hall")
 ---
 
 <Layout>
