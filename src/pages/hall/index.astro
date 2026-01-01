@@ -26,7 +26,7 @@ const contracts = await Astro.callAction(actions.contract.listWithGuild, {})
 					</a>
 				</div>
 			</div>
-			<div class="grid grid-cols-3 gap-6">
+			<div class="grid grid-cols-3 gap-3">
 				{
 					contracts.data ? (
 						contracts.data.map((contract) => (
@@ -50,7 +50,7 @@ const contracts = await Astro.callAction(actions.contract.listWithGuild, {})
 					</a>
 				</div>
 			</div>
-			<div class="grid grid-cols-3 gap-6">
+			<div class="grid grid-cols-3 gap-3">
 				{
 					guilds.data ? (
 						guilds.data.map((guild) => (
