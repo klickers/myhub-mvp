@@ -3,6 +3,14 @@ import Layout from "@/layouts/Layout.astro"
 import ContractCard from "@/components/guild-hall/ContractCard.astro"
 import PersonaCard from "@/components/guild-hall/PersonaCard.astro"
 import { Icon } from "astro-icon/components"
+import { actions } from "astro:actions"
+
+const guild = await Astro.callAction(actions.guild.getBySlug, {
+	slug: Astro.params.slug as string,
+})
+if (!guild.data) {
+	return Astro.redirect("/hall")
+}
 ---
 
 <Layout>
@@ -31,8 +39,8 @@ import { Icon } from "astro-icon/components"
 				</a>
 			</p>
 			<!-- TODO: double click to edit guild name -->
-			<h1 class="mb-3">STEMester</h1>
-			<p>Some description of this guild and so on</p>
+			<h1 class="mb-3">{guild.data.name}</h1>
+			<p>{guild.data.description ?? <em>Put a description here.</em>}</p>
 			<div class="mt-10">
 				<!-- TODO: in progress, upcoming, on hold -->
 				<h2 class="font-semibold text-2xl mb-4">Active Contracts</h2>
