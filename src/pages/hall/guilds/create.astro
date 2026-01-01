@@ -10,7 +10,7 @@ const personas = await prisma.persona.findMany({
 
 const result = Astro.getActionResult(actions.guild.create)
 if (result && !result.error) {
-	return Astro.redirect(`/guilds/${result.data.slug}`)
+	return Astro.redirect(`/hall/guilds/${result.data.slug}`)
 }
 ---
 
