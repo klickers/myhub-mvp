@@ -73,6 +73,11 @@ export const guild = {
 	list: defineAction({
 		handler: async () => {
 			return prisma.guild.findMany({
+				where: {
+					status: {
+						notIn: ["onhold", "archived"],
+					},
+				},
 				include: { persona: true },
 				orderBy: { name: "asc" },
 			})

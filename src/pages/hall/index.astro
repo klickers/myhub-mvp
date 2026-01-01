@@ -2,6 +2,9 @@
 import Layout from "@/layouts/Layout.astro"
 import ContractCard from "@/components/guild-hall/ContractCard.astro"
 import { Icon } from "astro-icon/components"
+import { actions } from "astro:actions"
+
+const guilds = await Astro.callAction(actions.guild.list, {})
 ---
 
 <Layout>
@@ -39,18 +42,30 @@ import { Icon } from "astro-icon/components"
 				</div>
 			</div>
 			<div class="grid grid-cols-4 gap-6">
-				<a
-					href="#!"
-					class="card duration-300 hover:shadow-md"
-				>
-					<div class="card__content flex gap-2 items-center">
-						<div class="h-10 w-10 rounded-full bg-gray-300"></div>
-						<div>
-							<p class="font-semibold">STEMester</p>
-							<p class="text-xs text-gray-600">in progress</p>
-						</div>
-					</div>
-				</a>
+				{
+					guilds.data ? (
+						guilds.data.map((guild) => (
+							<a
+								href={`/guilds/${guild.slug}`}
+								class="card duration-300 hover:shadow-md"
+							>
+								<div class="card__content flex gap-2 items-center">
+									<div class="h-10 w-10 rounded-full bg-gray-300" />
+									<div>
+										<p class="font-semibold">
+											{guild.name}
+										</p>
+										<p class="text-xs text-gray-600">
+											{guild.status}
+										</p>
+									</div>
+								</div>
+							</a>
+						))
+					) : (
+						<p>No guilds found.</p>
+					)
+				}
 			</div>
 		</div>
 	</div>
