@@ -1,6 +1,7 @@
 import { defineAction } from "astro:actions"
 import { z } from "zod"
 import prisma from "@/helpers/prisma"
+import { Status } from "@/generated/prisma/enums"
 
 const contractInput = z.object({
 	name: z.string().min(1),
@@ -75,12 +76,16 @@ export const contract = {
 		},
 	}),
 	listWithGuild: defineAction({
-		handler: async () => {
+		input: z.object({
+			status: z
+				.array(z.nativeEnum(Status))
+				.optional()
+				.default([Status.inprogress]),
+		}),
+		handler: async ({ status }) => {
 			return prisma.contract.findMany({
 				where: {
-					status: {
-						notIn: ["onhold", "archived"],
-					},
+					status: { in: status },
 				},
 				include: { guild: true },
 				orderBy: { dueDate: "asc" },
@@ -90,14 +95,16 @@ export const contract = {
 	listByGuild: defineAction({
 		input: z.object({
 			guildId: z.coerce.number().int(),
+			status: z
+				.array(z.nativeEnum(Status))
+				.optional()
+				.default([Status.inprogress]),
 		}),
-		handler: async ({ guildId }) => {
+		handler: async ({ guildId, status }) => {
 			return prisma.contract.findMany({
 				where: {
 					guildId,
-					status: {
-						notIn: ["onhold", "archived"],
-					},
+					status: { in: status },
 				},
 				orderBy: { dueDate: "asc" },
 			})

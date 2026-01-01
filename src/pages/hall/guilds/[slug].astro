@@ -4,14 +4,19 @@ import ContractCard from "@/components/guild-hall/ContractCard.astro"
 import PersonaCard from "@/components/guild-hall/PersonaCard.astro"
 import { Icon } from "astro-icon/components"
 import { actions } from "astro:actions"
+import { Status } from "@/generated/prisma/enums"
 
 const guild = await Astro.callAction(actions.guild.getBySlug, {
 	slug: Astro.params.slug as string,
 })
 if (!guild.data) return Astro.redirect("/hall")
 
-const contracts = await Astro.callAction(actions.contract.listByGuild, {
+const activeContracts = await Astro.callAction(actions.contract.listByGuild, {
 	guildId: guild.data.id,
+})
+const allContracts = await Astro.callAction(actions.contract.listByGuild, {
+	guildId: guild.data.id,
+	status: [Status.notstarted, Status.onhold],
 })
 ---
 
@@ -60,8 +65,8 @@ const contracts = await Astro.callAction(actions.contract.listByGuild, {
 				</div>
 				<div class="grid grid-cols-2 gap-4">
 					{
-						contracts.data ? (
-							contracts.data.map((contract) => (
+						activeContracts.data ? (
+							activeContracts.data.map((contract) => (
 								<ContractCard
 									contract={contract}
 									isGuild
@@ -73,13 +78,23 @@ const contracts = await Astro.callAction(actions.contract.listByGuild, {
 					}
 				</div>
 			</div>
-			<!-- <div class="mt-10">
-				<h2 class="font-semibold text-2xl mb-4">Previous Contracts</h2>
+			<div class="mt-10">
+				<h2 class="font-semibold text-2xl mb-4">All Contracts</h2>
 				<div class="grid grid-cols-2 gap-4">
-					<ContractCard isGuild />
-					<ContractCard isGuild />
+					{
+						allContracts.data ? (
+							allContracts.data.map((contract) => (
+								<ContractCard
+									contract={contract}
+									isGuild
+								/>
+							))
+						) : (
+							<p>No contracts found.</p>
+						)
+					}
 				</div>
-			</div> -->
+			</div>
 		</div>
 		<div class="space-y-4 w-[260px] flex-none">
 			<div class="sticky top-8"><PersonaCard /></div>
