@@ -28,13 +28,21 @@ if (!contract.data) return Astro.redirect("/hall")
 					<Icon name="mingcute:settings-5-fill" />
 				</a>
 			</div>
-			<p class="mb-3 text-gray-600 text-sm">
+			<p class="mb-3 text-gray-600 text-sm flex gap-2">
 				<a
 					href="/hall"
 					class="flex gap-1 items-center"
 				>
-					<Icon name="mingcute:arrow-left-fill" />Back to Guild Hall
+					<!-- <Icon name="mingcute:arrow-left-fill" /> -->
+					Guild Hall
 				</a>
+				{
+					contract.data.guild ? (
+						<a href={`/hall/guilds/${contract.data.guild.slug}`}>
+							{contract.data.guild.name}
+						</a>
+					) : null
+				}
 			</p>
 			<!-- TODO: double click to edit contract name -->
 			<h1 class="mb-3">{contract.data.name}</h1>
