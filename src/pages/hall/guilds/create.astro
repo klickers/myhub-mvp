@@ -4,13 +4,13 @@ import prisma from "@/helpers/prisma"
 import Layout from "@/layouts/Layout.astro"
 import { Icon } from "astro-icon/components"
 
-const personas = await prisma.persona.findMany({
-	orderBy: { name: "asc" },
-})
-
 const result = Astro.getActionResult(actions.guild.create)
 if (result && !result.error)
 	return Astro.redirect(`/hall/guilds/${result.data.slug}`)
+
+const personas = await prisma.persona.findMany({
+	orderBy: { name: "asc" },
+})
 ---
 
 <Layout>
