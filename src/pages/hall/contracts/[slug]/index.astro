@@ -22,7 +22,7 @@ if (!contract.data) return Astro.redirect("/hall")
 					<Icon name="mingcute:play-fill" />
 				</a>
 				<a
-					href="#!"
+					href={`/hall/contracts/${contract.data.slug}/edit`}
 					class="inline-block text-white p-1 rounded-sm bg-gray-950"
 				>
 					<Icon name="mingcute:settings-5-fill" />

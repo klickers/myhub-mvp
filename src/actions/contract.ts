@@ -35,6 +35,7 @@ export const contract = {
 		},
 	}),
 	update: defineAction({
+		accept: "form",
 		input: contractInput.extend({
 			id: z.coerce.number().int(),
 		}),
@@ -45,7 +46,7 @@ export const contract = {
 					name: input.name,
 					slug: input.slug,
 					description: input.description ?? null,
-					dueDate: input.dueDate,
+					dueDate: new Date(input.dueDate),
 					status: input.status,
 					guildId: input.guildId ?? null,
 				},

@@ -1,0 +1,126 @@
+---
+import { actions } from "astro:actions"
+import Layout from "@/layouts/Layout.astro"
+import { Icon } from "astro-icon/components"
+import { format } from "date-fns"
+
+const result = Astro.getActionResult(actions.contract.update)
+if (result && !result.error)
+	return Astro.redirect(`/hall/contracts/${result.data.slug}`)
+
+const guilds = await Astro.callAction(actions.guild.list, {})
+
+const slug = Astro.params.slug as string
+const contractRes = await Astro.callAction(actions.contract.getBySlug, {
+	slug,
+})
+if (!contractRes.data) throw new Error("Contract not found")
+const contract = contractRes.data
+---
+
+<Layout>
+	<p class="mb-3 text-gray-600 text-sm">
+		<a
+			href={`/hall/contracts/${slug}`}
+			class="flex gap-1 items-center"
+		>
+			<Icon name="mingcute:arrow-left-fill" />
+			Back to Contract
+		</a>
+	</p>
+
+	<h1>Edit Contract</h1>
+
+	<form
+		method="POST"
+		action={actions.contract.update}
+		class="flex flex-col space-y-1 max-w-lg"
+	>
+		<input
+			type="hidden"
+			name="id"
+			value={contract.id}
+		/>
+
+		<input
+			type="text"
+			name="name"
+			placeholder="Name"
+			required
+			value={contract.name}
+		/>
+
+		<input
+			type="text"
+			name="slug"
+			placeholder="Slug"
+			required
+			value={contract.slug}
+		/>
+
+		<input
+			type="date"
+			name="dueDate"
+			required
+			value={format(contract.dueDate, "yyyy-MM-dd")}
+		/>
+
+		<textarea
+			name="description"
+			placeholder="Description"
+		>
+			{contract.description ?? ""}
+		</textarea>
+
+		<select name="status">
+			<option
+				value="notstarted"
+				selected={contract.status === "notstarted"}
+			>
+				Not started
+			</option>
+			<option
+				value="inprogress"
+				selected={contract.status === "inprogress"}
+			>
+				In progress
+			</option>
+			<option
+				value="onhold"
+				selected={contract.status === "onhold"}
+			>
+				On hold
+			</option>
+			<option
+				value="completed"
+				selected={contract.status === "completed"}
+			>
+				Completed
+			</option>
+			<option
+				value="archived"
+				selected={contract.status === "archived"}
+			>
+				Archived
+			</option>
+		</select>
+
+		<select name="guildId">
+			<option value="">No guild</option>
+			{
+				guilds.data?.map((g) => (
+					<option
+						value={g.id}
+						selected={contract.guildId === g.id}
+					>
+						{g.name}
+					</option>
+				))
+			}
+		</select>
+
+		<div>
+			<button class="w-auto button py-2 mt-2">Save Changes</button>
+		</div>
+	</form>
+</Layout>
