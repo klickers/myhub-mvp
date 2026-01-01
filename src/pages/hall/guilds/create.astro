@@ -1,0 +1,70 @@
+---
+import { actions } from "astro:actions"
+import prisma from "@/helpers/prisma"
+import Layout from "@/layouts/Layout.astro"
+import { Icon } from "astro-icon/components"
+
+const personas = await prisma.persona.findMany({
+	orderBy: { name: "asc" },
+})
+
+const result = Astro.getActionResult(actions.guild.create)
+if (result && !result.error) {
+	return Astro.redirect(`/guilds/${result.data.slug}`)
+}
+---
+
+<Layout>
+	<p class="mb-3 text-gray-600 text-sm">
+		<a
+			href="/hall"
+			class="flex gap-1 items-center"
+		>
+			<Icon name="mingcute:arrow-left-fill" />Back to Guild Hall
+		</a>
+	</p>
+	<h1>New Guild</h1>
+	<form
+		method="POST"
+		action={actions.guild.create}
+		class="flex flex-col space-y-1 max-w-lg"
+	>
+		<input
+			name="name"
+			placeholder="Name"
+			required
+		/>
+		<input
+			name="slug"
+			placeholder="Slug"
+			required
+		/>
+
+		<textarea
+			name="description"
+			placeholder="Description"
+		></textarea>
+
+		<select name="status">
+			<option value="notstarted">Not started</option>
+			<option
+				value="inprogress"
+				selected
+			>
+				In progress
+			</option>
+			<option value="onhold">On hold</option>
+			<option value="completed">Completed</option>
+			<option value="archived">Archived</option>
+		</select>
+
+		<select name="personaId">
+			<option value="">No persona</option>
+			{personas.map((p) => <option value={p.id}>{p.name}</option>)}
+		</select>
+
+		<div>
+			<button class="w-auto button py-2 mt-2">Create</button>
+		</div>
+	</form>
+</Layout>

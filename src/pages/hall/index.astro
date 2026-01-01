@@ -1,6 +1,7 @@
 ---
 import Layout from "@/layouts/Layout.astro"
 import ContractCard from "@/components/guild-hall/ContractCard.astro"
+import { Icon } from "astro-icon/components"
 ---
 
 <Layout>
@@ -10,13 +11,33 @@ import ContractCard from "@/components/guild-hall/ContractCard.astro"
 			<!-- TODO: show all assignments -->
 		</div>
 		<div>
-			<h1 class="mb-8">Contracts</h1>
+			<div class="flex justify-between">
+				<h1 class="mb-8">Contracts</h1>
+				<div>
+					<a
+						href="#!"
+						class="flex gap-1 items-center rounded-xl py-1 px-3 bg-gray-200"
+					>
+						<Icon name="mingcute:plus-fill" />Add Contract
+					</a>
+				</div>
+			</div>
 			<div class="grid grid-cols-3 gap-6">
 				<ContractCard />
 			</div>
 		</div>
 		<div>
-			<h1 class="mb-8">Guilds</h1>
+			<div class="flex justify-between">
+				<h1 class="mb-8">Guilds</h1>
+				<div>
+					<a
+						href="/hall/guilds/create"
+						class="flex gap-1 items-center rounded-xl py-1 px-3 bg-gray-200"
+					>
+						<Icon name="mingcute:plus-fill" />Add Guild
+					</a>
+				</div>
+			</div>
 			<div class="grid grid-cols-4 gap-6">
 				<a
 					href="#!"

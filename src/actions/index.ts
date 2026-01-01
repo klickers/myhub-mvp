@@ -2,8 +2,10 @@ import { defineAction } from "astro:actions"
 import { z } from "zod"
 import { differenceInMinutes } from "date-fns"
 import prisma from "@/helpers/prisma"
+import { guild } from "./guild"
 
 export const server = {
+	guild,
 	// ===============================
 	// Session
 	// ===============================

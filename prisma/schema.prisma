@@ -10,6 +10,35 @@ datasource db {
     directUrl = env("DIRECT_URL")
 }
 
+// ================================================
+// Adventure Schema
+// ================================================
+
+model Guild {
+    id          Int     @id @default(autoincrement())
+    name        String
+    slug        String  @unique
+    description String?
+    status      Status  @default(inprogress)
+    personaId   Int?
+
+    persona   Persona?   @relation(fields: [personaId], references: [id])
+    contracts Contract[]
+}
+
+model Persona {
+    id          Int     @id @default(autoincrement())
+    name        String
+    description String
+    image       String?
+
+    guilds Guild[]
+}
+
+// ================================================
+// Previous Schema
+// ================================================
+
 model Bucket {
     id    Int    @id @default(autoincrement())
     name  String
