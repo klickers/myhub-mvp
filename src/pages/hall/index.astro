@@ -5,6 +5,7 @@ import { Icon } from "astro-icon/components"
 import { actions } from "astro:actions"
 
 const guilds = await Astro.callAction(actions.guild.list, {})
+const contracts = await Astro.callAction(actions.contract.listWithGuild, {})
 ---
 
 <Layout>
@@ -26,7 +27,15 @@ const guilds = await Astro.callAction(actions.guild.list, {})
 				</div>
 			</div>
 			<div class="grid grid-cols-3 gap-6">
-				<ContractCard />
+				{
+					contracts.data ? (
+						contracts.data.map((contract) => (
+							<ContractCard contract={contract} />
+						))
+					) : (
+						<p>No contracts found.</p>
+					)
+				}
 			</div>
 		</div>
 		<div>
