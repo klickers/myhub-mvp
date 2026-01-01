@@ -1,5 +1,5 @@
 ---
-import type { Prisma } from "@/generated/prisma/client"
+import type { Contract, Prisma } from "@/generated/prisma/client"
 import { Icon } from "astro-icon/components"
 import { format } from "date-fns"
 
@@ -7,10 +7,15 @@ type ContractWithGuild = Prisma.ContractGetPayload<{
 	include: { guild: true }
 }>
 
-interface Props {
-	isGuild?: boolean
-	contract: ContractWithGuild
-}
+type Props =
+	| {
+			isGuild: true
+			contract: Contract
+	  }
+	| {
+			isGuild?: false
+			contract: ContractWithGuild
+	  }
 
 const { isGuild = false, contract } = Astro.props
 ---
@@ -24,11 +29,11 @@ const { isGuild = false, contract } = Astro.props
 		<p class="font-semibold leading-tight">{contract.name}</p>
 		<div class="mt-2 flex justify-between items-center">
 			{
-				!isGuild && contract.guild ? (
+				!isGuild && (contract as ContractWithGuild).guild ? (
 					<div class="flex gap-1 items-center">
 						<div class="h-4 w-4 rounded-full bg-gray-300" />
 						<p class="text-gray-600 text-xs">
-							{contract.guild.name}
+							{(contract as ContractWithGuild).guild!.name}
 						</p>
 					</div>
 				) : null

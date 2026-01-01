@@ -9,6 +9,10 @@ const guild = await Astro.callAction(actions.guild.getBySlug, {
 	slug: Astro.params.slug as string,
 })
 if (!guild.data) return Astro.redirect("/hall")
+
+const contracts = await Astro.callAction(actions.contract.listByGuild, {
+	guildId: guild.data.id,
+})
 ---
 
 <Layout>
@@ -43,18 +47,27 @@ if (!guild.data) return Astro.redirect("/hall")
 				<!-- TODO: in progress, upcoming, on hold -->
 				<h2 class="font-semibold text-2xl mb-4">Active Contracts</h2>
 				<div class="grid grid-cols-2 gap-4">
-					<ContractCard isGuild />
-					<ContractCard isGuild />
-					<ContractCard isGuild />
+					{
+						contracts.data ? (
+							contracts.data.map((contract) => (
+								<ContractCard
+									contract={contract}
+									isGuild
+								/>
+							))
+						) : (
+							<p>No contracts found.</p>
+						)
+					}
 				</div>
 			</div>
-			<div class="mt-10">
+			<!-- <div class="mt-10">
 				<h2 class="font-semibold text-2xl mb-4">Previous Contracts</h2>
 				<div class="grid grid-cols-2 gap-4">
 					<ContractCard isGuild />
 					<ContractCard isGuild />
 				</div>
-			</div>
+			</div> -->
 		</div>
 		<div class="space-y-4 w-[260px] flex-none">
 			<div class="sticky top-8"><PersonaCard /></div>
