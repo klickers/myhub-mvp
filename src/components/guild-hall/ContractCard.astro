@@ -26,8 +26,7 @@ const { isGuild = false, contract } = Astro.props
 	class="card duration-300 hover:shadow-md"
 >
 	<div class="card__content">
-		<p class="font-semibold leading-tight">{contract.name}</p>
-		<div class="mt-2 flex justify-between items-center">
+		<div class="mb-2 flex justify-between items-center">
 			{
 				!isGuild && (contract as ContractWithGuild).guild ? (
 					<div class="flex gap-1 items-center">
@@ -43,13 +42,11 @@ const { isGuild = false, contract } = Astro.props
 				{format(new Date(contract.dueDate), "MMM dd, yyyy")}
 			</p>
 		</div>
-		{
-			!isGuild ? (
-				<div class="mt-4 relative">
-					<div class="h-2 w-full rounded-full bg-gray-200" />
-					<div class="h-2 w-3/4 rounded-full bg-emerald-400 absolute top-0" />
-				</div>
-			) : null
-		}
+		<p class="font-semibold leading-tight">{contract.name}</p>
+		<!-- <div class="mt-4 relative">
+			<div class="h-2 w-full rounded-full bg-gray-200"></div>
+			<div class="h-2 w-3/4 rounded-full bg-emerald-400 absolute top-0">
+			</div>
+		</div> -->
 	</div>
 </a>
