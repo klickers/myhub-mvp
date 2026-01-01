@@ -35,6 +35,18 @@ model Persona {
     guilds Guild[]
 }
 
+model Contract {
+    id          Int      @id @default(autoincrement())
+    name        String
+    slug        String   @unique
+    description String?
+    dueDate     DateTime
+    status      Status   @default(inprogress)
+    guildId     Int?
+
+    guild Guild? @relation(fields: [guildId], references: [id])
+}
+
 // ================================================
 // Previous Schema
 // ================================================

@@ -3,9 +3,11 @@ import { z } from "zod"
 import { differenceInMinutes } from "date-fns"
 import prisma from "@/helpers/prisma"
 import { guild } from "./guild"
+import { contract } from "./contract"
 
 export const server = {
 	guild,
+	contract,
 	// ===============================
 	// Session
 	// ===============================
