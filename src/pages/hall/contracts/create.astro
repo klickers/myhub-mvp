@@ -3,12 +3,11 @@ import { actions } from "astro:actions"
 import Layout from "@/layouts/Layout.astro"
 import { Icon } from "astro-icon/components"
 
-const guilds = await Astro.callAction(actions.guild.list, {})
-
 const result = Astro.getActionResult(actions.contract.create)
 if (result && !result.error)
 	return Astro.redirect(`/hall/contracts/${result.data.slug}`)
 
+const guilds = await Astro.callAction(actions.guild.list, {})
 const guildSlug = Astro.url.searchParams.get("guildSlug")
 ---
 
@@ -34,7 +33,9 @@ const guildSlug = Astro.url.searchParams.get("guildSlug")
 			)
 		}
 	</p>
+
 	<h1>New Contract</h1>
+
 	<form
 		method="POST"
 		action={actions.contract.create}
