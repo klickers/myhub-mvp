@@ -41,7 +41,7 @@ const guilds = await Astro.callAction(actions.guild.list, {})
 					</a>
 				</div>
 			</div>
-			<div class="grid grid-cols-4 gap-6">
+			<div class="grid grid-cols-3 gap-6">
 				{
 					guilds.data ? (
 						guilds.data.map((guild) => (
@@ -50,7 +50,11 @@ const guilds = await Astro.callAction(actions.guild.list, {})
 								class="card duration-300 hover:shadow-md"
 							>
 								<div class="card__content flex gap-2 items-center">
-									<div class="h-10 w-10 rounded-full bg-gray-300" />
+									{guild.persona ? (
+										<div>Persona</div>
+									) : (
+										<div class="h-10 w-10 rounded-full bg-gray-300" />
+									)}
 									<div>
 										<p class="font-semibold">
 											{guild.name}
