@@ -71,10 +71,7 @@ export const contract = {
 	}),
 	list: defineAction({
 		input: z.object({
-			status: z
-				.array(z.nativeEnum(Status))
-				.optional()
-				.default([Status.inprogress]),
+			status: z.array(z.nativeEnum(Status)).optional(),
 			withGuild: z.boolean().optional().default(false),
 		}),
 		handler: async ({ status, withGuild }) => {

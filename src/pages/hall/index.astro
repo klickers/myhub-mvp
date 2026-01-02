@@ -3,10 +3,12 @@ import Layout from "@/layouts/Layout.astro"
 import ContractCard from "@/components/guild-hall/ContractCard.astro"
 import { actions } from "astro:actions"
 import Button from "@/components/Button.astro"
+import { Status } from "@/generated/prisma/enums"
 
 const guilds = await Astro.callAction(actions.guild.list, {})
 const contracts = await Astro.callAction(actions.contract.list, {
 	withGuild: true,
+	status: [Status.inprogress],
 })
 ---
 
