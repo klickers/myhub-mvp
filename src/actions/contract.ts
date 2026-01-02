@@ -75,19 +75,20 @@ export const contract = {
 			})
 		},
 	}),
-	listWithGuild: defineAction({
+	list: defineAction({
 		input: z.object({
 			status: z
 				.array(z.nativeEnum(Status))
 				.optional()
 				.default([Status.inprogress]),
+			withGuild: z.boolean().optional().default(false),
 		}),
-		handler: async ({ status }) => {
+		handler: async ({ status, withGuild }) => {
 			return prisma.contract.findMany({
 				where: {
 					status: { in: status },
 				},
-				include: { guild: true },
+				include: { guild: withGuild },
 				orderBy: { dueDate: "asc" },
 			})
 		},
