@@ -1,0 +1,111 @@
+---
+import { actions } from "astro:actions"
+import Layout from "@/layouts/Layout.astro"
+import { Icon } from "astro-icon/components"
+
+const contractSlug = Astro.url.searchParams.get("contractSlug")
+
+const result = Astro.getActionResult(actions.task.create)
+if (result && !result.error)
+	return Astro.redirect(`/hall/contracts/${contractSlug}`)
+
+const contracts = await Astro.callAction(actions.contract.list, {})
+---
+
+<Layout>
+	{
+		contractSlug && (
+			<p class="mb-3 text-gray-600 text-sm">
+				<a
+					href={`/hall/contracts/${contractSlug}`}
+					class="flex gap-1 items-center"
+				>
+					<Icon name="mingcute:arrow-left-fill" />
+					Back to Contract
+				</a>
+			</p>
+		)
+	}
+
+	<h1>New Task</h1>
+
+	<form
+		method="POST"
+		action={actions.task.create}
+		class="flex flex-col space-y-1 max-w-lg"
+	>
+		<input
+			type="text"
+			name="name"
+			placeholder="Task name"
+			required
+		/>
+
+		<input
+			type="number"
+			name="estimatedTime"
+			placeholder="Estimated time (minutes)"
+			min="0"
+		/>
+
+		<input
+			type="date"
+			name="deadline"
+		/>
+
+		<select name="status">
+			<option
+				value="notstarted"
+				selected
+				>Not started</option
+			>
+			<option value="inprogress"> In progress </option>
+			<option value="onhold">On hold</option>
+			<option value="completed">Completed</option>
+			<option value="archived">Archived</option>
+		</select>
+
+		{
+			contractSlug ? (
+				<>
+					<input
+						type="hidden"
+						name="parentType"
+						value="contract"
+					/>
+					<input
+						type="hidden"
+						name="contractId"
+						value={
+							contracts.data?.find((c) => c.slug === contractSlug)
+								?.id
+						}
+					/>
+				</>
+			) : (
+				<>
+					<select name="parentType">
+						<option value="none">No parent</option>
+						<option
+							value="contract"
+							selected
+						>
+							Contract
+						</option>
+					</select>
+
+					<select name="contractId">
+						<option value="">No contract</option>
+						{contracts.data?.map((c) => (
+							<option value={c.id}>{c.name}</option>
+						))}
+					</select>
+				</>
+			)
+		}
+
+		<div>
+			<button class="w-auto button py-2 mt-2">Create Task</button>
+		</div>
+	</form>
+</Layout>
