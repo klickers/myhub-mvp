@@ -45,6 +45,7 @@ model Contract {
     guildId     Int?
 
     guild Guild? @relation(fields: [guildId], references: [id])
+    tasks Task[]
 }
 
 // ================================================
@@ -79,8 +80,17 @@ model Task {
     name          String
     parentType    TaskParentType @default(contract)
     status        Status         @default(notstarted)
-    estimatedTime Int            @default(0) // in minutes
+    estimatedTime Int?           @default(0) // in minutes
     deadline      DateTime?
+
+    contractId   Int?
+    experimentId Int?
+    parentTaskId Int?
+
+    contract   Contract?   @relation(fields: [contractId], references: [id])
+    experiment Experiment? @relation(fields: [experimentId], references: [id])
+    parentTask Task?       @relation("TaskHierarchy", fields: [parentTaskId], references: [id])
+    subtasks   Task[]      @relation("TaskHierarchy")
 
     sessions Session[]
 }
