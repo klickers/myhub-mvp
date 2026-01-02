@@ -200,11 +200,14 @@
 	--highlight: oklch(0.852 0.199 91.936);
 }
 
-@layer base {
-	* {
-		@apply border-border outline-ring/50;
+/******************************************************
+ * Guild Hall Calendar 
+ ******************************************************/
+.fc-event {
+	&.calendar-task {
+		@apply bg-sky-500 border-none;
 	}
-	body {
-		@apply bg-background text-foreground;
+	&.calendar-contract {
+		@apply bg-violet-600 border-none;
 	}
 }

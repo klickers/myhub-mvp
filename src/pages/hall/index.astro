@@ -4,6 +4,7 @@ import ContractCard from "@/components/guild-hall/ContractCard.astro"
 import { actions } from "astro:actions"
 import Button from "@/components/Button.astro"
 import { Status } from "@/generated/prisma/enums"
+import Calendar from "@/components/guild-hall/Calendar"
 
 const guilds = await Astro.callAction(actions.guild.list, {})
 const contracts = await Astro.callAction(actions.contract.list, {
@@ -15,8 +16,8 @@ const contracts = await Astro.callAction(actions.contract.list, {
 <Layout>
 	<div class="space-y-20">
 		<div>
-			<h1 class="mb-8">Calendar</h1>
-			<!-- TODO: show all assignments -->
+			<!-- <h1 class="mb-8">Calendar</h1> -->
+			<Calendar client:load />
 		</div>
 		<div>
 			<div class="flex justify-between">

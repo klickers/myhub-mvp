@@ -118,6 +118,19 @@ export const task = {
 			})
 		},
 	}),
+	listAll: defineAction({
+		input: z.object({
+			status: z.array(z.nativeEnum(Status)).optional(),
+		}),
+		handler: async ({ status }) => {
+			return prisma.task.findMany({
+				where: {
+					status: { in: status },
+				},
+				orderBy: { deadline: "asc" },
+			})
+		},
+	}),
 	listByContract: defineAction({
 		input: z.object({
 			contractId: z.coerce.number().int(),
