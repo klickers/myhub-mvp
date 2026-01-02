@@ -3,6 +3,7 @@ import Layout from "@/layouts/Layout.astro"
 import ContractCard from "@/components/guild-hall/ContractCard.astro"
 import { Icon } from "astro-icon/components"
 import { actions } from "astro:actions"
+import Button from "@/components/Button.astro"
 
 const guilds = await Astro.callAction(actions.guild.list, {})
 const contracts = await Astro.callAction(actions.contract.listWithGuild, {})
@@ -18,12 +19,11 @@ const contracts = await Astro.callAction(actions.contract.listWithGuild, {})
 			<div class="flex justify-between">
 				<h1 class="mb-8">Contracts</h1>
 				<div>
-					<a
+					<Button
 						href="/hall/contracts/create"
-						class="flex gap-1 items-center rounded-xl py-1 px-3 bg-gray-200"
-					>
-						<Icon name="mingcute:plus-fill" />Add Contract
-					</a>
+						icon="mingcute:plus-fill"
+						label="Add Contract"
+					/>
 				</div>
 			</div>
 			<!-- TODO: filter by status -->
@@ -43,12 +43,11 @@ const contracts = await Astro.callAction(actions.contract.listWithGuild, {})
 			<div class="flex justify-between">
 				<h1 class="mb-8">Guilds</h1>
 				<div>
-					<a
+					<Button
 						href="/hall/guilds/create"
-						class="flex gap-1 items-center rounded-xl py-1 px-3 bg-gray-200"
-					>
-						<Icon name="mingcute:plus-fill" />Add Guild
-					</a>
+						icon="mingcute:plus-fill"
+						label="Add Guild"
+					/>
 				</div>
 			</div>
 			<div class="grid grid-cols-3 gap-3">

@@ -5,6 +5,7 @@ import PersonaCard from "@/components/guild-hall/PersonaCard.astro"
 import { Icon } from "astro-icon/components"
 import { actions } from "astro:actions"
 import { Status } from "@/generated/prisma/enums"
+import Button from "@/components/Button.astro"
 
 const guild = await Astro.callAction(actions.guild.getBySlug, {
 	slug: Astro.params.slug as string,
@@ -55,12 +56,11 @@ const allContracts = await Astro.callAction(actions.contract.listByGuild, {
 						Active Contracts
 					</h2>
 					<div>
-						<a
+						<Button
 							href={`/hall/contracts/create?guildSlug=${guild.data.slug}`}
-							class="flex gap-1 items-center rounded-xl py-1 px-3 bg-gray-200"
-						>
-							<Icon name="mingcute:plus-fill" />Add Contract
-						</a>
+							icon="mingcute:plus-fill"
+							label="Add Contract"
+						/>
 					</div>
 				</div>
 				<div class="grid grid-cols-2 gap-4">
