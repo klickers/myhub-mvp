@@ -77,7 +77,7 @@ export const task = {
 					parentType: input.parentType,
 					status: input.status,
 					estimatedTime: input.estimatedTime,
-					deadline: new Date(input.deadline as Date),
+					deadline: input.deadline && new Date(input.deadline),
 					contractId: input.contractId ?? null,
 					experimentId: input.experimentId ?? null,
 					parentTaskId: input.parentTaskId ?? null,

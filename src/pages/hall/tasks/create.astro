@@ -10,6 +10,7 @@ if (result && !result.error)
 
 const contracts = await Astro.callAction(actions.contract.list, {})
 const contractSlug = Astro.url.searchParams.get("contractSlug")
+const contract = contracts.data?.find((c) => c.slug === contractSlug)
 ---
 
 <Layout>
@@ -21,7 +22,7 @@ const contractSlug = Astro.url.searchParams.get("contractSlug")
 					class="flex gap-1 items-center"
 				>
 					<Icon name="mingcute:arrow-left-fill" />
-					Back to Contract
+					Back to {contract?.name ?? "Contract"}
 				</a>
 			</p>
 		)
@@ -76,7 +77,7 @@ const contractSlug = Astro.url.searchParams.get("contractSlug")
 		</select>
 
 		{
-			contractSlug ? (
+			contract ? (
 				<>
 					<input
 						type="hidden"
@@ -86,10 +87,7 @@ const contractSlug = Astro.url.searchParams.get("contractSlug")
 					<input
 						type="hidden"
 						name="contractId"
-						value={
-							contracts.data?.find((c) => c.slug === contractSlug)
-								?.id
-						}
+						value={contract.id}
 					/>
 				</>
 			) : (
