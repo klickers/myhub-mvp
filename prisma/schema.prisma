@@ -70,22 +70,19 @@ model Objective {
     status    Status    @default(notstarted)
 
     bucket       Bucket        @relation(fields: [bucketId], references: [id])
-    tasks        Task[]
     sessions     Session[]
     timePerWeeks TimePerWeek[]
 }
 
 model Task {
-    id            Int       @id @default(autoincrement())
+    id            Int            @id @default(autoincrement())
     name          String
-    objectiveId   Int
-    status        Status    @default(notstarted)
-    estimatedTime Int       @default(0)
+    parentType    TaskParentType @default(contract)
+    status        Status         @default(notstarted)
+    estimatedTime Int            @default(0) // in minutes
     deadline      DateTime?
 
-    objective    Objective     @relation(fields: [objectiveId], references: [id])
-    timePerWeeks TimePerWeek[]
-    sessions     Session[]
+    sessions Session[]
 }
 
 model Week {
@@ -104,15 +101,13 @@ model TimePerWeek {
     weekNumber    Int
     itemType      ItemType @default(objective)
     objectiveId   Int?
-    taskId        Int?
     scheduledTime Int      @default(0)
     completed     Boolean  @default(false)
 
     objective Objective? @relation(fields: [objectiveId], references: [id])
-    task      Task?      @relation(fields: [taskId], references: [id])
     week      Week       @relation(fields: [year, weekNumber], references: [year, weekNumber])
 
-    @@unique([year, weekNumber, itemType, objectiveId, taskId])
+    @@unique([year, weekNumber, itemType, objectiveId])
 }
 
 model Session {
@@ -157,5 +152,12 @@ enum Status {
 enum ItemType {
     bucket
     objective
+    task
+}
+
+enum TaskParentType {
+    none
+    contract
+    experiment
     task
 }
