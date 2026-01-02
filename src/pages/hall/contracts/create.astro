@@ -79,19 +79,27 @@ const guildSlug = Astro.url.searchParams.get("guildSlug")
 			<option value="archived">Archived</option>
 		</select>
 
-		<select name="guildId">
-			<option value="">No guild</option>
-			{
-				guilds.data?.map((g) => (
-					<option
-						value={g.id}
-						selected={guildSlug && g.slug == guildSlug}
-					>
-						{g.name}
-					</option>
-				))
-			}
-		</select>
+		{
+			guildSlug ? (
+				<input
+					type="hidden"
+					name="guildId"
+					value={guilds.data?.find((g) => g.slug == guildSlug)?.id}
+				/>
+			) : (
+				<select name="guildId">
+					<option value="">No guild</option>
+					{guilds.data?.map((g) => (
+						<option
+							value={g.id}
+							selected={guildSlug && g.slug == guildSlug}
+						>
+							{g.name}
+						</option>
+					))}
+				</select>
+			)
+		}
 
 		<div>
 			<button class="w-auto button py-2 mt-2">Create</button>
