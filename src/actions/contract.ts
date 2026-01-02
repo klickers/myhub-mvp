@@ -8,13 +8,7 @@ const contractInput = z.object({
 	slug: z.string().min(1),
 	description: z.string().nullable().optional(),
 	dueDate: z.string(),
-	status: z.enum([
-		"notstarted",
-		"archived",
-		"inprogress",
-		"onhold",
-		"completed",
-	]),
+	status: z.nativeEnum(Status),
 	guildId: z.coerce.number().int().nullable().optional(),
 })
 

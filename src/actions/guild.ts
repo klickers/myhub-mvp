@@ -1,18 +1,13 @@
 import { defineAction } from "astro:actions"
 import { z } from "zod"
 import prisma from "@/helpers/prisma"
+import { Status } from "@/generated/prisma/enums"
 
 const guildInput = z.object({
 	name: z.string().min(1),
 	slug: z.string().min(1),
 	description: z.string().nullable().optional(),
-	status: z.enum([
-		"notstarted",
-		"archived",
-		"inprogress",
-		"onhold",
-		"completed",
-	]),
+	status: z.nativeEnum(Status),
 	personaId: z.coerce.number().int().nullable().optional(),
 })
 
@@ -75,7 +70,7 @@ export const guild = {
 			return prisma.guild.findMany({
 				where: {
 					status: {
-						notIn: ["onhold", "archived"],
+						notIn: [Status.onhold, Status.archived],
 					},
 				},
 				include: { persona: true },
