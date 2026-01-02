@@ -16,6 +16,9 @@ const taskInput = z
 		contractId: z.number().int().positive().optional(),
 		experimentId: z.number().int().positive().optional(),
 		parentTaskId: z.number().int().positive().optional(),
+
+		// for form handling
+		contractSlug: z.string().optional(),
 	})
 	.superRefine((data, ctx) => {
 		const parentIds = [
@@ -68,7 +71,7 @@ export const task = {
 		accept: "form",
 		input: taskInput,
 		handler: async (input) => {
-			return prisma.task.create({
+			const task = await prisma.task.create({
 				data: {
 					name: input.name,
 					parentType: input.parentType,
@@ -80,6 +83,10 @@ export const task = {
 					parentTaskId: input.parentTaskId ?? null,
 				},
 			})
+			return {
+				task,
+				contractSlug: input.contractSlug,
+			}
 		},
 	}),
 	// update: defineAction({

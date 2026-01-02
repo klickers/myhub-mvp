@@ -3,13 +3,13 @@ import { actions } from "astro:actions"
 import Layout from "@/layouts/Layout.astro"
 import { Icon } from "astro-icon/components"
 
-const contractSlug = Astro.url.searchParams.get("contractSlug")
-
 const result = Astro.getActionResult(actions.task.create)
 if (result && !result.error)
-	return Astro.redirect(`/hall/contracts/${contractSlug}`)
+	if (result.data?.contractSlug)
+		return Astro.redirect(`/hall/contracts/${result.data?.contractSlug}`)
 
 const contracts = await Astro.callAction(actions.contract.list, {})
+const contractSlug = Astro.url.searchParams.get("contractSlug")
 ---
 
 <Layout>
@@ -34,6 +34,16 @@ const contracts = await Astro.callAction(actions.contract.list, {})
 		action={actions.task.create}
 		class="flex flex-col space-y-1 max-w-lg"
 	>
+		{
+			contractSlug && (
+				<input
+					type="hidden"
+					name="contractSlug"
+					value={contractSlug}
+				/>
+			)
+		}
+
 		<input
 			type="text"
 			name="name"
