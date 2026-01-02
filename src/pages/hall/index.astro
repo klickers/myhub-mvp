@@ -26,6 +26,7 @@ const contracts = await Astro.callAction(actions.contract.listWithGuild, {})
 					</a>
 				</div>
 			</div>
+			<!-- TODO: filter by status -->
 			<div class="grid grid-cols-3 gap-3">
 				{
 					contracts.data ? (
@@ -33,7 +34,7 @@ const contracts = await Astro.callAction(actions.contract.listWithGuild, {})
 							<ContractCard contract={contract} />
 						))
 					) : (
-						<p>No contracts found.</p>
+						<p>No active contracts found.</p>
 					)
 				}
 			</div>
