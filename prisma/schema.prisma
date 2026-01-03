@@ -118,19 +118,41 @@ model Session {
     task       Task?       @relation(fields: [taskId], references: [id])
 }
 
-enum Status {
-    notstarted
-    archived
-    inprogress
-    onhold
-    completed
+model Category {
+    id   Int    @id @default(autoincrement())
+    name String
+    slug String @unique
+
+    experiments Experiment[]
 }
 
-enum TaskParentType {
-    none
+model Experiment {
+    id          Int      @id @default(autoincrement())
+    name        String
+    slug        String   @unique
+    description String?
+    status      Status   @default(inprogress)
+    categoryId  Int?
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+
+    category Category? @relation(fields: [categoryId], references: [id])
+
+    tasks    Task[]
+    sessions Session[]
+}
+
+model Agenda {
+    id Int @id @default(autoincrement())
+    // TODO
+}
+
+enum AgendaItemType {
+    guild
     contract
-    experiment
     task
+    category
+    experiment
 }
 
 // ================================================
