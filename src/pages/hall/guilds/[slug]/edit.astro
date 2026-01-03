@@ -1,0 +1,118 @@
+---
+import { actions } from "astro:actions"
+import prisma from "@/helpers/prisma"
+import Layout from "@/layouts/Layout.astro"
+import { Icon } from "astro-icon/components"
+
+const result = Astro.getActionResult(actions.guild.update)
+if (result && !result.error)
+	return Astro.redirect(`/hall/guilds/${result.data.slug}`)
+
+const personas = await prisma.persona.findMany({
+	orderBy: { name: "asc" },
+})
+
+const slug = Astro.params.slug as string
+const guildRes = await Astro.callAction(actions.guild.getBySlug, {
+	slug,
+})
+if (!guildRes.data) throw new Error("Guild not found")
+const guild = guildRes.data
+---
+
+<Layout>
+	<p class="mb-3 text-gray-600 text-sm">
+		<a
+			href={`/hall/guilds/${slug}`}
+			class="flex gap-1 items-center"
+		>
+			<Icon name="mingcute:arrow-left-fill" />
+			Back to Guild
+		</a>
+	</p>
+
+	<h1>Edit Guild</h1>
+
+	<form
+		method="POST"
+		action={actions.guild.update}
+		class="flex flex-col space-y-1 max-w-lg"
+	>
+		<input
+			type="hidden"
+			name="id"
+			value={guild.id}
+		/>
+
+		<input
+			name="name"
+			placeholder="Name"
+			required
+			value={guild.name}
+		/>
+
+		<input
+			name="slug"
+			placeholder="Slug"
+			required
+			value={guild.slug}
+		/>
+
+		<textarea
+			name="description"
+			placeholder="Description"
+			>{guild.description ?? ""}</textarea
+		>
+
+		<select name="status">
+			<option
+				value="notstarted"
+				selected={guild.status === "notstarted"}
+			>
+				Not started
+			</option>
+			<option
+				value="inprogress"
+				selected={guild.status === "inprogress"}
+			>
+				In progress
+			</option>
+			<option
+				value="onhold"
+				selected={guild.status === "onhold"}
+			>
+				On hold
+			</option>
+			<option
+				value="completed"
+				selected={guild.status === "completed"}
+			>
+				Completed
+			</option>
+			<option
+				value="archived"
+				selected={guild.status === "archived"}
+			>
+				Archived
+			</option>
+		</select>
+
+		<select name="personaId">
+			<option value="">No persona</option>
+			{
+				personas.map((p) => (
+					<option
+						value={p.id}
+						selected={guild.personaId === p.id}
+					>
+						{p.name}
+					</option>
+				))
+			}
+		</select>
+
+		<div>
+			<button class="w-auto button py-2 mt-2">Save Changes</button>
+		</div>
+	</form>
+</Layout>

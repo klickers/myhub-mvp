@@ -28,6 +28,7 @@ export const guild = {
 		},
 	}),
 	update: defineAction({
+		accept: "form",
 		input: guildInput.extend({
 			id: z.coerce.number().int(),
 		}),

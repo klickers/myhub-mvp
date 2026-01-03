@@ -38,7 +38,7 @@ const allContracts = await Astro.callAction(actions.contract.listByGuild, {
 					client:load
 				/>
 				<a
-					href="#!"
+					href={`/hall/guilds/${guild.data.slug}/edit`}
 					class="inline-block text-white p-1 rounded-sm bg-gray-950"
 				>
 					<Icon name="mingcute:settings-5-fill" />
