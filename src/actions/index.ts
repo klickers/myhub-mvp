@@ -15,7 +15,13 @@ export const server = {
 	// ===============================
 	startSession: defineAction({
 		input: z.object({
-			itemType: z.enum(["objective", "task"]),
+			itemType: z.enum([
+				"objective",
+				"guild",
+				"contract",
+				"experiment",
+				"task",
+			]),
 			itemId: z.number(),
 		}),
 		handler: async ({ itemType, itemId }) => {
@@ -24,6 +30,10 @@ export const server = {
 				startTime: new Date(),
 			}
 			if (itemType === "objective") data.objectiveId = itemId
+			else if (itemType == "guild") data.guildId = itemId
+			else if (itemType == "contract") data.contractId = itemId
+			else if (itemType == "experiment") data.experimentId = itemId
+			else if (itemType == "task") data.taskId = itemId
 			return await prisma.session.create({ data })
 		},
 	}),
