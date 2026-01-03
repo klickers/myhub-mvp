@@ -91,15 +91,22 @@ const tasks = await Astro.callAction(actions.task.listByContract, {
 											<p class="font-semibold">
 												{task.name}
 											</p>
-											{task.deadline ? (
-												<p class="text-xs text-gray-600">
-													Due{" "}
-													{format(
-														task.deadline,
-														"MMM d, yyyy"
-													)}
-												</p>
-											) : null}
+											<div class="flex items-center gap-2 -mr-1">
+												{task.deadline ? (
+													<p class="text-xs text-gray-600">
+														Due{" "}
+														{format(
+															task.deadline,
+															"MMM d, yyyy"
+														)}
+													</p>
+												) : null}
+												<SessionPlayButton
+													itemType="task"
+													itemId={task.id}
+													client:load
+												/>
+											</div>
 										</div>
 									</div>
 								</div>
