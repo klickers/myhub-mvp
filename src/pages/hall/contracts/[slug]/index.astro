@@ -45,13 +45,19 @@ const tasks = await Astro.callAction(actions.task.listByContract, {
 					href="/hall"
 					class="flex gap-1 items-center"
 				>
-					<!-- <Icon name="mingcute:arrow-left-fill" /> -->
+					<Icon
+						name="mingcute:building-4-fill"
+						class="-mt-0.5"
+					/>
 					Guild Hall
 				</a>
 				{
 					contract.data.guild ? (
-						<a href={`/hall/guilds/${contract.data.guild.slug}`}>
-							{contract.data.guild.name}
+						<a
+							href={`/hall/guilds/${contract.data.guild.slug}`}
+							class="flex gap-1 items-center"
+						>
+							/&nbsp;&nbsp;{contract.data.guild.name}
 						</a>
 					) : null
 				}
