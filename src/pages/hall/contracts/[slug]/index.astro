@@ -86,7 +86,9 @@ const tasks = await Astro.callAction(actions.task.listByContract, {
 					{
 						tasks.data && tasks.data.length > 0 ? (
 							tasks.data.map((task) => (
-								<div class="card">
+								<div
+									class={`card ${task.status == "completed" ? "bg-green-50 border-green-50" : ""}`}
+								>
 									<div class="card__content">
 										<div class="flex justify-between items-center">
 											<p class="font-semibold">
