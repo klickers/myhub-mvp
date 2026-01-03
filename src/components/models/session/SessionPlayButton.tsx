@@ -1,9 +1,10 @@
-import React from "react"
+import React, { useEffect } from "react"
 import { useStore } from "@nanostores/react"
 import { Icon } from "@iconify/react"
 import { actions } from "astro:actions"
 import { playingSession } from "@/stores/playingSession"
 import type { SessionItemType } from "@/generated/prisma/enums"
+import { initPlayingSession } from "@/helpers/initPlayingSession"
 
 interface Props {
 	itemType: SessionItemType
@@ -16,6 +17,10 @@ const SessionPlayButton: React.FC<Props> = ({ itemType, itemId }) => {
 		$playingSession.isPlaying &&
 		$playingSession.itemType == itemType &&
 		$playingSession.itemId == itemId
+
+	useEffect(() => {
+		initPlayingSession()
+	}, [])
 
 	const endCurrentSession = async () => {
 		const { data, error } = await actions.getKeyValue({

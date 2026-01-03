@@ -6,6 +6,7 @@ import { actions } from "astro:actions"
 import Button from "@/components/Button.astro"
 import { format } from "date-fns"
 import SessionPlayButton from "@/components/models/session/SessionPlayButton"
+import { initPlayingSession } from "@/helpers/initPlayingSession"
 
 const contract = await Astro.callAction(actions.contract.getBySlug, {
 	slug: Astro.params.slug as string,

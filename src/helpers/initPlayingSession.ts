@@ -38,6 +38,9 @@ async function getTitleAndSlug(
 }
 
 export const initPlayingSession = async () => {
+	const current = playingSession.get()
+	if (current._initialized) return
+
 	const id = await actions.getKeyValue.orThrow({
 			key: "playingSessionId",
 		}),
@@ -53,9 +56,7 @@ export const initPlayingSession = async () => {
 		startTime = await actions.getKeyValue.orThrow({
 			key: "playingSessionStartTime",
 		})
-
 	const parsedItemId = parseInt(itemId || "0")
-
 	const { title, slug } = await getTitleAndSlug(itemType, parsedItemId)
 
 	playingSession.set({
@@ -66,5 +67,6 @@ export const initPlayingSession = async () => {
 		startTime: startTime ? new Date(startTime) : null,
 		title,
 		slug,
+		_initialized: true,
 	})
 }

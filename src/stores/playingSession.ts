@@ -11,6 +11,8 @@ type playing = {
 
 	title: string | null
 	slug: string | null
+
+	_initialized: boolean
 }
 
 export const playingSession = atom<playing>({
@@ -23,4 +25,6 @@ export const playingSession = atom<playing>({
 
 	title: null,
 	slug: null,
+
+	_initialized: false,
 })
