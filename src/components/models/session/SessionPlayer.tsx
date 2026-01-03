@@ -103,7 +103,7 @@ const SessionPlayer: React.FC<Props> = ({ objectives, tasks }) => {
 	// Update timer display
 	// ---------------------------------------------------
 	useEffect(() => {
-		if (!$playingSession.startTime || !$playingSession.objectiveId) return
+		if (!$playingSession.startTime || !$playingSession.itemId) return
 		const interval = setInterval(() => {
 			setUsedTime(
 				secondsToDots(
