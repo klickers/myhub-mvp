@@ -84,11 +84,21 @@ export const contract = {
 		input: z.object({
 			status: z.array(z.nativeEnum(Status)).optional(),
 			withGuild: z.boolean().optional().default(false),
+			from: z.coerce.date().optional(),
+			to: z.coerce.date().optional(),
 		}),
-		handler: async ({ status, withGuild }) => {
+		handler: async ({ status, withGuild, from, to }) => {
 			return prisma.contract.findMany({
 				where: {
-					status: { in: status },
+					...(status && { status: { in: status } }),
+					...(from || to
+						? {
+								dueDate: {
+									...(from && { gte: from }),
+									...(to && { lte: to }),
+								},
+						  }
+						: {}),
 				},
 				include: { guild: withGuild },
 				orderBy: { dueDate: "asc" },

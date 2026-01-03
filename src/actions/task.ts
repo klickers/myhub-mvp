@@ -131,11 +131,21 @@ export const task = {
 	listAll: defineAction({
 		input: z.object({
 			status: z.array(z.nativeEnum(Status)).optional(),
+			from: z.coerce.date().optional(),
+			to: z.coerce.date().optional(),
 		}),
-		handler: async ({ status }) => {
+		handler: async ({ status, from, to }) => {
 			return prisma.task.findMany({
 				where: {
-					status: { in: status },
+					...(status && { status: { in: status } }),
+					...(from || to
+						? {
+								deadline: {
+									...(from && { gte: from }),
+									...(to && { lte: to }),
+								},
+						  }
+						: {}),
 				},
 				orderBy: { deadline: "asc" },
 			})

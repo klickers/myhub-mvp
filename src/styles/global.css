@@ -210,4 +210,7 @@
 	&.calendar-contract {
 		@apply bg-violet-600 border-none;
 	}
+	&.calendar-completed {
+		@apply bg-green-300 border-none;
+	}
 }
