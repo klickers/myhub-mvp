@@ -1,9 +1,10 @@
+import type { SessionItemType } from "@/generated/prisma/enums"
 import { atom } from "nanostores"
 
 type playing = {
 	id: number
 	isPlaying: boolean
-	itemType: "objective" | "guild" | "contract" | "experiment" | "task"
+	itemType: SessionItemType
 	itemId: number
 	// objectiveId: number
 	startTime: null | Date
