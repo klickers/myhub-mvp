@@ -86,11 +86,8 @@ const SessionPlayButton: React.FC<Props> = ({ itemType, itemId }) => {
 
 	const handleClick = async () => {
 		if ($playingSession.isPlaying) {
-			if (isCurrentlyPlaying) await endCurrentSession()
-			else {
-				await endCurrentSession()
-				await startSession()
-			}
+			await endCurrentSession()
+			if (!isCurrentlyPlaying) await startSession()
 			// TODO: update $bucket.objectives.sessions to include new session
 			// TODO: clear editor
 		} else await startSession()
