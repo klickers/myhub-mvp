@@ -1,4 +1,5 @@
 ---
+import SessionPlayer from "@/components/models/session/SessionPlayer"
 import Layout from "@/layouts/Layout.astro"
 ---
 
@@ -19,7 +20,9 @@ import Layout from "@/layouts/Layout.astro"
 		</div>
 		<div class="space-y-4 w-[220px] flex-none">
 			<div class="card">
-				<div class="card__content">Timer</div>
+				<div class="card__content">
+					<SessionPlayer client:load />
+				</div>
 			</div>
 			<div class="card">
 				<div class="card__content">Inspiring Quote</div>

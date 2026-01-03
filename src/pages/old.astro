@@ -6,7 +6,7 @@ import Dailies from "@/components/Dailies"
 import WeeklyTitle from "@/components/WeeklyTitle"
 import WeeklyHeader from "@/components/WeeklyHeader"
 import WeeklyCalendarControls from "@/components/WeeklyCalendarControls"
-import SessionPlayer from "@/components/models/session/SessionPlayer"
+import SessionPlayer from "@/components/models/session/SessionPlayerOld"
 import prisma from "@/helpers/prisma"
 
 const objectives = await prisma.objective.findMany({

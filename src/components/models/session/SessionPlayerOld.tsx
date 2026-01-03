@@ -6,38 +6,29 @@ import { playingSession } from "@/stores/playingSession"
 import { secondsToDots } from "@/helpers/time/secondsToDots"
 import { differenceInSeconds } from "date-fns"
 
-import { Plate, usePlateEditor } from "platejs/react"
+import { Plate, usePlateEditor, type TPlateEditor } from "platejs/react"
 import { Editor, EditorContainer } from "@/components/editor/ui/editor"
 import { EditorKit } from "@/components/editor/editor-kit"
 import type { Prisma } from "@/generated/prisma/client"
 import { type Value } from "platejs"
-import { initPlayingSession } from "@/helpers/initPlayingSession"
 
-// interface Objective {
-// 	id: number
-// 	name: string
-// }
-
-// interface Task {
-// 	id: number
-// 	name: string
-// }
-
-type SessionItemType =
-	| "objective"
-	| "none"
-	| "guild"
-	| "contract"
-	| "experiment"
-	| "task"
-
-interface Props {
-	// objectives: Objective[]
-	// tasks: Task[]
+interface Objective {
+	id: number
+	name: string
 }
 
-const SessionPlayer: React.FC<Props> = ({}) => {
-	const [itemType, setItemType] = useState<SessionItemType>("task")
+interface Task {
+	id: number
+	name: string
+}
+
+interface Props {
+	objectives: Objective[]
+	tasks: Task[]
+}
+
+const SessionPlayer: React.FC<Props> = ({ objectives, tasks }) => {
+	const [itemType, setItemType] = useState<"objective" | "task">("objective")
 	const [itemId, setItemId] = useState<number | null>(null)
 	const [notes, setNotes] = useState<Prisma.JsonArray>([])
 	const [lastSaved, setLastSaved] = useState<string | null>(null)
@@ -60,17 +51,13 @@ const SessionPlayer: React.FC<Props> = ({}) => {
 			if (!data) return
 
 			// Set correct item type + id
-			if (data.itemType === "objective" && data.objectiveId)
+			if (data.itemType === "objective" && data.objectiveId) {
+				setItemType("objective")
 				setItemId(data.objectiveId)
-			else if (data.itemType === "guild" && data.guildId)
-				setItemId(data.guildId)
-			else if (data.itemType === "contract" && data.contractId)
-				setItemId(data.contractId)
-			else if (data.itemType === "experiment" && data.experimentId)
-				setItemId(data.experimentId)
-			else if (data.itemType === "task" && data.taskId)
+			} else if (data.itemType === "task" && data.taskId) {
+				setItemType("task")
 				setItemId(data.taskId)
-			setItemType(data.itemType)
+			}
 
 			// Set notes
 			if ((data.notesJson as Array<any>).length == 0) {
@@ -84,7 +71,6 @@ const SessionPlayer: React.FC<Props> = ({}) => {
 			}
 		}
 
-		initPlayingSession()
 		loadSessionData()
 	}, [$playingSession.id, $playingSession.isPlaying])
 
@@ -128,7 +114,7 @@ const SessionPlayer: React.FC<Props> = ({}) => {
 		return () => clearInterval(interval)
 	}, [$playingSession])
 
-	// const itemList = itemType === "objective" ? objectives : tasks
+	const itemList = itemType === "objective" ? objectives : tasks
 
 	const isSessionPlaying = $playingSession.isPlaying && $playingSession.id
 
@@ -138,8 +124,42 @@ const SessionPlayer: React.FC<Props> = ({}) => {
 	})
 
 	return (
-		<div className="flex flex-col gap-2">
+		<div className="flex flex-col gap-2 border border-black p-4">
 			<div className="flex gap-2 items-center">
+				<select
+					value={itemType}
+					onChange={(e) => {
+						const t = e.target.value as "objective" | "task"
+						setItemType(t)
+						setItemId(null)
+					}}
+					className="p-1"
+				>
+					<option value="objective">Objective</option>
+					<option value="task">Task</option>
+				</select>
+
+				<select
+					value={itemId ?? ""}
+					onChange={(e) => setItemId(parseInt(e.target.value))}
+					className="p-1"
+				>
+					<option
+						value=""
+						disabled
+					>
+						Select {itemType}
+					</option>
+					{itemList.map((i) => (
+						<option
+							key={i.id}
+							value={i.id}
+						>
+							{i.name}
+						</option>
+					))}
+				</select>
+
 				{itemId && (
 					<>
 						<p className="text-xs font-mono">{usedTime}</p>
@@ -150,8 +170,24 @@ const SessionPlayer: React.FC<Props> = ({}) => {
 					</>
 				)}
 			</div>
+			{/* {isSessionPlaying && (
+                <div className="flex flex-col gap-1 relative">
+                    <textarea
+                        value={notes}
+                        onChange={(e) => setNotes(e.target.value)}
+                        placeholder="Notes..."
+                        className="p-2 h-24 border border-black focus:outline-none"
+                    />
+
+                    {lastSaved && (
+                        <div className="text-xs absolute bottom-2 left-2 text-gray-500">
+                            saved at {lastSaved}
+                        </div>
+                    )}
+                </div>
+            )} */}
 			{isSessionPlaying && (
-				<div>
+				<div className="relative">
 					<Plate
 						onValueChange={({ value }) => {
 							setNotes(value as Prisma.JsonArray)
@@ -162,13 +198,12 @@ const SessionPlayer: React.FC<Props> = ({}) => {
 							<Editor placeholder="Notes here..." />
 						</EditorContainer>
 					</Plate>
-					<div className="relative">
-						{lastSaved && (
-							<div className="text-xs absolute top-1 left-0 text-gray-500">
-								saved at {lastSaved}
-							</div>
-						)}
-					</div>
+
+					{lastSaved && (
+						<div className="text-xs absolute bottom-2 left-2 text-gray-500">
+							saved at {lastSaved}
+						</div>
+					)}
 				</div>
 			)}
 		</div>
