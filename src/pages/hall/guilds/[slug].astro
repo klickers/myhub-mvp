@@ -6,6 +6,7 @@ import { Icon } from "astro-icon/components"
 import { actions } from "astro:actions"
 import { Status } from "@/generated/prisma/enums"
 import Button from "@/components/Button.astro"
+import SessionPlayButton from "@/components/models/session/SessionPlayButton"
 
 const guild = await Astro.callAction(actions.guild.getBySlug, {
 	slug: Astro.params.slug as string,
@@ -24,13 +25,18 @@ const allContracts = await Astro.callAction(actions.contract.listByGuild, {
 <Layout>
 	<div class="flex gap-8 min-h-screen">
 		<div class="w-full">
-			<div class="sticky top-8 float-right">
-				<a
+			<div class="sticky top-8 float-right flex items-center gap-0.5">
+				<!-- <a
 					href="#!"
 					class="inline-block p-1"
 				>
 					<Icon name="mingcute:play-fill" />
-				</a>
+				</a> -->
+				<SessionPlayButton
+					itemType="guild"
+					itemId={guild.data.id}
+					client:load
+				/>
 				<a
 					href="#!"
 					class="inline-block text-white p-1 rounded-sm bg-gray-950"
