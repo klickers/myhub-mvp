@@ -14,6 +14,14 @@ datasource db {
 // Adventure Schema
 // ================================================
 
+enum Status {
+    notstarted
+    archived
+    inprogress
+    onhold
+    completed
+}
+
 model Guild {
     id          Int     @id @default(autoincrement())
     name        String
@@ -22,8 +30,10 @@ model Guild {
     status      Status  @default(inprogress)
     personaId   Int?
 
-    persona   Persona?   @relation(fields: [personaId], references: [id])
+    persona Persona? @relation(fields: [personaId], references: [id])
+
     contracts Contract[]
+    sessions  Session[]
 }
 
 model Persona {
@@ -45,7 +55,16 @@ model Contract {
     guildId     Int?
 
     guild Guild? @relation(fields: [guildId], references: [id])
-    tasks Task[]
+
+    tasks    Task[]
+    sessions Session[]
+}
+
+enum TaskParentType {
+    none
+    contract
+    experiment
+    task
 }
 
 model Task {
@@ -68,18 +87,35 @@ model Task {
     sessions Session[]
 }
 
-model Session {
-    id          Int       @id @default(autoincrement())
-    itemType    ItemType  @default(objective)
-    objectiveId Int?
-    taskId      Int?
-    startTime   DateTime
-    endTime     DateTime?
-    notes       String?
-    notesJson   Json?
+enum SessionItemType {
+    objective
 
-    objective Objective? @relation(fields: [objectiveId], references: [id])
-    task      Task?      @relation(fields: [taskId], references: [id])
+    none
+    guild
+    contract
+    experiment
+    task
+}
+
+model Session {
+    id        Int             @id @default(autoincrement())
+    itemType  SessionItemType @default(task)
+    startTime DateTime
+    endTime   DateTime?
+    notes     String?
+    notesJson Json?
+
+    objectiveId  Int?
+    guildId      Int?
+    contractId   Int?
+    experimentId Int?
+    taskId       Int?
+
+    objective  Objective?  @relation(fields: [objectiveId], references: [id])
+    guild      Guild?      @relation(fields: [guildId], references: [id])
+    contract   Contract?   @relation(fields: [contractId], references: [id])
+    experiment Experiment? @relation(fields: [experimentId], references: [id])
+    task       Task?       @relation(fields: [taskId], references: [id])
 }
 
 enum Status {
