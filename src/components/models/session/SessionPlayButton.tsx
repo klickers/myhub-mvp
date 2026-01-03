@@ -3,9 +3,10 @@ import { useStore } from "@nanostores/react"
 import { Icon } from "@iconify/react"
 import { actions } from "astro:actions"
 import { playingSession } from "@/stores/playingSession"
+import type { SessionItemType } from "@/generated/prisma/enums"
 
 interface Props {
-	itemType: "objective" | "guild" | "contract" | "experiment" | "task"
+	itemType: SessionItemType
 	itemId: number
 }
 

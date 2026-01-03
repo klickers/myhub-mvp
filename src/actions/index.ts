@@ -5,6 +5,7 @@ import prisma from "@/helpers/prisma"
 import { guild } from "./guild"
 import { contract } from "./contract"
 import { task } from "./task"
+import { SessionItemType } from "@/generated/prisma/enums"
 
 export const server = {
 	guild,
@@ -15,13 +16,7 @@ export const server = {
 	// ===============================
 	startSession: defineAction({
 		input: z.object({
-			itemType: z.enum([
-				"objective",
-				"guild",
-				"contract",
-				"experiment",
-				"task",
-			]),
+			itemType: z.nativeEnum(SessionItemType),
 			itemId: z.number(),
 		}),
 		handler: async ({ itemType, itemId }) => {
