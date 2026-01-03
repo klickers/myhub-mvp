@@ -48,6 +48,55 @@ model Contract {
     tasks Task[]
 }
 
+model Task {
+    id            Int            @id @default(autoincrement())
+    name          String
+    parentType    TaskParentType @default(contract)
+    status        Status         @default(notstarted)
+    estimatedTime Int?           @default(0) // in minutes
+    deadline      DateTime?
+
+    contractId   Int?
+    experimentId Int?
+    parentTaskId Int?
+
+    contract   Contract?   @relation(fields: [contractId], references: [id])
+    experiment Experiment? @relation(fields: [experimentId], references: [id])
+    parentTask Task?       @relation("TaskHierarchy", fields: [parentTaskId], references: [id])
+    subtasks   Task[]      @relation("TaskHierarchy")
+
+    sessions Session[]
+}
+
+model Session {
+    id          Int       @id @default(autoincrement())
+    itemType    ItemType  @default(objective)
+    objectiveId Int?
+    taskId      Int?
+    startTime   DateTime
+    endTime     DateTime?
+    notes       String?
+    notesJson   Json?
+
+    objective Objective? @relation(fields: [objectiveId], references: [id])
+    task      Task?      @relation(fields: [taskId], references: [id])
+}
+
+enum Status {
+    notstarted
+    archived
+    inprogress
+    onhold
+    completed
+}
+
+enum TaskParentType {
+    none
+    contract
+    experiment
+    task
+}
+
 // ================================================
 // Previous Schema
 // ================================================
@@ -75,26 +124,6 @@ model Objective {
     timePerWeeks TimePerWeek[]
 }
 
-model Task {
-    id            Int            @id @default(autoincrement())
-    name          String
-    parentType    TaskParentType @default(contract)
-    status        Status         @default(notstarted)
-    estimatedTime Int?           @default(0) // in minutes
-    deadline      DateTime?
-
-    contractId   Int?
-    experimentId Int?
-    parentTaskId Int?
-
-    contract   Contract?   @relation(fields: [contractId], references: [id])
-    experiment Experiment? @relation(fields: [experimentId], references: [id])
-    parentTask Task?       @relation("TaskHierarchy", fields: [parentTaskId], references: [id])
-    subtasks   Task[]      @relation("TaskHierarchy")
-
-    sessions Session[]
-}
-
 model Week {
     id         Int @id @default(autoincrement())
     year       Int
@@ -120,20 +149,6 @@ model TimePerWeek {
     @@unique([year, weekNumber, itemType, objectiveId])
 }
 
-model Session {
-    id          Int       @id @default(autoincrement())
-    itemType    ItemType  @default(objective)
-    objectiveId Int?
-    taskId      Int?
-    startTime   DateTime
-    endTime     DateTime?
-    notes       String?
-    notesJson   Json?
-
-    objective Objective? @relation(fields: [objectiveId], references: [id])
-    task      Task?      @relation(fields: [taskId], references: [id])
-}
-
 model KeyValue {
     key   String @id
     value String
@@ -151,23 +166,8 @@ model BusinessHours {
     endTime    String
 }
 
-enum Status {
-    notstarted
-    archived
-    inprogress
-    onhold
-    completed
-}
-
 enum ItemType {
     bucket
     objective
-    task
-}
-
-enum TaskParentType {
-    none
-    contract
-    experiment
     task
 }
