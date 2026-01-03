@@ -11,6 +11,7 @@ import { Editor, EditorContainer } from "@/components/editor/ui/editor"
 import { EditorKit } from "@/components/editor/editor-kit"
 import type { Prisma } from "@/generated/prisma/client"
 import { type Value } from "platejs"
+import { initPlayingSession } from "@/helpers/initPlayingSession"
 
 // interface Objective {
 // 	id: number
@@ -83,6 +84,7 @@ const SessionPlayer: React.FC<Props> = ({}) => {
 			}
 		}
 
+		initPlayingSession()
 		loadSessionData()
 	}, [$playingSession.id, $playingSession.isPlaying])
 
@@ -135,7 +137,7 @@ const SessionPlayer: React.FC<Props> = ({}) => {
 		value: notes as Value,
 	})
 
-	let href = "#"
+	let href = "#!"
 	if ($playingSession?.slug) {
 		switch ($playingSession.itemType) {
 			case "guild":

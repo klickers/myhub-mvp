@@ -118,6 +118,16 @@ export const task = {
 			})
 		},
 	}),
+	getById: defineAction({
+		input: z.object({
+			id: z.number(),
+		}),
+		handler: async ({ id }) => {
+			return prisma.task.findUnique({
+				where: { id },
+			})
+		},
+	}),
 	listAll: defineAction({
 		input: z.object({
 			status: z.array(z.nativeEnum(Status)).optional(),

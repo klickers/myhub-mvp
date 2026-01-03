@@ -32,6 +32,14 @@ async function getTitleAndSlug(
 			}
 		}
 
+		case "task": {
+			const task = await actions.task.getById({ id: itemId })
+			return {
+				title: task.data?.name ?? null,
+				slug: null,
+			}
+		}
+
 		default:
 			return { title: null, slug: null }
 	}
