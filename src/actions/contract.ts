@@ -58,6 +58,17 @@ export const contract = {
 			})
 		},
 	}),
+	getById: defineAction({
+		input: z.object({
+			id: z.number(),
+		}),
+		handler: async ({ id }) => {
+			return prisma.contract.findUnique({
+				where: { id },
+				// include: { guild: true },
+			})
+		},
+	}),
 	getBySlug: defineAction({
 		input: z.object({
 			slug: z.string(),

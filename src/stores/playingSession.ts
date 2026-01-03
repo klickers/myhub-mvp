@@ -8,6 +8,9 @@ type playing = {
 	itemId: number
 	// objectiveId: number
 	startTime: null | Date
+
+	title: string | null
+	slug: string | null
 }
 
 export const playingSession = atom<playing>({
@@ -17,4 +20,7 @@ export const playingSession = atom<playing>({
 	itemId: 0,
 	// objectiveId: 0,
 	startTime: null,
+
+	title: null,
+	slug: null,
 })

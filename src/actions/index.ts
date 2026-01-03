@@ -12,6 +12,19 @@ export const server = {
 	contract,
 	task,
 	// ===============================
+	// Objective
+	// ===============================
+	getObjectiveById: defineAction({
+		input: z.object({
+			id: z.number(),
+		}),
+		handler: async ({ id }) => {
+			return prisma.objective.findUnique({
+				where: { id },
+			})
+		},
+	}),
+	// ===============================
 	// Session
 	// ===============================
 	startSession: defineAction({

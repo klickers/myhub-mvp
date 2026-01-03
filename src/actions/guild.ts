@@ -55,6 +55,17 @@ export const guild = {
 			})
 		},
 	}),
+	getById: defineAction({
+		input: z.object({
+			id: z.number(),
+		}),
+		handler: async ({ id }) => {
+			return prisma.guild.findUnique({
+				where: { id },
+				// include: { persona: true },
+			})
+		},
+	}),
 	getBySlug: defineAction({
 		input: z.object({
 			slug: z.string(),

@@ -137,11 +137,29 @@ const SessionPlayer: React.FC<Props> = ({}) => {
 		value: notes as Value,
 	})
 
+	let href = "#"
+	if ($playingSession?.slug) {
+		switch ($playingSession.itemType) {
+			case "guild":
+				href = `/hall/guilds/${$playingSession.slug}`
+				break
+			case "contract":
+				href = `/hall/contracts/${$playingSession.slug}`
+				break
+			case "objective":
+				href = `/objectives/${$playingSession.slug}`
+				break
+		}
+	}
+
 	return (
 		<div className="flex flex-col gap-2">
 			<div className="flex gap-2 items-center">
 				{itemId && (
 					<>
+						<p>
+							<a href={href}>{$playingSession.title}</a>
+						</p>
 						<p className="text-xs font-mono">{usedTime}</p>
 						<SessionPlayButton
 							itemType={itemType}
