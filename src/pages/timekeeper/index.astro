@@ -1,0 +1,15 @@
+---
+import SessionPlayer from "@/components/models/session/SessionPlayer"
+import Layout from "@/layouts/Layout.astro"
+---
+
+<Layout>
+	<main>
+		<!-- TODO: allow easy play by guild, contract, task -->
+		<div class="card">
+			<div class="card__content">
+				<SessionPlayer client:load />
+			</div>
+		</div>
+	</main>
+</Layout>
