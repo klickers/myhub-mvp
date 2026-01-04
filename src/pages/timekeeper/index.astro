@@ -1,6 +1,47 @@
 ---
 import SessionPlayer from "@/components/models/session/SessionPlayer"
 import Layout from "@/layouts/Layout.astro"
+import { actions } from "astro:actions"
+
+const sessions = await Astro.callAction(actions.session.list, {})
+
+const fmt = (d?: string | Date) =>
+	d
+		? new Date(d).toLocaleString(undefined, {
+				year: "numeric",
+				month: "short",
+				day: "2-digit",
+				hour: "2-digit",
+				minute: "2-digit",
+			})
+		: "—"
+
+const getTitle = (s: any) =>
+	s?.title ||
+	s?.task?.name ||
+	s?.guild?.name ||
+	s?.contract?.name ||
+	s?.experiment?.name ||
+	s?.objective?.name ||
+	"(untitled)"
+
+const getItemHref = (s: any) => {
+	// adjust routes to your app
+	switch (s?.itemType) {
+		case "task":
+			return s?.taskId ? `/tasks/${s.taskId}` : null
+		case "guild":
+			return s?.guildId ? `/guilds/${s.guildId}` : null
+		case "contract":
+			return s?.contractId ? `/contracts/${s.contractId}` : null
+		case "experiment":
+			return s?.experimentId ? `/experiments/${s.experimentId}` : null
+		case "objective":
+			return s?.objectiveId ? `/objectives/${s.objectiveId}` : null
+		default:
+			return null
+	}
+}
 ---
 
 <Layout>
@@ -9,6 +50,56 @@ import Layout from "@/layouts/Layout.astro"
 		<div class="card">
 			<div class="card__content">
 				<SessionPlayer client:load />
+			</div>
+		</div>
+		<!-- TODO: render plateJS correctly, show time spent per session -->
+		<div class="mt-12">
+			<h1 class="text-2xl">Previous Sessions</h1>
+			<div class="space-y-3">
+				{
+					sessions.data?.length ? (
+						sessions.data.map((s: any) => {
+							const title = getTitle(s)
+							const href = getItemHref(s)
+							return (
+								<div>
+									<div>
+										{href ? (
+											<a href={href}>{title}</a>
+										) : (
+											title
+										)}
+									</div>
+
+									<div class="text-sm text-gray-600">
+										<span>{s.itemType}</span>
+										{" · "}
+										<span>{fmt(s.startTime)}</span>
+										{" → "}
+										<span>{fmt(s.endTime)}</span>
+									</div>
+
+									{s.notesJson ? (
+										<details class="mt-1">
+											<summary style="cursor: pointer;">
+												Notes
+											</summary>
+											<pre style="white-space: pre-wrap; margin: 0.5rem 0 0;">
+												{JSON.stringify(
+													s.notesJson,
+													null,
+													2
+												)}
+											</pre>
+										</details>
+									) : null}
+								</div>
+							)
+						})
+					) : (
+						<p>No sessions yet.</p>
+					)
+				}
 			</div>
 		</div>
 	</main>
