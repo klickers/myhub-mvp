@@ -1,4 +1,5 @@
 ---
+import SessionPlayButton from "@/components/models/session/SessionPlayButton"
 import SessionPlayer from "@/components/models/session/SessionPlayer"
 import Layout from "@/layouts/Layout.astro"
 import { actions } from "astro:actions"
@@ -29,15 +30,17 @@ const getItemHref = (s: any) => {
 	// adjust routes to your app
 	switch (s?.itemType) {
 		case "task":
-			return s?.taskId ? `/tasks/${s.taskId}` : null
+			return /*s?.taskId ? `/tasks/${s.taskId}` :*/ null
 		case "guild":
-			return s?.guildId ? `/guilds/${s.guildId}` : null
+			return s?.guildId ? `/hall/guilds/${s.guild.slug}` : null
 		case "contract":
-			return s?.contractId ? `/contracts/${s.contractId}` : null
+			return s?.contractId ? `/hall/contracts/${s.contract.slug}` : null
 		case "experiment":
-			return s?.experimentId ? `/experiments/${s.experimentId}` : null
+			return s?.experimentId
+				? `/lab/experiments/${s.experiment.slug}`
+				: null
 		case "objective":
-			return s?.objectiveId ? `/objectives/${s.objectiveId}` : null
+			return s?.objectiveId ? `/objectives/${s.objective.slug}` : null
 		default:
 			return null
 	}
@@ -55,7 +58,7 @@ const getItemHref = (s: any) => {
 		<!-- TODO: render plateJS correctly, show time spent per session -->
 		<div class="mt-12">
 			<h1 class="text-2xl">Previous Sessions</h1>
-			<div class="space-y-3">
+			<div class="space-y-3 max-w-sm">
 				{
 					sessions.data?.length ? (
 						sessions.data.map((s: any) => {
@@ -63,12 +66,17 @@ const getItemHref = (s: any) => {
 							const href = getItemHref(s)
 							return (
 								<div>
-									<div>
+									<div class="flex gap-1 items-center">
 										{href ? (
 											<a href={href}>{title}</a>
 										) : (
 											title
 										)}
+										<SessionPlayButton
+											itemType={s.itemType}
+											itemId={s[s.itemType].id}
+											client:load
+										/>
 									</div>
 
 									<div class="text-sm text-gray-600">

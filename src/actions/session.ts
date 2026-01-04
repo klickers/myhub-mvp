@@ -18,16 +18,16 @@ export const session = {
 				},
 				include: {
 					objective: {
-						select: { id: true, name: true },
+						select: { id: true, name: true, slug: true },
 					},
 					guild: {
-						select: { id: true, name: true },
+						select: { id: true, name: true, slug: true },
 					},
 					contract: {
-						select: { id: true, name: true },
+						select: { id: true, name: true, slug: true },
 					},
 					experiment: {
-						select: { id: true, name: true },
+						select: { id: true, name: true, slug: true },
 					},
 					task: {
 						select: { id: true, name: true },
