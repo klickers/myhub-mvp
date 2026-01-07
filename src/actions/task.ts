@@ -161,6 +161,33 @@ export const task = {
 			}
 		},
 	}),
+	createSubtask: defineAction({
+		input: z.object({
+			name: z.string().min(1),
+			parentTaskId: z.number().int().positive(),
+			status: z.nativeEnum(Status).optional(),
+			estimatedTime: z.number().int().nonnegative().optional(),
+			deadline: z.coerce.date().optional().nullable(),
+		}),
+		handler: async ({
+			name,
+			parentTaskId,
+			status = "notstarted",
+			estimatedTime,
+			deadline,
+		}) => {
+			return prisma.task.create({
+				data: {
+					name,
+					parentType: "task",
+					parentTaskId,
+					status,
+					estimatedTime,
+					deadline,
+				},
+			})
+		},
+	}),
 	update: defineAction({
 		input: z.object({
 			id: z.coerce.number().int(),

@@ -163,9 +163,8 @@ function AddSubtask({
 
 	const create = async () => {
 		if (!name.trim()) return
-		await actions.task.create({
+		await actions.task.createSubtask({
 			name,
-			parentType: "task",
 			parentTaskId,
 		})
 		setName("")
