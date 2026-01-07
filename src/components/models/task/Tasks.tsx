@@ -51,46 +51,62 @@ export default function Tasks({ tasks }: { tasks: Task[] }) {
 
 			{/* SIDE TRAY */}
 			{selectedTask && (
-				<div className="z-10 fixed right-0 top-0 h-screen w-2/5 bg-white shadow-lg p-6">
-					<div className="flex justify-between items-start">
-						<h2>{selectedTask.name}</h2>
-						<button
-							onClick={() => setSelectedTask(null)}
-							className="text-sm text-gray-500 hover:underline"
-						>
-							Close
-						</button>
-					</div>
+				<>
+					{/* BACKDROP */}
+					<div
+						className="fixed inset-0 z-40"
+						onClick={() => setSelectedTask(null)}
+					/>
 
-					<table className="text-sm mb-6 leading-relaxed">
-						<tbody>
-							<tr>
-								<td>Estimated Time</td>
-								<td>{selectedTask.estimatedTime ?? "—"}</td>
-							</tr>
-							<tr>
-								<td>Status</td>
-								<td>{selectedTask.status}</td>
-							</tr>
-							<tr>
-								<td>Deadline</td>
-								<td>
-									{selectedTask.deadline
-										? format(
-												new Date(selectedTask.deadline),
-												"MMM d, yyyy"
-										  )
-										: "no deadline"}
-								</td>
-							</tr>
-						</tbody>
-					</table>
+					{/* SIDE TRAY */}
+					<div
+						className="fixed right-0 top-0 h-screen w-2/5 bg-white shadow-lg p-6 z-50 overflow-y-auto"
+						onClick={(e) => e.stopPropagation()}
+					>
+						<div className="flex justify-between items-start mb-4">
+							<h2>{selectedTask.name}</h2>
+							<button
+								onClick={() => setSelectedTask(null)}
+								className="text-sm text-gray-500 hover:underline"
+							>
+								Close
+							</button>
+						</div>
 
-					<div>
-						<h3 className="text-lg font-semibold mb-3">Subtasks</h3>
-						<Subtasks taskId={selectedTask.id} />
+						<table className="text-sm mb-6 leading-relaxed">
+							<tbody>
+								<tr>
+									<td>Estimated Time</td>
+									<td>{selectedTask.estimatedTime ?? "—"}</td>
+								</tr>
+								<tr>
+									<td>Status</td>
+									<td>{selectedTask.status}</td>
+								</tr>
+								<tr>
+									<td>Deadline</td>
+									<td>
+										{selectedTask.deadline
+											? format(
+													new Date(
+														selectedTask.deadline
+													),
+													"MMM d, yyyy"
+											  )
+											: "no deadline"}
+									</td>
+								</tr>
+							</tbody>
+						</table>
+
+						<div>
+							<h3 className="text-lg font-semibold mb-3">
+								Subtasks
+							</h3>
+							<Subtasks taskId={selectedTask.id} />
+						</div>
 					</div>
-				</div>
+				</>
 			)}
 		</div>
 	)
