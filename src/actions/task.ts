@@ -66,6 +66,71 @@ const taskInput = z
 		}
 	})
 
+type TaskNode = {
+	id: number
+	name: string
+	parentTaskId: number | null
+	children: TaskNode[]
+}
+
+async function buildSubtaskTree(rootTaskId: number): Promise<TaskNode[]> {
+	// Fetch all descendants using a simple BFS (multiple queries).
+	// Good enough for typical UI usage; if you expect huge trees, we can optimize later.
+	const all: Array<{
+		id: number
+		name: string
+		parentTaskId: number | null
+	}> = []
+
+	let frontier: number[] = [rootTaskId]
+	const seen = new Set<number>([rootTaskId])
+
+	while (frontier.length > 0) {
+		const children = await prisma.task.findMany({
+			where: {
+				parentType: "task",
+				parentTaskId: { in: frontier },
+			},
+			select: { id: true, name: true, parentTaskId: true },
+			orderBy: { id: "asc" },
+		})
+
+		all.push(...children)
+
+		const next: number[] = []
+		for (const c of children) {
+			if (!seen.has(c.id)) {
+				seen.add(c.id)
+				next.push(c.id)
+			}
+		}
+		frontier = next
+	}
+
+	// Build parent->children map
+	const byParent = new Map<number, TaskNode[]>()
+	for (const t of all) {
+		const node: TaskNode = { ...t, children: [] }
+		const parentId = t.parentTaskId ?? -1
+		const arr = byParent.get(parentId) ?? []
+		arr.push(node)
+		byParent.set(parentId, arr)
+	}
+
+	// Attach children recursively
+	const attach = (node: TaskNode) => {
+		const kids = byParent.get(node.id) ?? []
+		node.children = kids
+		for (const k of kids) attach(k)
+	}
+
+	// Roots are direct children of rootTaskId
+	const roots = byParent.get(rootTaskId) ?? []
+	for (const r of roots) attach(r)
+
+	return roots
+}
+
 export const task = {
 	create: defineAction({
 		accept: "form",
@@ -89,25 +154,22 @@ export const task = {
 			}
 		},
 	}),
-	// update: defineAction({
-	// 	accept: "form",
-	// 	input: taskInput.extend({
-	// 		id: z.coerce.number().int(),
-	// 	}),
-	// 	handler: async ({ id, ...input }) => {
-	// 		return prisma.task.update({
-	// 			where: { id },
-	// 			data: {
-	// 				name: input.name,
-	// 				slug: input.slug,
-	// 				description: input.description ?? null,
-	// 				dueDate: new Date(input.dueDate),
-	// 				status: input.status,
-	// 				guildId: input.guildId ?? null,
-	// 			},
-	// 		})
-	// 	},
-	// }),
+	update: defineAction({
+		input: z.object({
+			id: z.coerce.number().int(),
+			name: z.string().min(1).optional(),
+			status: z.nativeEnum(Status).optional(),
+			estimatedTime: z.number().int().nonnegative().optional(),
+			deadline: z.coerce.date().optional().nullable(),
+		}),
+		handler: async ({ id, ...data }) => {
+			return prisma.task.update({
+				where: { id },
+				data,
+			})
+		},
+	}),
+
 	delete: defineAction({
 		input: z.object({
 			id: z.coerce.number().int(),
@@ -164,6 +226,48 @@ export const task = {
 				},
 				orderBy: { deadline: "asc" },
 			})
+		},
+	}),
+
+	// TODO: edit if needed
+	createSubtask: defineAction({
+		input: z.object({
+			parentTaskId: z.coerce.number().int().positive(),
+			name: z.string().min(1),
+		}),
+		handler: async ({ parentTaskId, name }) => {
+			const created = await prisma.task.create({
+				data: {
+					name,
+					parentType: "task",
+					parentTaskId,
+					// defaults for status/estimatedTime/etc are fine
+				},
+				select: { id: true, name: true, parentTaskId: true },
+			})
+			return created
+		},
+	}),
+	updateName: defineAction({
+		input: z.object({
+			id: z.coerce.number().int().positive(),
+			name: z.string().min(1),
+		}),
+		handler: async ({ id, name }) => {
+			return prisma.task.update({
+				where: { id },
+				data: { name },
+				select: { id: true, name: true, parentTaskId: true },
+			})
+		},
+	}),
+	subtaskTreeByTaskId: defineAction({
+		input: z.object({
+			taskId: z.coerce.number().int().positive(),
+		}),
+		handler: async ({ taskId }) => {
+			const tree = await buildSubtaskTree(taskId)
+			return { tree }
 		},
 	}),
 }

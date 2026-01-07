@@ -20,6 +20,10 @@
 		@apply text-5xl font-semibold mb-10;
 	}
 
+	h2 {
+		@apply font-semibold text-2xl mb-4;
+	}
+
 	button {
 		@apply cursor-pointer;
 	}

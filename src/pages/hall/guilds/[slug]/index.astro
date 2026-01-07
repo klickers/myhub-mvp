@@ -58,9 +58,7 @@ const allContracts = await Astro.callAction(actions.contract.listByGuild, {
 			<div class="mt-10">
 				<!-- TODO: in progress, upcoming, on hold -->
 				<div class="flex justify-between">
-					<h2 class="font-semibold text-2xl mb-4">
-						Active Contracts
-					</h2>
+					<h2>Active Contracts</h2>
 					<div>
 						<Button
 							href={`/hall/contracts/create?guildSlug=${guild.data.slug}`}
@@ -85,7 +83,7 @@ const allContracts = await Astro.callAction(actions.contract.listByGuild, {
 				</div>
 			</div>
 			<div class="mt-10">
-				<h2 class="font-semibold text-2xl mb-4">All Contracts</h2>
+				<h2>All Contracts</h2>
 				<div class="grid grid-cols-2 gap-4">
 					{
 						allContracts.data ? (

@@ -4,9 +4,8 @@ import PersonaCard from "@/components/guild-hall/PersonaCard.astro"
 import { Icon } from "astro-icon/components"
 import { actions } from "astro:actions"
 import Button from "@/components/Button.astro"
-import { format } from "date-fns"
 import SessionPlayButton from "@/components/models/session/SessionPlayButton"
-import { initPlayingSession } from "@/helpers/initPlayingSession"
+import Tasks from "@/components/models/task/Tasks"
 
 const contract = await Astro.callAction(actions.contract.getBySlug, {
 	slug: Astro.params.slug as string,
@@ -71,9 +70,7 @@ const tasks = await Astro.callAction(actions.task.listByContract, {
 			<div class="mt-10">
 				<!-- TODO: in progress, upcoming, on hold -->
 				<div class="flex justify-between">
-					<h2 class="font-semibold text-2xl mb-4">
-						Active Assignments
-					</h2>
+					<h2>Active Assignments</h2>
 					<div>
 						<Button
 							href={`/hall/tasks/create?contractSlug=${contract.data.slug}`}
@@ -82,43 +79,10 @@ const tasks = await Astro.callAction(actions.task.listByContract, {
 						/>
 					</div>
 				</div>
-				<div class="space-y-2">
-					{
-						tasks.data && tasks.data.length > 0 ? (
-							tasks.data.map((task) => (
-								<div
-									class={`card ${task.status == "completed" ? "bg-green-50 border-green-50" : ""}`}
-								>
-									<div class="card__content">
-										<div class="flex justify-between items-center">
-											<p class="font-semibold">
-												{task.name}
-											</p>
-											<div class="flex items-center gap-2 -mr-1">
-												{task.deadline ? (
-													<p class="text-xs text-gray-600">
-														Due{" "}
-														{format(
-															task.deadline,
-															"MMM d, yyyy"
-														)}
-													</p>
-												) : null}
-												<SessionPlayButton
-													itemType="task"
-													itemId={task.id}
-													client:load
-												/>
-											</div>
-										</div>
-									</div>
-								</div>
-							))
-						) : (
-							<p>No active assignments found.</p>
-						)
-					}
-				</div>
+				<Tasks
+					tasks={tasks.data}
+					client:load
+				/>
 			</div>
 		</div>
 		<div class="space-y-4 w-[260px] flex-none">
@@ -126,4 +90,43 @@ const tasks = await Astro.callAction(actions.task.listByContract, {
 			<!-- TODO: previous sessions -->
 		</div>
 	</div>
+	<!-- <div class="h-screen fixed right-0 top-0 w-2/5 bg-white shadow-lg p-6">
+		{
+			tasks.data && tasks.data.length > 0 ? (
+				<div>
+					<h2>{tasks.data[0].name}</h2>
+					<table class="text-sm mb-6 leading-relaxed">
+						<tbody>
+							<tr>
+								<td>Estimated Time</td>
+								<td>{tasks.data[0].estimatedTime}</td>
+							</tr>
+							<tr>
+								<td>Status</td>
+								<td>{tasks.data[0].status}</td>
+							</tr>
+							<tr>
+								<td>Deadline</td>
+								<td>
+									{tasks.data[0].deadline
+										? format(
+												tasks.data[0].deadline,
+												"MMM d, yyyy"
+											)
+										: "no deadline"}
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<div>
+						<h3 class="text-lg font-semibold mb-3">Subtasks</h3>
+						<Subtasks
+							client:load
+							taskId={tasks.data[0].id}
+						/>
+					</div>
+				</div>
+			) : null
+		}
+	</div> -->
 </Layout>
