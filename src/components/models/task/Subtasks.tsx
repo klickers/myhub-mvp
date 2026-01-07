@@ -1,33 +1,34 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { actions } from "astro:actions"
+import type { Status } from "@/generated/prisma/enums"
+import EditableDate from "@/components/form/EditableDate"
+import EditableStatus from "@/components/form/EditableStatus"
+import EditableNumber from "@/components/form/EditableNumber"
+import EditableText from "@/components/form/EditableText"
 
 type TaskNode = {
 	id: number
 	name: string
+	status: Status
+	estimatedTime: number | null
+	deadline: string | null
 	parentTaskId: number | null
 	children: TaskNode[]
 }
 
-function cx(...parts: Array<string | false | null | undefined>) {
-	return parts.filter(Boolean).join(" ")
-}
+/* -------------------------------------------------------
+   Root
+------------------------------------------------------- */
 
 export default function Subtasks({ taskId }: { taskId: number }) {
 	const [tree, setTree] = useState<TaskNode[]>([])
 	const [loading, setLoading] = useState(false)
-	const [error, setError] = useState<string | null>(null)
 
 	const reload = useCallback(async () => {
 		setLoading(true)
-		setError(null)
-		try {
-			const res = await actions.task.subtaskTreeByTaskId({ taskId })
-			setTree(res.data?.tree ?? [])
-		} catch (e: any) {
-			setError(e?.message ?? "Failed to load subtasks")
-		} finally {
-			setLoading(false)
-		}
+		const res = await actions.task.subtaskTreeByTaskId({ taskId })
+		setTree(res.data?.tree ?? [])
+		setLoading(false)
 	}, [taskId])
 
 	useEffect(() => {
@@ -36,24 +37,23 @@ export default function Subtasks({ taskId }: { taskId: number }) {
 
 	return (
 		<div className="space-y-2">
-			<div className="flex items-center justify-between">
-				<div className="text-sm text-gray-600">
-					{loading ? "Loading…" : null}
-					{error ? (
-						<span className="text-red-600">{error}</span>
-					) : null}
-				</div>
-				<AddInline
+			<div className="flex justify-between items-center">
+				{loading ? (
+					<span className="text-sm text-gray-500">"Loading…"</span>
+				) : (
+					<h3 className="text-lg font-semibold mb-3">Subtasks</h3>
+				)}
+				<AddSubtask
 					parentTaskId={taskId}
 					onAdded={reload}
 				/>
 			</div>
 
 			{tree.length === 0 && !loading ? (
-				<div className="text-sm text-gray-500">No subtasks yet.</div>
+				<p className="text-sm text-gray-500">No subtasks yet.</p>
 			) : null}
 
-			<div className="space-y-1">
+			<div className="space-y-2">
 				{tree.map((node) => (
 					<Node
 						key={node.id}
@@ -67,6 +67,10 @@ export default function Subtasks({ taskId }: { taskId: number }) {
 	)
 }
 
+/* -------------------------------------------------------
+   Recursive Node
+------------------------------------------------------- */
+
 function Node({
 	node,
 	depth,
@@ -76,88 +80,73 @@ function Node({
 	depth: number
 	onChange: () => void
 }) {
-	const [editing, setEditing] = useState(false)
-	const [draft, setDraft] = useState(node.name)
-	const inputRef = useRef<HTMLInputElement | null>(null)
-
-	useEffect(() => {
-		setDraft(node.name)
-	}, [node.name])
-
-	useEffect(() => {
-		if (editing) inputRef.current?.focus()
-	}, [editing])
-
-	const save = useCallback(async () => {
-		const next = draft.trim()
-		if (!next || next === node.name) {
-			setEditing(false)
-			setDraft(node.name)
-			return
-		}
-		await actions.task.updateName({ id: node.id, name: next })
-		setEditing(false)
-		onChange()
-	}, [draft, node.id, node.name, onChange])
-
 	return (
 		<div className="space-y-1">
 			<div
-				className={cx(
-					"flex items-center gap-2 text-sm",
-					depth > 0 && "pl-3 border-l border-gray-200"
-				)}
-				style={{ marginLeft: depth === 0 ? 0 : 8 }}
+				className="flex items-center gap-3 text-sm"
+				style={{ marginLeft: depth * 12 }}
 			>
-				{editing ? (
-					<input
-						ref={inputRef}
-						value={draft}
-						onChange={(e) => setDraft(e.target.value)}
-						onBlur={() => void save()}
-						onKeyDown={(e) => {
-							if (e.key === "Enter") void save()
-							if (e.key === "Escape") {
-								setEditing(false)
-								setDraft(node.name)
-							}
-						}}
-						className="w-full rounded border border-gray-200 px-2 py-1 text-sm"
-					/>
-				) : (
-					<button
-						type="button"
-						onClick={() => setEditing(true)}
-						className="flex-1 text-left hover:underline"
-						title="Click to rename"
-					>
-						{node.name}
-					</button>
-				)}
-
-				<AddInline
+				<EditableText
+					value={node.name}
+					onSave={(name) =>
+						actions.task
+							.update({ id: node.id, name })
+							.then(onChange)
+					}
+				/>
+				<EditableStatus
+					value={node.status}
+					onSave={(status) =>
+						actions.task
+							.update({ id: node.id, status })
+							.then(onChange)
+					}
+				/>
+				<EditableNumber
+					value={node.estimatedTime}
+					onSave={(v) =>
+						actions.task
+							.update({
+								id: node.id,
+								estimatedTime: v ?? undefined,
+							})
+							.then(onChange)
+					}
+				/>
+				<EditableDate
+					value={node.deadline ? node.deadline.toISOString() : null}
+					onSave={(date) =>
+						actions.task
+							.update({
+								id: node.id,
+								deadline: date ? new Date(date) : null,
+							})
+							.then(onChange)
+					}
+				/>
+				<AddSubtask
 					parentTaskId={node.id}
 					onAdded={onChange}
 				/>
 			</div>
 
-			{node.children?.length ? (
-				<div className="space-y-1">
-					{node.children.map((child) => (
-						<Node
-							key={child.id}
-							node={child}
-							depth={depth + 1}
-							onChange={onChange}
-						/>
-					))}
-				</div>
-			) : null}
+			{node.children.map((child) => (
+				<Node
+					key={child.id}
+					node={child}
+					depth={depth + 1}
+					onChange={onChange}
+				/>
+			))}
 		</div>
 	)
 }
 
-function AddInline({
+/* -------------------------------------------------------
+   Add Subtask
+------------------------------------------------------- */
+
+function AddSubtask({
 	parentTaskId,
 	onAdded,
 }: {
@@ -166,64 +155,47 @@ function AddInline({
 }) {
 	const [open, setOpen] = useState(false)
 	const [name, setName] = useState("")
-	const [saving, setSaving] = useState(false)
-	const inputRef = useRef<HTMLInputElement | null>(null)
+	const ref = useRef<HTMLInputElement | null>(null)
 
 	useEffect(() => {
-		if (open) inputRef.current?.focus()
+		if (open) ref.current?.focus()
 	}, [open])
 
-	const create = useCallback(async () => {
-		const next = name.trim()
-		if (!next) return
-		setSaving(true)
-		try {
-			await actions.task.createSubtask({ parentTaskId, name: next })
-			setName("")
-			setOpen(false)
-			onAdded()
-		} finally {
-			setSaving(false)
-		}
-	}, [name, onAdded, parentTaskId])
+	const create = async () => {
+		if (!name.trim()) return
+		await actions.task.create({
+			name,
+			parentType: "task",
+			parentTaskId,
+		})
+		setName("")
+		setOpen(false)
+		onAdded()
+	}
 
 	if (!open) {
 		return (
 			<button
-				type="button"
 				onClick={() => setOpen(true)}
-				className="text-xs text-gray-600 hover:underline"
-				title="Add subtask"
+				className="text-xs text-gray-500 hover:underline"
 			>
-				+ subtask
+				+
 			</button>
 		)
 	}
 
 	return (
-		<div className="flex items-center gap-2">
-			<input
-				ref={inputRef}
-				value={name}
-				onChange={(e) => setName(e.target.value)}
-				onKeyDown={(e) => {
-					if (e.key === "Enter") void create()
-					if (e.key === "Escape") {
-						setOpen(false)
-						setName("")
-					}
-				}}
-				placeholder="New subtask…"
-				className="w-40 rounded border border-gray-200 px-2 py-1 text-xs"
-			/>
-			<button
-				type="button"
-				onClick={() => void create()}
-				disabled={saving}
-				className="text-xs text-gray-700 hover:underline disabled:opacity-50"
-			>
-				Add
-			</button>
-		</div>
+		<input
+			ref={ref}
+			value={name}
+			onChange={(e) => setName(e.target.value)}
+			onBlur={create}
+			onKeyDown={(e) => {
+				if (e.key === "Enter") create()
+				if (e.key === "Escape") setOpen(false)
+			}}
+			placeholder="New subtask…"
+			className="border px-1 text-xs"
+		/>
 	)
 }

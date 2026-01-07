@@ -1,11 +1,23 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { format } from "date-fns"
+import { actions } from "astro:actions"
 import Subtasks from "./Subtasks"
 import SessionPlayButton from "@/components/models/session/SessionPlayButton"
-import type { Task } from "@/generated/prisma/client"
+import type { Status, Task } from "@/generated/prisma/client"
+import EditableDate from "@/components/form/EditableDate"
+import EditableStatus from "@/components/form/EditableStatus"
+import EditableNumber from "@/components/form/EditableNumber"
+import EditableText from "@/components/form/EditableText"
 
 export default function Tasks({ tasks }: { tasks: Task[] }) {
 	const [selectedTask, setSelectedTask] = useState<Task | null>(null)
+
+	// keep local copy in sync if tasks prop changes
+	useEffect(() => {
+		if (!selectedTask) return
+		const fresh = tasks.find((t) => t.id === selectedTask.id)
+		if (fresh) setSelectedTask(fresh)
+	}, [tasks])
 
 	return (
 		<div>
@@ -15,7 +27,7 @@ export default function Tasks({ tasks }: { tasks: Task[] }) {
 					<div
 						key={task.id}
 						className={`card ${
-							task.status == "completed"
+							task.status === "completed"
 								? "bg-green-50 border-green-50"
 								: ""
 						}`}
@@ -29,7 +41,7 @@ export default function Tasks({ tasks }: { tasks: Task[] }) {
 									{task.name}
 								</p>
 								<div className="flex items-center gap-2 -mr-1">
-									{task.deadline ? (
+									{task.deadline && (
 										<p className="text-xs text-gray-600">
 											Due{" "}
 											{format(
@@ -37,7 +49,7 @@ export default function Tasks({ tasks }: { tasks: Task[] }) {
 												"MMM d, yyyy"
 											)}
 										</p>
-									) : null}
+									)}
 									<SessionPlayButton
 										itemType="task"
 										itemId={task.id}
@@ -58,13 +70,25 @@ export default function Tasks({ tasks }: { tasks: Task[] }) {
 						onClick={() => setSelectedTask(null)}
 					/>
 
-					{/* SIDE TRAY */}
+					{/* TRAY */}
 					<div
 						className="fixed right-0 top-0 h-screen w-2/5 bg-white shadow-lg p-6 z-50 overflow-y-auto"
 						onClick={(e) => e.stopPropagation()}
 					>
-						<div className="flex justify-between items-start mb-4">
-							<h2>{selectedTask.name}</h2>
+						<div className="flex justify-between items-start mb-6">
+							<EditableText
+								value={selectedTask.name}
+								onSave={async (name) => {
+									const updated = await actions.task.update({
+										id: selectedTask.id,
+										name,
+									})
+									setSelectedTask((t) =>
+										t ? { ...t, name } : t
+									)
+								}}
+								className="text-xl font-semibold"
+							/>
 							<button
 								onClick={() => setSelectedTask(null)}
 								className="text-sm text-gray-500 hover:underline"
@@ -73,38 +97,89 @@ export default function Tasks({ tasks }: { tasks: Task[] }) {
 							</button>
 						</div>
 
-						<table className="text-sm mb-6 leading-relaxed">
-							<tbody>
+						<table className="text-sm mb-8 leading-relaxed">
+							<tbody className="space-y-2">
 								<tr>
-									<td>Estimated Time</td>
-									<td>{selectedTask.estimatedTime ?? "—"}</td>
-								</tr>
-								<tr>
-									<td>Status</td>
-									<td>{selectedTask.status}</td>
-								</tr>
-								<tr>
-									<td>Deadline</td>
+									<td className="pr-4 text-gray-600">
+										Estimated Time
+									</td>
 									<td>
-										{selectedTask.deadline
-											? format(
-													new Date(
-														selectedTask.deadline
-													),
-													"MMM d, yyyy"
-											  )
-											: "no deadline"}
+										<EditableNumber
+											value={selectedTask.estimatedTime}
+											onSave={async (v) => {
+												const updated =
+													await actions.task.update({
+														id: selectedTask.id,
+														estimatedTime:
+															v ?? undefined,
+													})
+												setSelectedTask((t) =>
+													t
+														? {
+																...t,
+																estimatedTime:
+																	v,
+														  }
+														: t
+												)
+											}}
+										/>
+									</td>
+								</tr>
+								<tr>
+									<td className="pr-4 text-gray-600">
+										Status
+									</td>
+									<td>
+										<EditableStatus
+											value={
+												selectedTask.status as Status
+											}
+											onSave={async (status) => {
+												const updated =
+													await actions.task.update({
+														id: selectedTask.id,
+														status,
+													})
+												setSelectedTask((t) =>
+													t ? { ...t, status } : t
+												)
+											}}
+										/>
+									</td>
+								</tr>
+								<tr>
+									<td className="pr-4 text-gray-600">
+										Deadline
+									</td>
+									<td>
+										<EditableDate
+											value={
+												selectedTask.deadline
+													? selectedTask.deadline.toISOString()
+													: null
+											}
+											onSave={async (date) => {
+												const d = date
+													? new Date(date)
+													: null
+												await actions.task.update({
+													id: selectedTask.id,
+													deadline: d,
+												})
+												setSelectedTask((t) =>
+													t
+														? { ...t, deadline: d }
+														: t
+												)
+											}}
+										/>
 									</td>
 								</tr>
 							</tbody>
 						</table>
 
-						<div>
-							<h3 className="text-lg font-semibold mb-3">
-								Subtasks
-							</h3>
-							<Subtasks taskId={selectedTask.id} />
-						</div>
+						<Subtasks taskId={selectedTask.id} />
 					</div>
 				</>
 			)}

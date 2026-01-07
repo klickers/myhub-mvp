@@ -91,7 +91,14 @@ async function buildSubtaskTree(rootTaskId: number): Promise<TaskNode[]> {
 				parentType: "task",
 				parentTaskId: { in: frontier },
 			},
-			select: { id: true, name: true, parentTaskId: true },
+			select: {
+				id: true,
+				name: true,
+				status: true,
+				estimatedTime: true,
+				deadline: true,
+				parentTaskId: true,
+			},
 			orderBy: { id: "asc" },
 		})
 
@@ -224,39 +231,6 @@ export const task = {
 					status: { in: status },
 				},
 				orderBy: { deadline: "asc" },
-			})
-		},
-	}),
-
-	// TODO: edit if needed
-	createSubtask: defineAction({
-		input: z.object({
-			parentTaskId: z.coerce.number().int().positive(),
-			name: z.string().min(1),
-		}),
-		handler: async ({ parentTaskId, name }) => {
-			const created = await prisma.task.create({
-				data: {
-					name,
-					parentType: "task",
-					parentTaskId,
-					// defaults for status/estimatedTime/etc are fine
-				},
-				select: { id: true, name: true, parentTaskId: true },
-			})
-			return created
-		},
-	}),
-	updateName: defineAction({
-		input: z.object({
-			id: z.coerce.number().int().positive(),
-			name: z.string().min(1),
-		}),
-		handler: async ({ id, name }) => {
-			return prisma.task.update({
-				where: { id },
-				data: { name },
-				select: { id: true, name: true, parentTaskId: true },
 			})
 		},
 	}),
