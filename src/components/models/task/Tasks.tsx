@@ -76,19 +76,26 @@ export default function Tasks({ tasks }: { tasks: Task[] }) {
 						onClick={(e) => e.stopPropagation()}
 					>
 						<div className="flex justify-between items-start mb-6">
-							<EditableText
-								value={selectedTask.name}
-								onSave={async (name) => {
-									const updated = await actions.task.update({
-										id: selectedTask.id,
-										name,
-									})
-									setSelectedTask((t) =>
-										t ? { ...t, name } : t
-									)
-								}}
-								className="text-xl font-semibold"
-							/>
+							<div className="flex items-center gap-1">
+								<EditableText
+									value={selectedTask.name}
+									onSave={async (name) => {
+										const updated =
+											await actions.task.update({
+												id: selectedTask.id,
+												name,
+											})
+										setSelectedTask((t) =>
+											t ? { ...t, name } : t
+										)
+									}}
+									className="text-xl font-semibold"
+								/>
+								<SessionPlayButton
+									itemType="task"
+									itemId={selectedTask.id}
+								/>
+							</div>
 							<button
 								onClick={() => setSelectedTask(null)}
 								className="text-sm text-gray-500 hover:underline"
