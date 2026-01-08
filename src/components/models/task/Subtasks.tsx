@@ -5,6 +5,7 @@ import EditableDate from "@/components/form/EditableDate"
 import EditableStatus from "@/components/form/EditableStatus"
 import EditableNumber from "@/components/form/EditableNumber"
 import EditableText from "@/components/form/EditableText"
+import SessionPlayButton from "../session/SessionPlayButton"
 
 type TaskNode = {
 	id: number
@@ -123,6 +124,10 @@ function Node({
 							})
 							.then(onChange)
 					}
+				/>
+				<SessionPlayButton
+					itemType="task"
+					itemId={node.id}
 				/>
 				<AddSubtask
 					parentTaskId={node.id}
