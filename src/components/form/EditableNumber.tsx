@@ -21,7 +21,7 @@ export default function EditableNumber({
 				onClick={() => setEditing(true)}
 				className="hover:underline"
 			>
-				{value ?? "—"} minutes
+				{value ?? "—"} min
 			</button>
 		)
 	}
