@@ -60,7 +60,7 @@ const tasks = await Astro.callAction(actions.task.listByGuild, {
 					<h2>Active Assignments</h2>
 					<div>
 						<Button
-							href={`/hall/tasks/create?guildSlug=${guild.data.slug}`}
+							href={`/tasks/create?guildSlug=${guild.data.slug}`}
 							icon="mingcute:plus-fill"
 							label="Add Assignment"
 						/>
