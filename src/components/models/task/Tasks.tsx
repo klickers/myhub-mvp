@@ -38,6 +38,8 @@ export default function Tasks({ tasks }: { tasks: Task[] }) {
 							className={`card ${
 								task.status === "completed"
 									? "bg-green-50 border-green-50"
+									: task.status === "inprogress"
+									? "bg-yellow-50"
 									: ""
 							}`}
 						>

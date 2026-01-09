@@ -299,7 +299,7 @@ export const task = {
 				include: {
 					...(includeSubtasks && { subtasks: true }),
 				},
-				orderBy: { deadline: "asc" },
+				orderBy: [{ deadline: "asc" }, { name: "asc" }],
 			})
 		},
 	}),
