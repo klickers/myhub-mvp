@@ -26,12 +26,6 @@ const allContracts = await Astro.callAction(actions.contract.listByGuild, {
 	<div class="flex gap-8 min-h-screen">
 		<div class="w-full">
 			<div class="sticky top-8 float-right flex items-center gap-0.5">
-				<!-- <a
-					href="#!"
-					class="inline-block p-1"
-				>
-					<Icon name="mingcute:play-fill" />
-				</a> -->
 				<SessionPlayButton
 					itemType="guild"
 					itemId={guild.data.id}
