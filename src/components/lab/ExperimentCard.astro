@@ -1,0 +1,23 @@
+---
+import type { Experiment } from "@/generated/prisma/client"
+
+interface Props {
+	experiment: Experiment
+}
+
+const { experiment } = Astro.props
+---
+
+<a
+	href={`/lab/experiments/${experiment.slug}`}
+	class="card duration-300 hover:shadow-md"
+>
+	<div class="card__content">
+		<p class="font-semibold leading-tight">{experiment.name}</p>
+		<!-- <div class="mt-4 relative">
+			<div class="h-2 w-full rounded-full bg-gray-200"></div>
+			<div class="h-2 w-3/4 rounded-full bg-emerald-400 absolute top-0">
+			</div>
+		</div> -->
+	</div>
+</a>

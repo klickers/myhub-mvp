@@ -7,12 +7,16 @@ import { contract } from "./contract"
 import { task } from "./task"
 import { SessionItemType } from "@/generated/prisma/enums"
 import { session } from "./session"
+import { experiment } from "./experiment"
+import { category } from "./category"
 
 export const server = {
 	guild,
 	contract,
 	task,
 	session,
+	experiment,
+	category,
 	// ===============================
 	// Objective
 	// ===============================

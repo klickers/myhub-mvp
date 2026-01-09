@@ -1,0 +1,39 @@
+---
+import Layout from "@/layouts/Layout.astro"
+import { actions } from "astro:actions"
+import Button from "@/components/Button.astro"
+import { Status } from "@/generated/prisma/enums"
+import ExperimentCard from "@/components/lab/ExperimentCard.astro"
+
+const experiments = await Astro.callAction(actions.experiment.list, {
+	status: [Status.inprogress],
+})
+---
+
+<Layout>
+	<div class="space-y-20">
+		<div>
+			<div class="flex justify-between">
+				<h1 class="mb-8">Experiments</h1>
+				<div>
+					<Button
+						href="/lab/experiments/create"
+						icon="mingcute:plus-fill"
+						label="Add Experiment"
+					/>
+				</div>
+			</div>
+			<div class="grid grid-cols-3 gap-3">
+				{
+					experiments.data ? (
+						experiments.data.map((experiment) => (
+							<ExperimentCard experiment={experiment} />
+						))
+					) : (
+						<p>No active contracts found.</p>
+					)
+				}
+			</div>
+		</div>
+	</div>
+</Layout>

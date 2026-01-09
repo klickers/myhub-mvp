@@ -1,0 +1,118 @@
+---
+import { actions } from "astro:actions"
+import Layout from "@/layouts/Layout.astro"
+import { Icon } from "astro-icon/components"
+
+const result = Astro.getActionResult(actions.experiment.update)
+if (result && !result.error)
+	return Astro.redirect(`/lab/experiments/${result.data.slug}`)
+
+const categories = await Astro.callAction(actions.category.list, {})
+
+const slug = Astro.params.slug as string
+const experimentRes = await Astro.callAction(actions.experiment.getBySlug, {
+	slug,
+})
+if (!experimentRes.data) throw new Error("Experiment not found")
+const experiment = experimentRes.data
+---
+
+<Layout>
+	<p class="mb-3 text-gray-600 text-sm">
+		<a
+			href={`/lab/experiments/${slug}`}
+			class="flex gap-1 items-center"
+		>
+			<Icon name="mingcute:arrow-left-fill" />
+			Back to Experiment
+		</a>
+	</p>
+
+	<h1>Edit Experiment</h1>
+
+	<form
+		method="POST"
+		action={actions.experiment.update}
+		class="flex flex-col space-y-1 max-w-lg"
+	>
+		<input
+			type="hidden"
+			name="id"
+			value={experiment.id}
+		/>
+
+		<input
+			type="text"
+			name="name"
+			placeholder="Name"
+			required
+			value={experiment.name}
+		/>
+
+		<input
+			type="text"
+			name="slug"
+			placeholder="Slug"
+			required
+			value={experiment.slug}
+		/>
+
+		<textarea
+			name="description"
+			placeholder="Description"
+		>
+			{experiment.description ?? ""}
+		</textarea>
+
+		<select name="status">
+			<option
+				value="notstarted"
+				selected={experiment.status === "notstarted"}
+			>
+				Not started
+			</option>
+			<option
+				value="inprogress"
+				selected={experiment.status === "inprogress"}
+			>
+				In progress
+			</option>
+			<option
+				value="onhold"
+				selected={experiment.status === "onhold"}
+			>
+				On hold
+			</option>
+			<option
+				value="completed"
+				selected={experiment.status === "completed"}
+			>
+				Completed
+			</option>
+			<option
+				value="archived"
+				selected={experiment.status === "archived"}
+			>
+				Archived
+			</option>
+		</select>
+
+		<select name="categoryId">
+			<option value="">No category</option>
+			{
+				categories.data?.map((c) => (
+					<option
+						value={c.id}
+						selected={experiment.categoryId === c.id}
+					>
+						{c.name}
+					</option>
+				))
+			}
+		</select>
+
+		<div>
+			<button class="w-auto button py-2 mt-2">Save Changes</button>
+		</div>
+	</form>
+</Layout>

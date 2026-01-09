@@ -3,6 +3,7 @@ import { z } from "zod"
 import prisma from "@/helpers/prisma"
 import { Status, TaskParentType } from "@/generated/prisma/enums"
 import { guild } from "./guild"
+import type { list } from "@/app/api/ai/command/utils"
 
 const taskInput = z
 	.object({
@@ -312,6 +313,25 @@ export const task = {
 			return prisma.task.findMany({
 				where: {
 					guildId,
+					status: { in: status },
+				},
+				include: {
+					...(includeSubtasks && { subtasks: true }),
+				},
+				orderBy: { deadline: "asc" },
+			})
+		},
+	}),
+	listByExperiment: defineAction({
+		input: z.object({
+			experimentId: z.coerce.number().int(),
+			status: z.array(z.nativeEnum(Status)).optional(),
+			includeSubtasks: z.boolean().default(false),
+		}),
+		handler: async ({ experimentId, status, includeSubtasks }) => {
+			return prisma.task.findMany({
+				where: {
+					experimentId,
 					status: { in: status },
 				},
 				include: {
