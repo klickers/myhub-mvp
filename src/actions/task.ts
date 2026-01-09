@@ -2,8 +2,6 @@ import { defineAction } from "astro:actions"
 import { z } from "zod"
 import prisma from "@/helpers/prisma"
 import { Status, TaskParentType } from "@/generated/prisma/enums"
-import { guild } from "./guild"
-import type { list } from "@/app/api/ai/command/utils"
 
 const taskInput = z
 	.object({
@@ -23,6 +21,7 @@ const taskInput = z
 		// for form handling
 		contractSlug: z.string().optional(),
 		guildSlug: z.string().optional(),
+		experimentSlug: z.string().optional(),
 	})
 	.superRefine((data, ctx) => {
 		const parentIds = [
@@ -172,6 +171,7 @@ export const task = {
 				task,
 				contractSlug: input.contractSlug,
 				guildSlug: input.guildSlug,
+				experimentSlug: input.experimentSlug,
 			}
 		},
 	}),
