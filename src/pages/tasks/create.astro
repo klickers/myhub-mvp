@@ -9,35 +9,46 @@ if (result && !result.error) {
 		return Astro.redirect(`/hall/contracts/${result.data.contractSlug}`)
 	if (result.data?.guildSlug)
 		return Astro.redirect(`/hall/guilds/${result.data.guildSlug}`)
+	if (result.data?.experimentSlug)
+		return Astro.redirect(`/lab/experiments/${result.data.experimentSlug}`)
 }
 
 // Fetch parents
 const contracts = await Astro.callAction(actions.contract.list, {})
 const guilds = await Astro.callAction(actions.guild.list, {})
+const experiments = await Astro.callAction(actions.experiment.list, {})
 
 // URL params
 const contractSlug = Astro.url.searchParams.get("contractSlug")
 const guildSlug = Astro.url.searchParams.get("guildSlug")
+const experimentSlug = Astro.url.searchParams.get("experimentSlug")
 
 // Resolve parents
 const contract = contracts.data?.find((c) => c.slug === contractSlug)
 const guild = guilds.data?.find((g) => g.slug === guildSlug)
+const experiment = experiments.data?.find((e) => e.slug === experimentSlug)
 ---
 
 <Layout>
 	{
-		(contractSlug || guildSlug) && (
+		(contractSlug || guildSlug || experimentSlug) && (
 			<p class="mb-3 text-gray-600 text-sm">
 				<a
 					href={
 						contractSlug
 							? `/hall/contracts/${contractSlug}`
-							: `/hall/guilds/${guildSlug}`
+							: guildSlug
+								? `/hall/guilds/${guildSlug}`
+								: `/lab/experiments/${experimentSlug}`
 					}
 					class="flex gap-1 items-center"
 				>
 					<Icon name="mingcute:arrow-left-fill" />
-					Back to {contract?.name ?? guild?.name ?? "Parent"}
+					Back to{" "}
+					{contract?.name ??
+						guild?.name ??
+						experiment?.name ??
+						"Parent"}
 				</a>
 			</p>
 		)
@@ -68,6 +79,15 @@ const guild = guilds.data?.find((g) => g.slug === guildSlug)
 				/>
 			)
 		}
+		{
+			experimentSlug && (
+				<input
+					type="hidden"
+					name="experimentSlug"
+					value={experimentSlug}
+				/>
+			)
+		}
 
 		<input
 			type="text"
@@ -94,7 +114,7 @@ const guild = guilds.data?.find((g) => g.slug === guildSlug)
 				selected
 				>Not started</option
 			>
-			<option value="inprogress"> In progress </option>
+			<option value="inprogress">In progress</option>
 			<option value="onhold">On hold</option>
 			<option value="completed">Completed</option>
 			<option value="archived">Archived</option>
@@ -127,12 +147,26 @@ const guild = guilds.data?.find((g) => g.slug === guildSlug)
 						value={guild.id}
 					/>
 				</>
+			) : experiment ? (
+				<>
+					<input
+						type="hidden"
+						name="parentType"
+						value="experiment"
+					/>
+					<input
+						type="hidden"
+						name="experimentId"
+						value={experiment.id}
+					/>
+				</>
 			) : (
 				<>
 					<select name="parentType">
 						<option value="none">No parent</option>
 						<option value="contract">Contract</option>
 						<option value="guild">Guild</option>
+						<option value="experiment">Experiment</option>
 					</select>
 
 					<select name="contractId">
@@ -146,6 +180,13 @@ const guild = guilds.data?.find((g) => g.slug === guildSlug)
 						<option value="">No guild</option>
 						{guilds.data?.map((g) => (
 							<option value={g.id}>{g.name}</option>
+						))}
+					</select>
+
+					<select name="experimentId">
+						<option value="">No experiment</option>
+						{experiments.data?.map((e) => (
+							<option value={e.id}>{e.name}</option>
 						))}
 					</select>
 				</>
