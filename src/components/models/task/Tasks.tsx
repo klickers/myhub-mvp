@@ -209,6 +209,8 @@ export default function Tasks({ tasks }: { tasks: Task[] }) {
 						</table>
 
 						<Subtasks taskId={selectedTask.id} />
+
+						{/* TODO: add past sessions */}
 					</div>
 				</>
 			)}

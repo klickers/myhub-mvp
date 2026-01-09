@@ -101,6 +101,7 @@ export default function Calendar() {
 			/* ===============================
 			   Custom event rendering
 			   =============================== */
+			//    TODO: clicking event opens details, or side tray
 			eventContent={(arg) => {
 				const { event } = arg
 				const { type } = event.extendedProps

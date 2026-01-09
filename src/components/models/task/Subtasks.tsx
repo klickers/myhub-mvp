@@ -84,6 +84,7 @@ function Node({
 }) {
 	return (
 		<div className="space-y-1">
+			{/* TODO: change styling depending on status */}
 			<div
 				className="flex items-center gap-3 text-sm"
 				style={{ marginLeft: depth * 12 }}
