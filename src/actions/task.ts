@@ -201,6 +201,30 @@ export const task = {
 			})
 		},
 	}),
+	createErrand: defineAction({
+		input: z.object({
+			name: z.string().min(1),
+			status: z.nativeEnum(Status).optional(),
+			estimatedTime: z.number().int().nonnegative().optional(),
+			deadline: z.coerce.date().optional().nullable(),
+		}),
+		handler: async ({
+			name,
+			status = "notstarted",
+			estimatedTime,
+			deadline,
+		}) => {
+			return prisma.task.create({
+				data: {
+					name,
+					parentType: "none",
+					status,
+					estimatedTime,
+					deadline,
+				},
+			})
+		},
+	}),
 	update: defineAction({
 		input: z.object({
 			id: z.coerce.number().int(),
@@ -292,6 +316,20 @@ export const task = {
 				},
 				include: {
 					...(includeSubtasks && { subtasks: true }),
+				},
+				orderBy: { deadline: "asc" },
+			})
+		},
+	}),
+	listErrands: defineAction({
+		input: z.object({
+			status: z.array(z.nativeEnum(Status)).optional(),
+		}),
+		handler: async ({ status }) => {
+			return prisma.task.findMany({
+				where: {
+					parentType: "none",
+					status: { in: status },
 				},
 				orderBy: { deadline: "asc" },
 			})

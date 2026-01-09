@@ -1,5 +1,5 @@
 ---
-import SessionPlayer from "@/components/models/session/SessionPlayer"
+import Errands from "@/components/models/task/Errands"
 import Layout from "@/layouts/Layout.astro"
 ---
 
@@ -23,7 +23,9 @@ import Layout from "@/layouts/Layout.astro"
 				<div class="card__content">Inspiring Quote</div>
 			</div>
 			<div class="card">
-				<div class="card__content">Errands</div>
+				<div class="card__content">
+					<Errands client:load />
+				</div>
 			</div>
 		</div>
 	</div>
