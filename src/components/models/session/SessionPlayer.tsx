@@ -149,6 +149,9 @@ const SessionPlayer: React.FC<Props> = ({}) => {
 			case "objective":
 				href = `/objectives/${$playingSession.slug}`
 				break
+			case "experiment":
+				href = `/lab/experiments/${$playingSession.slug}`
+				break
 		}
 	}
 

@@ -40,6 +40,14 @@ async function getTitleAndSlug(
 			}
 		}
 
+		case "experiment": {
+			const experiment = await actions.experiment.getById({ id: itemId })
+			return {
+				title: experiment.data?.name ?? null,
+				slug: experiment.data?.slug ?? null,
+			}
+		}
+
 		default:
 			return { title: null, slug: null }
 	}
