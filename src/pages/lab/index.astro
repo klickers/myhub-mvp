@@ -5,35 +5,76 @@ import Button from "@/components/Button.astro"
 import { Status } from "@/generated/prisma/enums"
 import ExperimentCard from "@/components/lab/ExperimentCard.astro"
 
-const experiments = await Astro.callAction(actions.experiment.list, {
-	status: [Status.inprogress],
+const categories = await Astro.callAction(actions.category.list, {
+	withExperiments: true,
 })
+const experiments = await Astro.callAction(
+	actions.experiment.listWithoutCategory,
+	{
+		status: [Status.inprogress],
+	}
+)
 ---
 
 <Layout>
 	<div class="space-y-20">
-		<div>
-			<div class="flex justify-between">
-				<h1 class="mb-8">Experiments</h1>
-				<div>
-					<Button
-						href="/lab/experiments/create"
-						icon="mingcute:plus-fill"
-						label="Add Experiment"
-					/>
-				</div>
-			</div>
-			<div class="grid grid-cols-3 gap-3">
-				{
-					experiments.data ? (
-						experiments.data.map((experiment) => (
-							<ExperimentCard experiment={experiment} />
-						))
-					) : (
-						<p>No active contracts found.</p>
-					)
-				}
-			</div>
+		<div class="flex gap-2">
+			<Button
+				href="/lab/categories/create"
+				icon="mingcute:plus-fill"
+				label="Add Category"
+			/>
+			<Button
+				href="/lab/experiments/create"
+				icon="mingcute:plus-fill"
+				label="Add Experiment"
+			/>
 		</div>
+		{
+			categories.data?.map((category) => (
+				<div>
+					<div class="flex justify-between">
+						<h2 class="text-3xl mb-6">{category.name}</h2>
+						<div>
+							<Button
+								href={`/lab/experiments/create?categorySlug=${category.slug}`}
+								icon="mingcute:plus-fill"
+								label="Add Experiment"
+							/>
+						</div>
+					</div>
+					<div class="grid grid-cols-3 gap-3">
+						{category.experiments ? (
+							category.experiments.map((experiment) => (
+								<ExperimentCard experiment={experiment} />
+							))
+						) : (
+							<p>No active experiments found.</p>
+						)}
+					</div>
+				</div>
+			))
+		}
+		{
+			experiments.data && experiments.data.length > 0 ? (
+				<div>
+					<div class="flex justify-between">
+						<h2 class="text-3xl mb-6">Other</h2>
+						<div>
+							<Button
+								href="/lab/experiments/create"
+								icon="mingcute:plus-fill"
+								label="Add Experiment"
+							/>
+						</div>
+					</div>
+					<div class="grid grid-cols-3 gap-3">
+						{experiments.data.map((experiment) => (
+							<ExperimentCard experiment={experiment} />
+						))}
+					</div>
+				</div>
+			) : null
+		}
 	</div>
 </Layout>

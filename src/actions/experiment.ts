@@ -93,7 +93,7 @@ export const experiment = {
 					...(status && { status: { in: status } }),
 				},
 				include: { category: withCategory },
-				orderBy: { updatedAt: "desc" },
+				orderBy: { name: "asc" },
 			})
 		},
 	}),
@@ -112,7 +112,25 @@ export const experiment = {
 					categoryId,
 					status: { in: status },
 				},
-				orderBy: { updatedAt: "desc" },
+				orderBy: { name: "asc" },
+			})
+		},
+	}),
+
+	listWithoutCategory: defineAction({
+		input: z.object({
+			status: z
+				.array(z.nativeEnum(Status))
+				.optional()
+				.default([Status.inprogress]),
+		}),
+		handler: async ({ status }) => {
+			return prisma.experiment.findMany({
+				where: {
+					categoryId: null,
+					status: { in: status },
+				},
+				orderBy: { name: "asc" },
 			})
 		},
 	}),

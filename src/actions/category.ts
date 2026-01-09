@@ -81,7 +81,7 @@ export const category = {
 				include: {
 					experiments: withExperiments,
 				},
-				orderBy: { name: "asc" },
+				// orderBy: { name: "asc" },
 			})
 		},
 	}),

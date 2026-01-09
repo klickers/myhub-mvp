@@ -1,0 +1,47 @@
+---
+import { actions } from "astro:actions"
+import Layout from "@/layouts/Layout.astro"
+import { Icon } from "astro-icon/components"
+
+const result = Astro.getActionResult(actions.category.create)
+if (result && !result.error) return Astro.redirect(`/lab/`)
+// return Astro.redirect(`/lab/categories/${result.data.slug}`)
+---
+
+<Layout>
+	<p class="mb-3 text-gray-600 text-sm">
+		<a
+			href="/lab"
+			class="flex gap-1 items-center"
+		>
+			<Icon name="mingcute:arrow-left-fill" />
+			Back to Lab
+		</a>
+	</p>
+
+	<h1>New Category</h1>
+
+	<form
+		method="POST"
+		action={actions.category.create}
+		class="flex flex-col space-y-1 max-w-lg"
+	>
+		<input
+			type="text"
+			name="name"
+			placeholder="Name"
+			required
+		/>
+
+		<input
+			type="text"
+			name="slug"
+			placeholder="Slug"
+			required
+		/>
+
+		<div>
+			<button class="w-auto button py-2 mt-2">Create</button>
+		</div>
+	</form>
+</Layout>
