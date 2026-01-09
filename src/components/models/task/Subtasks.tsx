@@ -5,7 +5,8 @@ import EditableDate from "@/components/form/EditableDate"
 import EditableStatus from "@/components/form/EditableStatus"
 import EditableNumber from "@/components/form/EditableNumber"
 import EditableText from "@/components/form/EditableText"
-import SessionPlayButton from "../session/SessionPlayButton"
+import SessionPlayButton from "@/components/models/session/SessionPlayButton"
+import AddSubtaskOfTask from "./AddSubtaskOfTask"
 
 type TaskNode = {
 	id: number
@@ -44,7 +45,7 @@ export default function Subtasks({ taskId }: { taskId: number }) {
 				) : (
 					<h3 className="text-lg font-semibold mb-3">Subtasks</h3>
 				)}
-				<AddSubtask
+				<AddSubtaskOfTask
 					parentTaskId={taskId}
 					onAdded={reload}
 				/>
@@ -129,7 +130,7 @@ function Node({
 					itemType="task"
 					itemId={node.id}
 				/>
-				<AddSubtask
+				<AddSubtaskOfTask
 					parentTaskId={node.id}
 					onAdded={onChange}
 				/>
@@ -144,62 +145,5 @@ function Node({
 				/>
 			))}
 		</div>
-	)
-}
-
-/* -------------------------------------------------------
-   Add Subtask
-------------------------------------------------------- */
-
-function AddSubtask({
-	parentTaskId,
-	onAdded,
-}: {
-	parentTaskId: number
-	onAdded: () => void
-}) {
-	const [open, setOpen] = useState(false)
-	const [name, setName] = useState("")
-	const ref = useRef<HTMLInputElement | null>(null)
-
-	useEffect(() => {
-		if (open) ref.current?.focus()
-	}, [open])
-
-	const create = async () => {
-		if (!name.trim()) return
-		await actions.task.createSubtask({
-			name,
-			parentTaskId,
-		})
-		setName("")
-		setOpen(false)
-		onAdded()
-	}
-
-	if (!open) {
-		return (
-			<button
-				onClick={() => setOpen(true)}
-				className="text-xs text-gray-500 hover:underline"
-			>
-				+
-			</button>
-		)
-	}
-
-	return (
-		<input
-			ref={ref}
-			value={name}
-			onChange={(e) => setName(e.target.value)}
-			onBlur={create}
-			onKeyDown={(e) => {
-				if (e.key === "Enter") create()
-				if (e.key === "Escape") setOpen(false)
-			}}
-			placeholder="New subtask…"
-			className="border px-1 text-xs"
-		/>
 	)
 }
