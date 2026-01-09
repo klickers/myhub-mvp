@@ -7,23 +7,32 @@ interface Props {
 const { path } = Astro.props
 
 const links = [
-	{ name: "Home", href: "/", icon: "mingcute:home-4-fill" },
-	// Agenda
-	{
-		name: "Timekeeper",
-		href: "/timekeeper",
-		icon: "mingcute:time-fill",
-	},
-	{
-		name: "Guild Hall",
-		href: "/hall",
-		icon: "mingcute:building-4-fill",
-	},
-	{
-		name: "Alchemy Lab",
-		href: "/lab",
-		icon: "mingcute:flask-3-fill",
-	},
+	[
+		{ name: "Home", href: "/", icon: "mingcute:home-4-fill" },
+		// TODO: Agenda
+		{
+			name: "Calendar",
+			href: "/calendar",
+			icon: "mingcute:calendar-2-fill",
+		},
+		{
+			name: "Timekeeper",
+			href: "/timekeeper",
+			icon: "mingcute:time-fill",
+		},
+	],
+	[
+		{
+			name: "Guild Hall",
+			href: "/hall",
+			icon: "mingcute:building-4-fill",
+		},
+		{
+			name: "Alchemy Lab",
+			href: "/lab",
+			icon: "mingcute:flask-3-fill",
+		},
+	],
 	// {
 	// 	name: "Library",
 	// 	href: "#!",
@@ -55,21 +64,25 @@ const isActive = (href: string) => {
 			</div>
 		</div>
 	</div>
-	<nav class="space-y-1">
+	<nav class="space-y-4">
 		{
-			links.map((link) => (
-				<a
-					href={link.href}
-					class={
-						"duration-300 px-4 py-2 flex gap-2 items-center rounded-xl" +
-						(isActive(link.href)
-							? " bg-black text-white hover:bg-black"
-							: " hover:bg-gray-100")
-					}
-				>
-					<Icon name={link.icon} />
-					<span>{link.name}</span>
-				</a>
+			links.map((group) => (
+				<div class="space-y-1">
+					{group.map((link) => (
+						<a
+							href={link.href}
+							class={
+								"duration-300 px-4 py-2 flex gap-2 items-center rounded-xl" +
+								(isActive(link.href)
+									? " bg-black text-white hover:bg-black"
+									: " hover:bg-gray-100")
+							}
+						>
+							<Icon name={link.icon} />
+							<span>{link.name}</span>
+						</a>
+					))}
+				</div>
 			))
 		}
 	</nav>
