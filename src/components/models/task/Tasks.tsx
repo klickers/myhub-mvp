@@ -8,6 +8,7 @@ import EditableDate from "@/components/form/EditableDate"
 import EditableStatus from "@/components/form/EditableStatus"
 import EditableNumber from "@/components/form/EditableNumber"
 import EditableText from "@/components/form/EditableText"
+import { Icon } from "@iconify/react"
 
 export default function Tasks({ tasks }: { tasks: Task[] }) {
 	const [selectedTask, setSelectedTask] = useState<Task | null>(null)
@@ -23,42 +24,61 @@ export default function Tasks({ tasks }: { tasks: Task[] }) {
 		<div>
 			{/* TASK LIST */}
 			<div className="space-y-2">
-				{tasks.map((task) => (
-					<div
-						key={task.id}
-						className={`card ${
-							task.status === "completed"
-								? "bg-green-50 border-green-50"
-								: ""
-						}`}
-					>
-						<div className="card__content">
-							<div className="flex justify-between items-center">
-								<p
-									className="font-semibold cursor-pointer"
-									onClick={() => setSelectedTask(task)}
-								>
-									{task.name}
-								</p>
-								<div className="flex items-center gap-2 -mr-1">
-									{task.deadline && (
-										<p className="text-xs text-gray-600">
-											Due{" "}
-											{format(
-												task.deadline,
-												"MMM d, yyyy"
-											)}
+				{tasks.map((task) => {
+					let completed = 0,
+						total = 0
+					for (const subtask of task.subtasks) {
+						if (subtask.status === "archived") continue
+						total++
+						if (subtask.status === "completed") completed++
+					}
+					return (
+						<div
+							key={task.id}
+							className={`card ${
+								task.status === "completed"
+									? "bg-green-50 border-green-50"
+									: ""
+							}`}
+						>
+							<div className="card__content">
+								<div className="flex justify-between items-center">
+									<div
+										className="flex gap-4 items-center cursor-pointer"
+										onClick={() => setSelectedTask(task)}
+									>
+										<p className="font-semibold">
+											{task.name}
 										</p>
-									)}
-									<SessionPlayButton
-										itemType="task"
-										itemId={task.id}
-									/>
+										{task.subtasks.length > 0 && (
+											<p className="text-xs text-gray-600 flex items-center gap-1">
+												<Icon icon="mingcute:list-check-2-line" />
+												<span>
+													{completed}/{total}
+												</span>
+											</p>
+										)}
+									</div>
+									<div className="flex items-center gap-2 -mr-1">
+										{task.deadline && (
+											<p className="text-xs text-gray-600">
+												Due{" "}
+												{format(
+													task.deadline,
+													"MMM d, yyyy"
+												)}
+											</p>
+										)}
+										<SessionPlayButton
+											itemType="task"
+											itemId={task.id}
+										/>
+									</div>
 								</div>
 							</div>
 						</div>
-					</div>
-				))}
+					)
+				})}
 			</div>
 
 			{/* SIDE TRAY */}

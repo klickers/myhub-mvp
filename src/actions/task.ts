@@ -263,12 +263,16 @@ export const task = {
 		input: z.object({
 			contractId: z.coerce.number().int(),
 			status: z.array(z.nativeEnum(Status)).optional(),
+			includeSubtasks: z.boolean().default(false),
 		}),
-		handler: async ({ contractId, status }) => {
+		handler: async ({ contractId, status, includeSubtasks }) => {
 			return prisma.task.findMany({
 				where: {
 					contractId,
 					status: { in: status },
+				},
+				include: {
+					...(includeSubtasks && { subtasks: true }),
 				},
 				orderBy: { deadline: "asc" },
 			})
@@ -278,12 +282,16 @@ export const task = {
 		input: z.object({
 			guildId: z.coerce.number().int(),
 			status: z.array(z.nativeEnum(Status)).optional(),
+			includeSubtasks: z.boolean().default(false),
 		}),
-		handler: async ({ guildId, status }) => {
+		handler: async ({ guildId, status, includeSubtasks }) => {
 			return prisma.task.findMany({
 				where: {
 					guildId,
 					status: { in: status },
+				},
+				include: {
+					...(includeSubtasks && { subtasks: true }),
 				},
 				orderBy: { deadline: "asc" },
 			})

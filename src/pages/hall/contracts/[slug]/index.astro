@@ -14,6 +14,7 @@ if (!contract.data) return Astro.redirect("/hall")
 
 const tasks = await Astro.callAction(actions.task.listByContract, {
 	contractId: contract.data.id,
+	includeSubtasks: true,
 })
 ---
 
