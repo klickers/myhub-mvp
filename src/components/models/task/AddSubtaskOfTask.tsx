@@ -1,7 +1,7 @@
 import { actions } from "astro:actions"
 import { useEffect, useRef, useState } from "react"
 
-export default function AddSubtask({
+export default function AddSubtaskOfTask({
 	parentTaskId,
 	onAdded,
 }: {
