@@ -2,6 +2,7 @@ import { defineAction } from "astro:actions"
 import { z } from "zod"
 import prisma from "@/helpers/prisma"
 import { Status, TaskParentType } from "@/generated/prisma/enums"
+import { guild } from "./guild"
 
 const taskInput = z
 	.object({
@@ -16,15 +17,18 @@ const taskInput = z
 		contractId: z.number().int().positive().optional(),
 		experimentId: z.number().int().positive().optional(),
 		parentTaskId: z.number().int().positive().optional(),
+		guildId: z.number().int().positive().optional(),
 
 		// for form handling
 		contractSlug: z.string().optional(),
+		guildSlug: z.string().optional(),
 	})
 	.superRefine((data, ctx) => {
 		const parentIds = [
 			data.contractId,
 			data.experimentId,
 			data.parentTaskId,
+			data.guildId,
 		].filter((v) => v != null)
 
 		// Rule: only one parent (or none)
@@ -62,6 +66,13 @@ const taskInput = z
 			ctx.addIssue({
 				code: z.ZodIssueCode.custom,
 				message: "parentType is 'task' but parentTaskId is missing",
+			})
+		}
+
+		if (data.parentType === "guild" && !data.guildId) {
+			ctx.addIssue({
+				code: z.ZodIssueCode.custom,
+				message: "parentType is 'guild' but guildId is missing",
 			})
 		}
 	})
@@ -153,11 +164,13 @@ export const task = {
 					contractId: input.contractId ?? null,
 					experimentId: input.experimentId ?? null,
 					parentTaskId: input.parentTaskId ?? null,
+					guildId: input.guildId ?? null,
 				},
 			})
 			return {
 				task,
 				contractSlug: input.contractSlug,
+				guildSlug: input.guildSlug,
 			}
 		},
 	}),
@@ -255,6 +268,21 @@ export const task = {
 			return prisma.task.findMany({
 				where: {
 					contractId,
+					status: { in: status },
+				},
+				orderBy: { deadline: "asc" },
+			})
+		},
+	}),
+	listByGuild: defineAction({
+		input: z.object({
+			guildId: z.coerce.number().int(),
+			status: z.array(z.nativeEnum(Status)).optional(),
+		}),
+		handler: async ({ guildId, status }) => {
+			return prisma.task.findMany({
+				where: {
+					guildId,
 					status: { in: status },
 				},
 				orderBy: { deadline: "asc" },

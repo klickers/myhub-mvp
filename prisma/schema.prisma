@@ -34,6 +34,7 @@ model Guild {
 
     contracts Contract[]
     sessions  Session[]
+    tasks     Task[]
 }
 
 model Persona {
@@ -65,6 +66,7 @@ enum TaskParentType {
     contract
     experiment
     task
+    guild
 }
 
 model Task {
@@ -78,11 +80,13 @@ model Task {
     contractId   Int?
     experimentId Int?
     parentTaskId Int?
+    guildId      Int?
 
     contract   Contract?   @relation(fields: [contractId], references: [id])
     experiment Experiment? @relation(fields: [experimentId], references: [id])
     parentTask Task?       @relation("TaskHierarchy", fields: [parentTaskId], references: [id])
     subtasks   Task[]      @relation("TaskHierarchy")
+    guild      Guild?      @relation(fields: [guildId], references: [id])
 
     sessions Session[]
 }

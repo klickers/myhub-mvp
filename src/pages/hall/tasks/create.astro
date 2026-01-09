@@ -4,25 +4,40 @@ import Layout from "@/layouts/Layout.astro"
 import { Icon } from "astro-icon/components"
 
 const result = Astro.getActionResult(actions.task.create)
-if (result && !result.error)
+if (result && !result.error) {
 	if (result.data?.contractSlug)
-		return Astro.redirect(`/hall/contracts/${result.data?.contractSlug}`)
+		return Astro.redirect(`/hall/contracts/${result.data.contractSlug}`)
+	if (result.data?.guildSlug)
+		return Astro.redirect(`/hall/guilds/${result.data.guildSlug}`)
+}
 
+// Fetch parents
 const contracts = await Astro.callAction(actions.contract.list, {})
+const guilds = await Astro.callAction(actions.guild.list, {})
+
+// URL params
 const contractSlug = Astro.url.searchParams.get("contractSlug")
+const guildSlug = Astro.url.searchParams.get("guildSlug")
+
+// Resolve parents
 const contract = contracts.data?.find((c) => c.slug === contractSlug)
+const guild = guilds.data?.find((g) => g.slug === guildSlug)
 ---
 
 <Layout>
 	{
-		contractSlug && (
+		(contractSlug || guildSlug) && (
 			<p class="mb-3 text-gray-600 text-sm">
 				<a
-					href={`/hall/contracts/${contractSlug}`}
+					href={
+						contractSlug
+							? `/hall/contracts/${contractSlug}`
+							: `/hall/guilds/${guildSlug}`
+					}
 					class="flex gap-1 items-center"
 				>
 					<Icon name="mingcute:arrow-left-fill" />
-					Back to {contract?.name ?? "Contract"}
+					Back to {contract?.name ?? guild?.name ?? "Parent"}
 				</a>
 			</p>
 		)
@@ -41,6 +56,15 @@ const contract = contracts.data?.find((c) => c.slug === contractSlug)
 					type="hidden"
 					name="contractSlug"
 					value={contractSlug}
+				/>
+			)
+		}
+		{
+			guildSlug && (
+				<input
+					type="hidden"
+					name="guildSlug"
+					value={guildSlug}
 				/>
 			)
 		}
@@ -90,22 +114,38 @@ const contract = contracts.data?.find((c) => c.slug === contractSlug)
 						value={contract.id}
 					/>
 				</>
+			) : guild ? (
+				<>
+					<input
+						type="hidden"
+						name="parentType"
+						value="guild"
+					/>
+					<input
+						type="hidden"
+						name="guildId"
+						value={guild.id}
+					/>
+				</>
 			) : (
 				<>
 					<select name="parentType">
 						<option value="none">No parent</option>
-						<option
-							value="contract"
-							selected
-						>
-							Contract
-						</option>
+						<option value="contract">Contract</option>
+						<option value="guild">Guild</option>
 					</select>
 
 					<select name="contractId">
 						<option value="">No contract</option>
 						{contracts.data?.map((c) => (
 							<option value={c.id}>{c.name}</option>
+						))}
+					</select>
+
+					<select name="guildId">
+						<option value="">No guild</option>
+						{guilds.data?.map((g) => (
+							<option value={g.id}>{g.name}</option>
 						))}
 					</select>
 				</>

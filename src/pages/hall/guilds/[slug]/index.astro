@@ -7,6 +7,7 @@ import { actions } from "astro:actions"
 import { Status } from "@/generated/prisma/enums"
 import Button from "@/components/Button.astro"
 import SessionPlayButton from "@/components/models/session/SessionPlayButton"
+import Tasks from "@/components/models/task/Tasks"
 
 const guild = await Astro.callAction(actions.guild.getBySlug, {
 	slug: Astro.params.slug as string,
@@ -19,6 +20,10 @@ const activeContracts = await Astro.callAction(actions.contract.listByGuild, {
 const allContracts = await Astro.callAction(actions.contract.listByGuild, {
 	guildId: guild.data.id,
 	status: [Status.notstarted, Status.onhold],
+})
+
+const tasks = await Astro.callAction(actions.task.listByGuild, {
+	guildId: guild.data.id,
 })
 ---
 
@@ -49,6 +54,23 @@ const allContracts = await Astro.callAction(actions.contract.listByGuild, {
 			<!-- TODO: double click to edit guild name -->
 			<h1 class="mb-3">{guild.data.name}</h1>
 			<p>{guild.data.description ?? <em>Put a description here.</em>}</p>
+			<div class="mt-10">
+				<!-- TODO: in progress, upcoming, on hold -->
+				<div class="flex justify-between">
+					<h2>Active Assignments</h2>
+					<div>
+						<Button
+							href={`/hall/tasks/create?guildSlug=${guild.data.slug}`}
+							icon="mingcute:plus-fill"
+							label="Add Assignment"
+						/>
+					</div>
+				</div>
+				<Tasks
+					tasks={tasks.data}
+					client:load
+				/>
+			</div>
 			<div class="mt-10">
 				<!-- TODO: in progress, upcoming, on hold -->
 				<div class="flex justify-between">
