@@ -266,8 +266,18 @@ export const task = {
 			status: z.array(z.nativeEnum(Status)).optional(),
 			from: z.coerce.date().optional(),
 			to: z.coerce.date().optional(),
+			includeContract: z.boolean().default(false),
+			includeGuild: z.boolean().default(false),
+			includeExperiment: z.boolean().default(false),
 		}),
-		handler: async ({ status, from, to }) => {
+		handler: async ({
+			status,
+			from,
+			to,
+			includeContract,
+			includeGuild,
+			includeExperiment,
+		}) => {
 			return prisma.task.findMany({
 				where: {
 					...(status && { status: { in: status } }),
@@ -279,6 +289,11 @@ export const task = {
 								},
 						  }
 						: {}),
+				},
+				include: {
+					contract: includeContract,
+					guild: includeGuild,
+					experiment: includeExperiment,
 				},
 				orderBy: { deadline: "asc" },
 			})

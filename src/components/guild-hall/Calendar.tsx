@@ -44,6 +44,9 @@ export default function Calendar() {
 							status: statuses,
 							from: new Date(start),
 							to: new Date(end),
+							includeContract: true,
+							includeGuild: true,
+							includeExperiment: true,
 						}),
 					])
 
@@ -59,7 +62,10 @@ export default function Calendar() {
 							extendedProps: {
 								type: "contract",
 								status: contract.status,
-								contractId: contract.id,
+								contract: {
+									id: contract.id,
+									slug: contract.slug,
+								},
 							},
 						})
 					)
@@ -75,9 +81,27 @@ export default function Calendar() {
 								type: "task",
 								status: task.status,
 								taskId: task.id,
-								contractId: task.contractId ?? undefined,
+								...(task.contract && {
+									contract: {
+										id: task.contractId,
+										slug: task.contract.slug,
+									},
+								}),
+								...(task.guild && {
+									guild: {
+										id: task.guildId,
+										slug: task.guild.slug,
+									},
+								}),
+								...(task.experiment && {
+									experiment: {
+										id: task.experimentId,
+										slug: task.experiment.slug,
+									},
+								}),
 							},
 						}))
+					console.log(taskEvents)
 
 					successCallback([...contractEvents, ...taskEvents])
 				} catch (error) {
@@ -111,8 +135,20 @@ export default function Calendar() {
 				const { event } = arg
 				const { type } = event.extendedProps
 
+				// TODO: open task in side tray on click; handle subtasks
+				let url = "#!"
+				if (event.extendedProps.contract)
+					url = `/hall/contracts/${event.extendedProps.contract.slug}`
+				else if (event.extendedProps.guild)
+					url = `/hall/guilds/${event.extendedProps.guild.slug}`
+				else if (event.extendedProps.experiment)
+					url = `/lab/experiments/${event.extendedProps.experiment.slug}`
+
 				return (
-					<div className="flex gap-1 items-center px-1 py-0.5">
+					<a
+						href={url}
+						className="flex gap-1 items-center px-1 py-0.5"
+					>
 						{type === "contract" ? (
 							<Icon
 								icon="mingcute:document-2-fill"
@@ -125,7 +161,7 @@ export default function Calendar() {
 							/>
 						)}
 						<span>{event.title}</span>
-					</div>
+					</a>
 				)
 			}}
 		/>
