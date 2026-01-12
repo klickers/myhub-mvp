@@ -99,6 +99,8 @@ export default function Calendar() {
 				}
 				if (arg.event.extendedProps.status === Status.completed)
 					classes.push("calendar-completed")
+				else if (arg.event.extendedProps.status === Status.inprogress)
+					classes.push("calendar-inprogress")
 				return classes
 			}}
 			/* ===============================

@@ -210,6 +210,9 @@
 .fc-event {
 	&.calendar-task {
 		@apply bg-sky-500 border-none;
+		&.calendar-inprogress {
+			@apply bg-yellow-400;
+		}
 	}
 	&.calendar-contract {
 		@apply bg-violet-600 border-none;
