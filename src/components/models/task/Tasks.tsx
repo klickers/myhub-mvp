@@ -27,10 +27,12 @@ export default function Tasks({ tasks }: { tasks: Task[] }) {
 				{tasks.map((task) => {
 					let completed = 0,
 						total = 0
-					for (const subtask of task.subtasks) {
-						if (subtask.status === "archived") continue
-						total++
-						if (subtask.status === "completed") completed++
+					if (task.subtasks) {
+						for (const subtask of task.subtasks) {
+							if (subtask.status === "archived") continue
+							total++
+							if (subtask.status === "completed") completed++
+						}
 					}
 					return (
 						<div
@@ -52,14 +54,15 @@ export default function Tasks({ tasks }: { tasks: Task[] }) {
 										<p className="font-semibold">
 											{task.name}
 										</p>
-										{task.subtasks.length > 0 && (
-											<p className="text-xs text-gray-600 flex items-center gap-1">
-												<Icon icon="mingcute:list-check-2-line" />
-												<span>
-													{completed}/{total}
-												</span>
-											</p>
-										)}
+										{task.subtasks &&
+											task.subtasks.length > 0 && (
+												<p className="text-xs text-gray-600 flex items-center gap-1">
+													<Icon icon="mingcute:list-check-2-line" />
+													<span>
+														{completed}/{total}
+													</span>
+												</p>
+											)}
 									</div>
 									<div className="flex items-center gap-2 -mr-1">
 										{task.deadline && (
