@@ -31,14 +31,17 @@ export default function Calendar() {
 					const start = info.start.toISOString()
 					const end = info.end.toISOString()
 
+					const statuses = Object.values(Status).filter(
+						(status) => status !== Status.archived
+					)
 					const [contractsRes, tasksRes] = await Promise.all([
 						actions.contract.list({
-							status: Object.values(Status),
+							status: statuses,
 							from: new Date(start),
 							to: new Date(end),
 						}),
 						actions.task.listAll({
-							status: Object.values(Status),
+							status: statuses,
 							from: new Date(start),
 							to: new Date(end),
 						}),
