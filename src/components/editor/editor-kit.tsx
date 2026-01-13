@@ -6,8 +6,8 @@ import { type TPlateEditor, useEditorRef } from "platejs/react"
 // import { AIKit } from "@/components/editor/kits/ai-kit"
 // import { AlignKit } from "@/components/editor/kits/align-kit"
 import { AutoformatKit } from "@/components/editor/kits/autoformat-kit"
-// import { BasicBlocksKit } from "@/components/editor/kits/basic-blocks-kit"
-// import { BasicMarksKit } from "@/components/editor/kits/basic-marks-kit"
+import { BasicBlocksKit } from "@/components/editor/kits/basic-blocks-kit"
+import { BasicMarksKit } from "@/components/editor/kits/basic-marks-kit"
 // import { BlockMenuKit } from "@/components/editor/kits/block-menu-kit"
 import { BlockPlaceholderKit } from "@/components/editor/kits/block-placeholder-kit"
 // import { CalloutKit } from "@/components/editor/kits/callout-kit"
@@ -42,7 +42,7 @@ export const EditorKit = [
 	// ...BlockMenuKit,
 
 	// Elements
-	// ...BasicBlocksKit,
+	...BasicBlocksKit,
 	...CodeBlockKit,
 	// ...TableKit,
 	// ...ToggleKit,
@@ -56,7 +56,7 @@ export const EditorKit = [
 	// ...MentionKit,
 
 	// Marks
-	// ...BasicMarksKit,
+	...BasicMarksKit,
 	// ...FontKit,
 
 	// Block Style
