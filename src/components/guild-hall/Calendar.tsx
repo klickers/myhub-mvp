@@ -125,6 +125,8 @@ export default function Calendar() {
 					classes.push("calendar-completed")
 				else if (arg.event.extendedProps.status === Status.inprogress)
 					classes.push("calendar-inprogress")
+				else if (arg.event.extendedProps.status === Status.onhold)
+					classes.push("calendar-onhold")
 				return classes
 			}}
 			/* ===============================

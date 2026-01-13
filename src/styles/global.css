@@ -213,9 +213,15 @@
 		&.calendar-inprogress {
 			@apply bg-yellow-400;
 		}
+		&.calendar-onhold {
+			@apply bg-gray-300;
+		}
 	}
 	&.calendar-contract {
-		@apply bg-violet-600 border-none;
+		@apply bg-violet-500 border-none;
+		&.calendar-inprogress {
+			@apply bg-violet-600;
+		}
 	}
 	&.calendar-completed {
 		@apply bg-green-300 border-none;
