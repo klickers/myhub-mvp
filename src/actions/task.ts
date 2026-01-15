@@ -80,8 +80,19 @@ const taskInput = z
 type TaskNode = {
 	id: number
 	name: string
+	status: Status
 	parentTaskId: number | null
+	estimatedTime: number | null
+	deadline: Date | null
 	children: TaskNode[]
+}
+
+const STATUS_ORDER: Record<Status, number> = {
+	notstarted: 0,
+	inprogress: 1,
+	onhold: 2,
+	completed: 3,
+	archived: 4,
 }
 
 async function buildSubtaskTree(rootTaskId: number): Promise<TaskNode[]> {
@@ -91,6 +102,9 @@ async function buildSubtaskTree(rootTaskId: number): Promise<TaskNode[]> {
 		id: number
 		name: string
 		parentTaskId: number | null
+		status: Status
+		estimatedTime: number | null
+		deadline: Date | null
 	}> = []
 
 	let frontier: number[] = [rootTaskId]
@@ -110,7 +124,7 @@ async function buildSubtaskTree(rootTaskId: number): Promise<TaskNode[]> {
 				deadline: true,
 				parentTaskId: true,
 			},
-			orderBy: { id: "asc" },
+			orderBy: [{ status: "asc" }, { id: "asc" }],
 		})
 
 		all.push(...children)
@@ -138,6 +152,14 @@ async function buildSubtaskTree(rootTaskId: number): Promise<TaskNode[]> {
 	// Attach children recursively
 	const attach = (node: TaskNode) => {
 		const kids = byParent.get(node.id) ?? []
+		kids.sort((a, b) => {
+			const s = STATUS_ORDER[a.status] - STATUS_ORDER[b.status]
+			if (s !== 0) return s
+			if (!a.deadline && !b.deadline) return 0
+			else if (!a.deadline) return 1
+			else if (!b.deadline) return -1
+			return a.deadline.getTime() - b.deadline.getTime()
+		})
 		node.children = kids
 		for (const k of kids) attach(k)
 	}

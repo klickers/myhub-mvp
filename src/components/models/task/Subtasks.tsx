@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { actions } from "astro:actions"
 import type { Status } from "@/generated/prisma/enums"
 import EditableDate from "@/components/form/EditableDate"
@@ -55,7 +55,7 @@ export default function Subtasks({ taskId }: { taskId: number }) {
 				<p className="text-sm text-gray-500">No subtasks yet.</p>
 			) : null}
 
-			<div className="space-y-2">
+			<div className="">
 				{tree.map((node) => (
 					<Node
 						key={node.id}
@@ -82,9 +82,15 @@ function Node({
 	depth: number
 	onChange: () => void
 }) {
+	let statusStyle = ""
+	if (node.status === "completed") statusStyle = "bg-green-100 text-green-800"
+	else if (node.status === "inprogress")
+		statusStyle = "bg-yellow-100 text-yellow-800"
+	else if (node.status === "notstarted")
+		statusStyle = "bg-gray-100 text-gray-800"
+
 	return (
-		<div className="space-y-1">
-			{/* TODO: change styling depending on status */}
+		<div className={`space-y-1 px-2 ${statusStyle}`}>
 			<div
 				className="flex items-center gap-3 text-sm"
 				style={{ marginLeft: depth * 12 }}
