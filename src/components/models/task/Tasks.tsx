@@ -63,6 +63,17 @@ export default function Tasks({ tasks }: { tasks: Task[] }) {
 													</span>
 												</p>
 											)}
+										{task.estimatedTime &&
+										task.estimatedTime != 0 ? (
+											<p className="text-xs text-gray-600 flex items-center gap-1">
+												<Icon icon="mingcute:time-line" />{" "}
+												{Math.round(
+													(task.estimatedTime / 60) *
+														100
+												) / 100}
+												h
+											</p>
+										) : null}
 									</div>
 									<div className="flex items-center gap-2 -mr-1">
 										{task.deadline && (
