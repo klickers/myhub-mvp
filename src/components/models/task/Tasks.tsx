@@ -9,6 +9,7 @@ import EditableStatus from "@/components/form/EditableStatus"
 import EditableNumber from "@/components/form/EditableNumber"
 import EditableText from "@/components/form/EditableText"
 import { Icon } from "@iconify/react"
+import minutesToHours from "@/helpers/time/minutesToHours"
 
 export default function Tasks({ tasks }: { tasks: Task[] }) {
 	const [selectedTask, setSelectedTask] = useState<Task | null>(null)
@@ -67,10 +68,9 @@ export default function Tasks({ tasks }: { tasks: Task[] }) {
 										task.estimatedTime != 0 ? (
 											<p className="text-xs text-gray-600 flex items-center gap-1">
 												<Icon icon="mingcute:time-line" />{" "}
-												{Math.round(
-													(task.estimatedTime / 60) *
-														100
-												) / 100}
+												{minutesToHours(
+													task.estimatedTime
+												)}
 												h
 											</p>
 										) : null}
