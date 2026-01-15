@@ -89,14 +89,16 @@ function Node({
 				className="flex items-center gap-3 text-sm"
 				style={{ marginLeft: depth * 12 }}
 			>
-				<EditableText
-					value={node.name}
-					onSave={(name) =>
-						actions.task
-							.update({ id: node.id, name })
-							.then(onChange)
-					}
-				/>
+				<div className="w-64">
+					<EditableText
+						value={node.name}
+						onSave={(name) =>
+							actions.task
+								.update({ id: node.id, name })
+								.then(onChange)
+						}
+					/>
+				</div>
 				<EditableStatus
 					value={node.status}
 					onSave={(status) =>

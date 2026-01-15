@@ -29,7 +29,7 @@ export default function EditableNumber({
 	return (
 		<input
 			type="number"
-			className="border px-1 w-24"
+			className="border px-1 w-10"
 			value={draft}
 			onChange={(e) => setDraft(e.target.value)}
 			onBlur={save}

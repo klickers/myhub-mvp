@@ -108,7 +108,7 @@ export default function Tasks({ tasks }: { tasks: Task[] }) {
 
 					{/* TRAY */}
 					<div
-						className="fixed right-0 top-0 h-screen w-2/5 bg-white shadow-lg p-6 z-50 overflow-y-auto"
+						className="fixed right-0 top-0 h-screen w-1/2 bg-white shadow-lg p-6 z-50 overflow-y-auto"
 						onClick={(e) => e.stopPropagation()}
 					>
 						<div className="flex justify-between items-start mb-6">
