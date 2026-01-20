@@ -1,5 +1,6 @@
 ---
 import Errands from "@/components/models/task/Errands"
+import DayCalendar from "@/components/DayCalendar"
 import Layout from "@/layouts/Layout.astro"
 ---
 
@@ -12,20 +13,25 @@ import Layout from "@/layouts/Layout.astro"
 			<p class="text-gray-600 ml-0.5">Today will be amazing.</p>
 			<div class="flex gap-4 mt-8">
 				<div class="card">
-					<div class="card__content">Calendar</div>
+					<div class="card__content">
+						<h2>Calendar</h2>
+						<DayCalendar client:load />
+					</div>
 				</div>
 				<div class="card">
 					<div class="card__content">Agenda</div>
 				</div>
 			</div>
 		</div>
-		<div class="space-y-4 w-[220px] flex-none">
-			<div class="card">
-				<div class="card__content">Inspiring Quote</div>
-			</div>
-			<div class="card">
-				<div class="card__content">
-					<Errands client:load />
+		<div class="w-[220px] flex-none">
+			<div class="sticky top-8 space-y-4">
+				<div class="card">
+					<div class="card__content">Inspiring Quote</div>
+				</div>
+				<div class="card">
+					<div class="card__content">
+						<Errands client:load />
+					</div>
 				</div>
 			</div>
 		</div>
