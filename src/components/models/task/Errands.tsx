@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from "react"
 import { actions } from "astro:actions"
 import EditableStatus from "@/components/form/EditableStatus"
-import EditableNumber from "@/components/form/EditableNumber"
 import EditableText from "@/components/form/EditableText"
 import SessionPlayButton from "@/components/models/session/SessionPlayButton"
 import AddErrand from "./AddErrand"
