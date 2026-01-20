@@ -90,7 +90,7 @@ function Node({
 		statusStyle = "bg-gray-100 text-gray-800"
 
 	return (
-		<div className={`space-y-1 px-2 ${statusStyle}`}>
+		<div className={`px-2 ${statusStyle}`}>
 			<div
 				className="flex items-center gap-3 text-sm"
 				style={{ marginLeft: depth * 12 }}
