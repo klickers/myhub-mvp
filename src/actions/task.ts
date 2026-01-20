@@ -309,7 +309,7 @@ export const task = {
 									...(from && { gte: from }),
 									...(to && { lte: to }),
 								},
-						  }
+							}
 						: {}),
 				},
 				include: {
@@ -380,7 +380,10 @@ export const task = {
 	}),
 	listErrands: defineAction({
 		input: z.object({
-			status: z.array(z.nativeEnum(Status)).optional(),
+			status: z
+				.array(z.nativeEnum(Status))
+				.optional()
+				.default([Status.notstarted, Status.inprogress, Status.onhold]),
 		}),
 		handler: async ({ status }) => {
 			return prisma.task.findMany({
@@ -388,7 +391,7 @@ export const task = {
 					parentType: "none",
 					status: { in: status },
 				},
-				orderBy: { deadline: "asc" },
+				orderBy: [{ status: "desc" }, { name: "asc" }],
 			})
 		},
 	}),
