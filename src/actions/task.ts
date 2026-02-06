@@ -1,13 +1,14 @@
 import { defineAction } from "astro:actions"
 import { z } from "zod"
 import prisma from "@/helpers/prisma"
-import { Status, TaskParentType } from "@/generated/prisma/enums"
+import { MakeTimeType, Status, TaskParentType } from "@/generated/prisma/enums"
 
 const taskInput = z
 	.object({
 		name: z.string().min(1),
 
 		parentType: z.nativeEnum(TaskParentType).default("contract"),
+		makeTimeType: z.nativeEnum(MakeTimeType).optional(),
 		status: z.nativeEnum(Status).default("notstarted"),
 
 		estimatedTime: z.number().int().nonnegative().optional(),
@@ -253,6 +254,7 @@ export const task = {
 			id: z.coerce.number().int(),
 			name: z.string().min(1).optional(),
 			status: z.nativeEnum(Status).optional(),
+			makeTimeType: z.nativeEnum(MakeTimeType).optional(),
 			estimatedTime: z.number().int().nonnegative().optional(),
 			deadline: z.coerce.date().optional().nullable(),
 		}),

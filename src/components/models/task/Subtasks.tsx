@@ -1,16 +1,18 @@
 import { useCallback, useEffect, useState } from "react"
 import { actions } from "astro:actions"
-import type { Status } from "@/generated/prisma/enums"
+import type { MakeTimeType, Status } from "@/generated/prisma/enums"
 import EditableDate from "@/components/form/EditableDate"
 import EditableStatus from "@/components/form/EditableStatus"
 import EditableNumber from "@/components/form/EditableNumber"
 import EditableText from "@/components/form/EditableText"
 import SessionPlayButton from "@/components/models/session/SessionPlayButton"
 import AddSubtaskOfTask from "./AddSubtaskOfTask"
+import EditableMakeTimeType from "@/components/form/EditableMakeTimeType"
 
 type TaskNode = {
 	id: number
 	name: string
+	makeTimeType: MakeTimeType | null
 	status: Status
 	estimatedTime: number | null
 	deadline: string | null
@@ -105,6 +107,17 @@ function Node({
 						}
 					/>
 				</div>
+				<EditableMakeTimeType
+					value={node.makeTimeType ?? ""}
+					onSave={(makeTimeType) =>
+						actions.task
+							.update({
+								id: node.id,
+								makeTimeType: makeTimeType || null,
+							})
+							.then(onChange)
+					}
+				/>
 				<EditableStatus
 					value={node.status}
 					onSave={(status) =>

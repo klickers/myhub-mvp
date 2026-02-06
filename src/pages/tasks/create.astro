@@ -120,6 +120,12 @@ const experiment = experiments.data?.find((e) => e.slug === experimentSlug)
 			<option value="archived">Archived</option>
 		</select>
 
+		<select name="makeTimeType">
+			<option value="">N/A</option>
+			<option value="highlight">Highlight</option>
+			<option value="batch">Batch</option>
+		</select>
+
 		{
 			contract ? (
 				<>

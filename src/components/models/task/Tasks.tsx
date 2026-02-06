@@ -3,13 +3,14 @@ import { format } from "date-fns"
 import { actions } from "astro:actions"
 import Subtasks from "./Subtasks"
 import SessionPlayButton from "@/components/models/session/SessionPlayButton"
-import type { Status, Task } from "@/generated/prisma/client"
+import type { MakeTimeType, Status, Task } from "@/generated/prisma/client"
 import EditableDate from "@/components/form/EditableDate"
 import EditableStatus from "@/components/form/EditableStatus"
 import EditableNumber from "@/components/form/EditableNumber"
 import EditableText from "@/components/form/EditableText"
 import { Icon } from "@iconify/react"
 import minutesToHours from "@/helpers/time/minutesToHours"
+import EditableMakeTimeType from "@/components/form/EditableMakeTimeType"
 
 export default function Tasks({ tasks }: { tasks: Task[] }) {
 	const [selectedTask, setSelectedTask] = useState<Task | null>(null)
@@ -42,8 +43,8 @@ export default function Tasks({ tasks }: { tasks: Task[] }) {
 								task.status === "completed"
 									? "bg-green-50 border-green-50"
 									: task.status === "inprogress"
-									? "bg-yellow-50"
-									: ""
+										? "bg-yellow-50"
+										: ""
 							}`}
 						>
 							<div className="card__content">
@@ -69,7 +70,7 @@ export default function Tasks({ tasks }: { tasks: Task[] }) {
 											<p className="text-xs text-gray-600 flex items-center gap-1">
 												<Icon icon="mingcute:time-line" />{" "}
 												{minutesToHours(
-													task.estimatedTime
+													task.estimatedTime,
 												)}
 												h
 											</p>
@@ -81,7 +82,7 @@ export default function Tasks({ tasks }: { tasks: Task[] }) {
 												Due{" "}
 												{format(
 													task.deadline,
-													"MMM d, yyyy"
+													"MMM d, yyyy",
 												)}
 											</p>
 										)}
@@ -122,7 +123,7 @@ export default function Tasks({ tasks }: { tasks: Task[] }) {
 												name,
 											})
 										setSelectedTask((t) =>
-											t ? { ...t, name } : t
+											t ? { ...t, name } : t,
 										)
 									}}
 									className="text-xl font-semibold"
@@ -162,8 +163,32 @@ export default function Tasks({ tasks }: { tasks: Task[] }) {
 																...t,
 																estimatedTime:
 																	v,
-														  }
-														: t
+															}
+														: t,
+												)
+											}}
+										/>
+									</td>
+								</tr>
+								<tr>
+									<td className="pr-4 text-gray-600">
+										Make Time Type
+									</td>
+									<td>
+										<EditableMakeTimeType
+											value={
+												selectedTask.makeTimeType as MakeTimeType
+											}
+											onSave={async (makeTimeType) => {
+												const updated =
+													await actions.task.update({
+														id: selectedTask.id,
+														makeTimeType,
+													})
+												setSelectedTask((t) =>
+													t
+														? { ...t, makeTimeType }
+														: t,
 												)
 											}}
 										/>
@@ -185,7 +210,7 @@ export default function Tasks({ tasks }: { tasks: Task[] }) {
 														status,
 													})
 												setSelectedTask((t) =>
-													t ? { ...t, status } : t
+													t ? { ...t, status } : t,
 												)
 											}}
 										/>
@@ -213,7 +238,7 @@ export default function Tasks({ tasks }: { tasks: Task[] }) {
 												setSelectedTask((t) =>
 													t
 														? { ...t, deadline: d }
-														: t
+														: t,
 												)
 											}}
 										/>
