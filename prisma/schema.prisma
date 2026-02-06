@@ -69,10 +69,16 @@ enum TaskParentType {
     guild
 }
 
+enum MakeTimeType {
+    highlight
+    batch
+}
+
 model Task {
     id            Int            @id @default(autoincrement())
     name          String
     parentType    TaskParentType @default(contract)
+    makeTimeType  MakeTimeType?
     status        Status         @default(notstarted)
     estimatedTime Int?           @default(0) // in minutes
     deadline      DateTime?
