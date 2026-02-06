@@ -103,6 +103,7 @@ async function buildSubtaskTree(rootTaskId: number): Promise<TaskNode[]> {
 		id: number
 		name: string
 		parentTaskId: number | null
+		makeTimeType: MakeTimeType | null
 		status: Status
 		estimatedTime: number | null
 		deadline: Date | null
@@ -120,6 +121,7 @@ async function buildSubtaskTree(rootTaskId: number): Promise<TaskNode[]> {
 			select: {
 				id: true,
 				name: true,
+				makeTimeType: true,
 				status: true,
 				estimatedTime: true,
 				deadline: true,
