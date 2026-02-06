@@ -9,6 +9,9 @@ import vercel from "@astrojs/vercel"
 export default defineConfig({
 	vite: {
 		plugins: [tailwindcss()],
+		server: {
+			allowedHosts: ["personalhub.test"],
+		},
 	},
 	integrations: [react(), icon()],
 	adapter: vercel(),
