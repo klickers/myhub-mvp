@@ -9,6 +9,7 @@ import { SessionItemType } from "@/generated/prisma/enums"
 import { session } from "./session"
 import { experiment } from "./experiment"
 import { category } from "./category"
+import { dailyHighlight } from "./dailyHighlight"
 
 export const server = {
 	guild,
@@ -17,6 +18,7 @@ export const server = {
 	session,
 	experiment,
 	category,
+	dailyHighlight,
 	// ===============================
 	// Objective
 	// ===============================

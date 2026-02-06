@@ -3,6 +3,7 @@ import dayGridPlugin from "@fullcalendar/daygrid"
 import { actions } from "astro:actions"
 import { Status } from "@/generated/prisma/enums"
 import { Icon } from "@iconify/react"
+import { useCallback, useRef, useState } from "react"
 
 type CalendarEvent = {
 	id: string
@@ -18,95 +19,138 @@ type CalendarEvent = {
 }
 
 export default function Calendar() {
+	const [highlights, setHighlights] = useState<Record<string, string>>({})
+	const loadedRange = useRef<string>("")
+
+	const saveTimeouts = new Map<string, number>()
+	const saveHighlight = (dateKey: string, value: string) => {
+		setHighlights((prev) => ({ ...prev, [dateKey]: value }))
+		if (saveTimeouts.has(dateKey)) clearTimeout(saveTimeouts.get(dateKey))
+		saveTimeouts.set(
+			dateKey,
+			window.setTimeout(async () => {
+				await actions.dailyHighlight.upsert({
+					date: new Date(dateKey),
+					highlight: value,
+				})
+			}, 500), // debounce
+		)
+	}
+
+	const loadEvents = useCallback(
+		async (info, successCallback) => {
+			try {
+				const start = info.start.toISOString()
+				const end = info.end.toISOString()
+
+				const statuses = Object.values(Status).filter(
+					(status) => status !== Status.archived,
+				)
+				const [contractsRes, tasksRes] = await Promise.all([
+					actions.contract.list({
+						status: statuses,
+						from: new Date(start),
+						to: new Date(end),
+					}),
+					actions.task.listAll({
+						status: statuses,
+						from: new Date(start),
+						to: new Date(end),
+						includeContract: true,
+						includeGuild: true,
+						includeExperiment: true,
+					}),
+				])
+
+				const contracts = contractsRes.data ?? []
+				const tasks = tasksRes.data ?? []
+
+				const contractEvents: CalendarEvent[] = contracts.map(
+					(contract) => ({
+						id: `contract-${contract.id}`,
+						title: contract.name,
+						start: contract.dueDate,
+						allDay: true,
+						extendedProps: {
+							type: "contract",
+							status: contract.status,
+							contract: {
+								id: contract.id,
+								slug: contract.slug,
+							},
+						},
+					}),
+				)
+
+				const taskEvents: CalendarEvent[] = tasks
+					.filter((task) => task.deadline)
+					.map((task) => ({
+						id: `task-${task.id}`,
+						title: task.name,
+						start: task.deadline!,
+						allDay: true,
+						extendedProps: {
+							type: "task",
+							status: task.status,
+							taskId: task.id,
+							...(task.contract && {
+								contract: {
+									id: task.contractId,
+									slug: task.contract.slug,
+								},
+							}),
+							...(task.guild && {
+								guild: {
+									id: task.guildId,
+									slug: task.guild.slug,
+								},
+							}),
+							...(task.experiment && {
+								experiment: {
+									id: task.experimentId,
+									slug: task.experiment.slug,
+								},
+							}),
+						},
+					}))
+
+				successCallback([...contractEvents, ...taskEvents])
+			} catch (error) {
+				console.error("Failed to load calendar events", error)
+			}
+		},
+		[], // ← IMPORTANT
+	)
+
 	return (
 		<FullCalendar
 			plugins={[dayGridPlugin]}
 			initialView="dayGridMonth"
 			height="auto"
+			initialEvents={[]}
 			/* ===============================
 			   Load only events in view range
 			   =============================== */
-			events={async (info, successCallback) => {
-				try {
-					const start = info.start.toISOString()
-					const end = info.end.toISOString()
+			events={loadEvents}
+			/* ===============================
+			   Load daily highlights
+			   =============================== */
+			datesSet={async (arg) => {
+				const key = `${arg.startStr}_${arg.endStr}`
+				if (loadedRange.current === key) return
+				loadedRange.current = key
 
-					const statuses = Object.values(Status).filter(
-						(status) => status !== Status.archived
-					)
-					const [contractsRes, tasksRes] = await Promise.all([
-						actions.contract.list({
-							status: statuses,
-							from: new Date(start),
-							to: new Date(end),
-						}),
-						actions.task.listAll({
-							status: statuses,
-							from: new Date(start),
-							to: new Date(end),
-							includeContract: true,
-							includeGuild: true,
-							includeExperiment: true,
-						}),
-					])
-
-					const contracts = contractsRes.data ?? []
-					const tasks = tasksRes.data ?? []
-
-					const contractEvents: CalendarEvent[] = contracts.map(
-						(contract) => ({
-							id: `contract-${contract.id}`,
-							title: contract.name,
-							start: contract.dueDate,
-							allDay: true,
-							extendedProps: {
-								type: "contract",
-								status: contract.status,
-								contract: {
-									id: contract.id,
-									slug: contract.slug,
-								},
-							},
-						})
-					)
-
-					const taskEvents: CalendarEvent[] = tasks
-						.filter((task) => task.deadline)
-						.map((task) => ({
-							id: `task-${task.id}`,
-							title: task.name,
-							start: task.deadline!,
-							allDay: true,
-							extendedProps: {
-								type: "task",
-								status: task.status,
-								taskId: task.id,
-								...(task.contract && {
-									contract: {
-										id: task.contractId,
-										slug: task.contract.slug,
-									},
-								}),
-								...(task.guild && {
-									guild: {
-										id: task.guildId,
-										slug: task.guild.slug,
-									},
-								}),
-								...(task.experiment && {
-									experiment: {
-										id: task.experimentId,
-										slug: task.experiment.slug,
-									},
-								}),
-							},
-						}))
-					console.log(taskEvents)
-
-					successCallback([...contractEvents, ...taskEvents])
-				} catch (error) {
-					console.error("Failed to load calendar events", error)
-				}
+				const res = await actions.dailyHighlight.listInRange({
+					from: arg.start,
+					to: arg.end,
+				})
+				const map = Object.fromEntries(
+					(res.data ?? []).map((h) => [
+						h.date.toISOString().slice(0, 10),
+						h.highlight ?? "",
+					]),
+				)
+				setHighlights(map)
 			}}
 			/* ===============================
 			   Dynamic class names
@@ -164,6 +208,29 @@ export default function Calendar() {
 						)}
 						<span>{event.title}</span>
 					</a>
+				)
+			}}
+			/* ===============================
+			   Custom day cell content
+			   =============================== */
+			dayCellContent={(arg) => {
+				const dateKey = arg.date.toISOString().slice(0, 10)
+				return (
+					<div className="flex flex-col gap-1 w-full h-full">
+						<div className="w-full text-right text-xs">
+							{arg.dayNumberText}
+						</div>
+						<textarea
+							rows={2}
+							value={highlights[dateKey] ?? ""}
+							placeholder="Highlight"
+							onChange={(e) =>
+								saveHighlight(dateKey, e.target.value)
+							}
+							className={`${highlights[dateKey] ? "bg-yellow-50" : ""} w-full resize-none border border-gray-300 rounded px-1 py-0.5 text-sm leading-snug`}
+							style={{ minHeight: "2.5em" }}
+						/>
+					</div>
 				)
 			}}
 		/>
