@@ -1,7 +1,7 @@
 import FullCalendar from "@fullcalendar/react"
 import dayGridPlugin from "@fullcalendar/daygrid"
 import { actions } from "astro:actions"
-import { Status } from "@/generated/prisma/enums"
+import { MakeTimeType, Status } from "@/generated/prisma/enums"
 import { Icon } from "@iconify/react"
 import { useCallback, useRef, useState } from "react"
 
@@ -91,6 +91,7 @@ export default function Calendar() {
 						allDay: true,
 						extendedProps: {
 							type: "task",
+							makeTimeType: task.makeTimeType,
 							status: task.status,
 							taskId: task.id,
 							...(task.contract && {
@@ -156,8 +157,10 @@ export default function Calendar() {
 			   Dynamic class names
 			   =============================== */
 			eventClassNames={(arg) => {
+				const { extendedProps } = arg.event
 				const classes: string[] = []
-				switch (arg.event.extendedProps.type) {
+
+				switch (extendedProps.type) {
 					case "contract":
 						classes.push("calendar-contract")
 						break
@@ -165,12 +168,19 @@ export default function Calendar() {
 						classes.push("calendar-task")
 						break
 				}
-				if (arg.event.extendedProps.status === Status.completed)
+
+				if (extendedProps.status === Status.completed)
 					classes.push("calendar-completed")
-				else if (arg.event.extendedProps.status === Status.inprogress)
+				else if (extendedProps.status === Status.inprogress)
 					classes.push("calendar-inprogress")
-				else if (arg.event.extendedProps.status === Status.onhold)
+				else if (extendedProps.status === Status.onhold)
 					classes.push("calendar-onhold")
+
+				if (extendedProps.makeTimeType === MakeTimeType.highlight)
+					classes.push("calendar-highlight")
+				else if (extendedProps.makeTimeType === MakeTimeType.batch)
+					classes.push("calendar-batch")
+
 				return classes
 			}}
 			/* ===============================

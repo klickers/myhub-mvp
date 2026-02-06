@@ -209,9 +209,9 @@
  ******************************************************/
 .fc-event {
 	&.calendar-task {
-		@apply bg-sky-500 border-none;
-		&.calendar-inprogress {
-			@apply bg-yellow-400;
+		@apply bg-indigo-200 border-none;
+		&.calendar-inprogress svg {
+			@apply text-yellow-600;
 		}
 		&.calendar-onhold {
 			@apply bg-gray-300;
@@ -225,5 +225,12 @@
 	}
 	&.calendar-completed {
 		@apply bg-green-300 border-none;
+	}
+
+	&.calendar-highlight {
+		@apply bg-amber-400 border-none;
+	}
+	&.calendar-batch {
+		@apply bg-blue-300 border-none;
 	}
 }
