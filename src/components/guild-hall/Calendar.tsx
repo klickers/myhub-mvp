@@ -4,6 +4,7 @@ import { actions } from "astro:actions"
 import { MakeTimeType, Status } from "@/generated/prisma/enums"
 import { Icon } from "@iconify/react"
 import { useCallback, useRef, useState } from "react"
+import type { EventImpl } from "@fullcalendar/core/internal"
 
 type CalendarEvent = {
 	id: string
@@ -133,6 +134,25 @@ export default function Calendar() {
 			   Load only events in view range
 			   =============================== */
 			events={loadEvents}
+			eventOrder={(a, b) => {
+				function getRank(event: unknown): number {
+					if (
+						typeof event === "object" &&
+						event !== null &&
+						"extendedProps" in event
+					) {
+						const type = (event as EventImpl).extendedProps
+							.makeTimeType
+						return type === "highlight"
+							? 0
+							: type === "batch"
+								? 1
+								: 2
+					}
+					return 2
+				}
+				return getRank(a) - getRank(b)
+			}}
 			/* ===============================
 			   Load daily highlights
 			   =============================== */
