@@ -141,6 +141,11 @@ export default function Calendar() {
 						event !== null &&
 						"extendedProps" in event
 					) {
+						if (
+							(event as EventImpl).extendedProps.status ===
+							Status.completed
+						)
+							return 3
 						const type = (event as EventImpl).extendedProps
 							.makeTimeType
 						return type === "highlight"
