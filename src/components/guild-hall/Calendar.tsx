@@ -5,6 +5,7 @@ import { MakeTimeType, Status } from "@/generated/prisma/enums"
 import { Icon } from "@iconify/react"
 import { useCallback, useRef, useState } from "react"
 import type { EventImpl } from "@fullcalendar/core/internal"
+import getItemUrl from "@/helpers/getItemUrl"
 
 type CalendarEvent = {
 	id: string
@@ -217,13 +218,11 @@ export default function Calendar() {
 				const { type } = event.extendedProps
 
 				// TODO: open task in side tray on click; handle subtasks
-				let url = "#!"
-				if (event.extendedProps.contract)
-					url = `/hall/contracts/${event.extendedProps.contract.slug}`
-				else if (event.extendedProps.guild)
-					url = `/hall/guilds/${event.extendedProps.guild.slug}`
-				else if (event.extendedProps.experiment)
-					url = `/lab/experiments/${event.extendedProps.experiment.slug}`
+				const url = getItemUrl(
+					event.extendedProps.contract,
+					event.extendedProps.guild,
+					event.extendedProps.experiment,
+				)
 
 				return (
 					<a
