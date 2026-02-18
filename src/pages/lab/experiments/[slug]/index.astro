@@ -2,12 +2,9 @@
 import Layout from "@/layouts/Layout.astro"
 import { Icon } from "astro-icon/components"
 import { actions } from "astro:actions"
-import { differenceInMinutes, format } from "date-fns"
 import Button from "@/components/Button.astro"
 import SessionPlayButton from "@/components/models/session/SessionPlayButton"
 import Tasks from "@/components/models/task/Tasks"
-import PlateInstance from "@/components/models/session/PlateInstance"
-import type { Prisma } from "@/generated/prisma/client"
 import PreviousSessions from "@/components/models/session/PreviousSessions.astro"
 
 const experiment = await Astro.callAction(actions.experiment.getBySlug, {
