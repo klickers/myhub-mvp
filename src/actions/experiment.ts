@@ -73,11 +73,26 @@ export const experiment = {
 	getBySlug: defineAction({
 		input: z.object({
 			slug: z.string(),
+			includeSessions: z.boolean().optional().default(false),
+			sessionsLimit: z.number().optional(),
 		}),
-		handler: async ({ slug }) => {
+		handler: async ({ slug, includeSessions, sessionsLimit = 5 }) => {
 			return prisma.experiment.findUnique({
 				where: { slug },
-				include: { category: true },
+				include: {
+					category: true,
+					...(includeSessions && {
+						sessions: {
+							take: sessionsLimit,
+							where: {
+								endTime: { not: null },
+							},
+							orderBy: {
+								startTime: "desc",
+							},
+						},
+					}),
+				},
 			})
 		},
 	}),

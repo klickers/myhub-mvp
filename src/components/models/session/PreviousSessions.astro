@@ -1,0 +1,53 @@
+---
+import { Icon } from "astro-icon/components"
+import { differenceInMinutes, format } from "date-fns"
+import PlateInstance from "./PlateInstance"
+import type { Prisma } from "@/generated/prisma/client"
+
+interface Props {
+	sessions: {
+		id: number
+		startTime: Date
+		endTime: Date | null
+		notesJson: unknown
+	}[]
+}
+
+const { sessions } = Astro.props as Props
+---
+
+<div>
+	{
+		sessions && sessions.length > 0 ? (
+			<div class="space-y-2">
+				{sessions.map((session) => (
+					<div class="p-3 border border-gray-200 rounded-md bg-white">
+						<p class="text-sm text-gray-600 mb-1 flex justify-between items-center">
+							<span>
+								{format(
+									new Date(session.startTime),
+									"MMM dd, hh:mm a",
+								)}
+							</span>
+							<span class="flex items-center gap-0.5 text-xs">
+								<Icon name="mingcute:time-line" />
+								{differenceInMinutes(
+									new Date(session.endTime!),
+									new Date(session.startTime),
+								) + "min"}
+							</span>
+						</p>
+						<div>
+							<PlateInstance
+								value={session.notesJson as Prisma.JsonArray}
+								client:load
+							/>
+						</div>
+					</div>
+				))}
+			</div>
+		) : (
+			<p class="text-gray-600">No previous sessions found.</p>
+		)
+	}
+</div>

@@ -2,12 +2,18 @@
 import Layout from "@/layouts/Layout.astro"
 import { Icon } from "astro-icon/components"
 import { actions } from "astro:actions"
+import { differenceInMinutes, format } from "date-fns"
 import Button from "@/components/Button.astro"
 import SessionPlayButton from "@/components/models/session/SessionPlayButton"
 import Tasks from "@/components/models/task/Tasks"
+import PlateInstance from "@/components/models/session/PlateInstance"
+import type { Prisma } from "@/generated/prisma/client"
+import PreviousSessions from "@/components/models/session/PreviousSessions.astro"
 
 const experiment = await Astro.callAction(actions.experiment.getBySlug, {
 	slug: Astro.params.slug as string,
+	includeSessions: true,
+	sessionsLimit: 5,
 })
 if (!experiment.data) return Astro.redirect("/lab")
 
@@ -83,7 +89,10 @@ const tasks = await Astro.callAction(actions.task.listByExperiment, {
 			</div>
 		</div>
 		<div class="space-y-4 w-[260px] flex-none">
-			<!-- TODO: previous sessions -->
+			<div class="sticky top-8">
+				<h2>Previous Sessions</h2>
+				<PreviousSessions sessions={experiment.data.sessions} />
+			</div>
 		</div>
 	</div>
 </Layout>

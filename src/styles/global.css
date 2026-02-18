@@ -71,7 +71,7 @@
 	}
 
 	.editor {
-		@apply border border-black;
+		@apply border border-black rounded-md;
 	}
 
 	.card {
