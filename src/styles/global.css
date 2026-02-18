@@ -223,14 +223,13 @@
 			@apply bg-violet-600;
 		}
 	}
-	&.calendar-completed {
-		@apply bg-green-300 border-none;
-	}
-
 	&.calendar-highlight {
 		@apply bg-amber-400 border-none;
 	}
 	&.calendar-batch {
 		@apply bg-blue-300 border-none;
+	}
+	&.calendar-completed {
+		@apply bg-green-300 border-none;
 	}
 }
