@@ -262,6 +262,10 @@ export default function Calendar() {
 							onChange={(e) =>
 								saveHighlight(dateKey, e.target.value)
 							}
+							onPointerDown={(e) => e.stopPropagation()}
+							onMouseDown={(e) => e.stopPropagation()}
+							onTouchStart={(e) => e.stopPropagation()}
+							onClick={(e) => e.stopPropagation()}
 							className={`${highlights[dateKey] ? "bg-yellow-50" : ""} w-full resize-none border border-gray-300 rounded px-1 py-0.5 text-sm leading-snug`}
 							style={{ minHeight: "2.5em" }}
 						/>
