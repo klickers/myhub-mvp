@@ -1,5 +1,6 @@
 import FullCalendar from "@fullcalendar/react"
 import dayGridPlugin from "@fullcalendar/daygrid"
+import interactionPlugin from "@fullcalendar/interaction"
 import { actions } from "astro:actions"
 import { MakeTimeType, Status } from "@/generated/prisma/enums"
 import { Icon } from "@iconify/react"
@@ -127,7 +128,7 @@ export default function Calendar() {
 
 	return (
 		<FullCalendar
-			plugins={[dayGridPlugin]}
+			plugins={[dayGridPlugin, interactionPlugin]}
 			initialView="dayGridMonth"
 			height="auto"
 			initialEvents={[]}
@@ -266,6 +267,26 @@ export default function Calendar() {
 						/>
 					</div>
 				)
+			}}
+			/* ===============================
+			   Handle event drag-and-drop
+			   =============================== */
+			editable
+			eventDrop={async (info) => {
+				const { type } = info.event.extendedProps
+				if (type === "contract") {
+					await actions.contract.updateJson({
+						id: info.event.extendedProps.contract.id,
+						...(info.event.start && {
+							dueDate: info.event.start.toISOString(),
+						}),
+					})
+				} else if (type === "task") {
+					await actions.task.update({
+						id: info.event.extendedProps.taskId,
+						deadline: info.event.start,
+					})
+				}
 			}}
 		/>
 	)

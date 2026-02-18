@@ -48,6 +48,23 @@ export const contract = {
 			})
 		},
 	}),
+	updateJson: defineAction({
+		input: z.object({
+			id: z.coerce.number().int(),
+			name: z.string().min(1).optional(),
+			slug: z.string().min(1).optional(),
+			description: z.string().nullable().optional(),
+			dueDate: z.string().optional(),
+			status: z.nativeEnum(Status).optional(),
+			guildId: z.coerce.number().int().nullable().optional(),
+		}),
+		handler: async ({ id, ...data }) => {
+			return prisma.contract.update({
+				where: { id },
+				data,
+			})
+		},
+	}),
 	delete: defineAction({
 		input: z.object({
 			id: z.coerce.number().int(),
@@ -97,7 +114,7 @@ export const contract = {
 									...(from && { gte: from }),
 									...(to && { lte: to }),
 								},
-						  }
+							}
 						: {}),
 				},
 				include: { guild: withGuild },
