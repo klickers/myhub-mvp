@@ -37,12 +37,12 @@ const { sessions } = Astro.props as Props
 								) + "min"}
 							</span>
 						</p>
-						<div>
+						{session.notesJson && (
 							<PlateInstance
 								value={session.notesJson as Prisma.JsonArray}
 								client:load
 							/>
-						</div>
+						)}
 					</div>
 				))}
 			</div>
