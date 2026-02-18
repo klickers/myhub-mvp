@@ -8,9 +8,12 @@ import { Status } from "@/generated/prisma/enums"
 import Button from "@/components/Button.astro"
 import SessionPlayButton from "@/components/models/session/SessionPlayButton"
 import Tasks from "@/components/models/task/Tasks"
+import PreviousSessions from "@/components/models/session/PreviousSessions.astro"
 
 const guild = await Astro.callAction(actions.guild.getBySlug, {
 	slug: Astro.params.slug as string,
+	includeSessions: true,
+	sessionsLimit: 5,
 })
 if (!guild.data) return Astro.redirect("/hall")
 
@@ -117,7 +120,11 @@ const tasks = await Astro.callAction(actions.task.listByGuild, {
 			</div>
 		</div>
 		<div class="space-y-4 w-[260px] flex-none">
-			<div class="sticky top-8"><PersonaCard /></div>
+			<PersonaCard />
+			<div class="mt-8">
+				<h2>Previous Sessions</h2>
+				<PreviousSessions sessions={guild.data.sessions} />
+			</div>
 		</div>
 	</div>
 </Layout>

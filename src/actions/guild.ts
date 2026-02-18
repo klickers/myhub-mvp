@@ -69,11 +69,26 @@ export const guild = {
 	getBySlug: defineAction({
 		input: z.object({
 			slug: z.string(),
+			includeSessions: z.boolean().optional(),
+			sessionsLimit: z.number().int().optional(),
 		}),
-		handler: async ({ slug }) => {
+		handler: async ({ slug, includeSessions, sessionsLimit }) => {
 			return prisma.guild.findUnique({
 				where: { slug },
-				include: { persona: true },
+				include: {
+					persona: true,
+					...(includeSessions && {
+						sessions: {
+							take: sessionsLimit,
+							where: {
+								endTime: { not: null },
+							},
+							orderBy: {
+								startTime: "desc",
+							},
+						},
+					}),
+				},
 			})
 		},
 	}),
