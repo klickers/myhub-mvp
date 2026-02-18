@@ -6,9 +6,12 @@ import { actions } from "astro:actions"
 import Button from "@/components/Button.astro"
 import SessionPlayButton from "@/components/models/session/SessionPlayButton"
 import Tasks from "@/components/models/task/Tasks"
+import PreviousSessions from "@/components/models/session/PreviousSessions.astro"
 
 const contract = await Astro.callAction(actions.contract.getBySlug, {
 	slug: Astro.params.slug as string,
+	includeSessions: true,
+	sessionsLimit: 5,
 })
 if (!contract.data) return Astro.redirect("/hall")
 
@@ -87,8 +90,11 @@ const tasks = await Astro.callAction(actions.task.listByContract, {
 			</div>
 		</div>
 		<div class="space-y-4 w-[260px] flex-none">
-			<div class="sticky top-8"><PersonaCard /></div>
-			<!-- TODO: previous sessions -->
+			<PersonaCard />
+			<div class="mt-8">
+				<h2>Previous Sessions</h2>
+				<PreviousSessions sessions={contract.data.sessions} />
+			</div>
 		</div>
 	</div>
 	<!-- <div class="h-screen fixed right-0 top-0 w-2/5 bg-white shadow-lg p-6">

@@ -89,11 +89,26 @@ export const contract = {
 	getBySlug: defineAction({
 		input: z.object({
 			slug: z.string(),
+			includeSessions: z.boolean().optional().default(false),
+			sessionsLimit: z.number().optional(),
 		}),
-		handler: async ({ slug }) => {
+		handler: async ({ slug, includeSessions, sessionsLimit }) => {
 			return prisma.contract.findUnique({
 				where: { slug },
-				include: { guild: true },
+				include: {
+					guild: true,
+					...(includeSessions && {
+						sessions: {
+							take: sessionsLimit,
+							where: {
+								endTime: { not: null },
+							},
+							orderBy: {
+								startTime: "desc",
+							},
+						},
+					}),
+				},
 			})
 		},
 	}),
