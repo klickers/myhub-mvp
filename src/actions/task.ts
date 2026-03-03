@@ -8,7 +8,9 @@ const taskInput = z
 		name: z.string().min(1),
 
 		parentType: z.nativeEnum(TaskParentType).default("contract"),
-		makeTimeType: z.nativeEnum(MakeTimeType).optional(),
+		makeTimeType: z
+			.union([z.nativeEnum(MakeTimeType), z.literal("none")])
+			.optional(),
 		status: z.nativeEnum(Status).default("notstarted"),
 
 		estimatedTime: z.number().int().nonnegative().optional(),
@@ -257,7 +259,10 @@ export const task = {
 			id: z.coerce.number().int(),
 			name: z.string().min(1).optional(),
 			status: z.nativeEnum(Status).optional(),
-			makeTimeType: z.nativeEnum(MakeTimeType).optional(),
+			makeTimeType: z
+				.union([z.nativeEnum(MakeTimeType), z.literal("none")])
+				.transform((val) => (val === "none" ? null : val))
+				.optional(),
 			estimatedTime: z.number().int().nonnegative().optional(),
 			deadline: z.coerce.date().optional().nullable(),
 		}),

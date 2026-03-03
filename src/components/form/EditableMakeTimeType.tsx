@@ -13,7 +13,7 @@ export default function EditableMakeTimeType({
 			onChange={(e) => onSave(e.target.value as MakeTimeType)}
 			className="border px-1 bg-white"
 		>
-			<option value="">N/A</option>
+			<option value="none">N/A</option>
 			<option value="highlight">Highlight</option>
 			<option value="batch">Batch</option>
 		</select>
