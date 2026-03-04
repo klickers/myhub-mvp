@@ -12,7 +12,7 @@ const experiments = await Astro.callAction(
 	actions.experiment.listWithoutCategory,
 	{
 		status: [Status.inprogress],
-	}
+	},
 )
 ---
 
@@ -43,7 +43,7 @@ const experiments = await Astro.callAction(
 							/>
 						</div>
 					</div>
-					<div class="grid grid-cols-3 gap-3">
+					<div class="grid grid-cols-1 gap-1">
 						{category.experiments ? (
 							category.experiments.map((experiment) => (
 								<ExperimentCard experiment={experiment} />

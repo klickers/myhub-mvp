@@ -79,7 +79,11 @@ export const category = {
 		handler: async ({ withExperiments }) => {
 			return prisma.category.findMany({
 				include: {
-					experiments: withExperiments,
+					experiments: withExperiments
+						? {
+								orderBy: { name: "asc" },
+							}
+						: false,
 				},
 				// orderBy: { name: "asc" },
 			})
