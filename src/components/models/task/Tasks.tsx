@@ -25,7 +25,7 @@ export default function Tasks({ tasks }: { tasks: Task[] }) {
 	return (
 		<div>
 			{/* TASK LIST */}
-			<div className="space-y-2">
+			<div className="space-y-1">
 				{tasks.map((task) => {
 					let completed = 0,
 						total = 0
@@ -47,7 +47,7 @@ export default function Tasks({ tasks }: { tasks: Task[] }) {
 										: ""
 							}`}
 						>
-							<div className="card__content">
+							<div className="card__content p-2">
 								<div className="flex justify-between items-center">
 									<div
 										className="flex gap-4 items-center cursor-pointer"
