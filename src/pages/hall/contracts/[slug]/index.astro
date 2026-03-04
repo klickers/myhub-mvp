@@ -18,6 +18,12 @@ if (!contract.data) return Astro.redirect("/hall")
 const tasks = await Astro.callAction(actions.task.listByContract, {
 	contractId: contract.data.id,
 	includeSubtasks: true,
+	status: ["notstarted", "inprogress", "onhold"],
+})
+const completedTasks = await Astro.callAction(actions.task.listByContract, {
+	contractId: contract.data.id,
+	includeSubtasks: true,
+	status: ["completed"],
 })
 ---
 
@@ -84,6 +90,11 @@ const tasks = await Astro.callAction(actions.task.listByContract, {
 				</div>
 				<Tasks
 					tasks={tasks.data}
+					client:load
+				/>
+				<div class="h-1"></div>
+				<Tasks
+					tasks={completedTasks.data}
 					client:load
 				/>
 			</div>
