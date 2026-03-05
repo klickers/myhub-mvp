@@ -78,11 +78,13 @@ export default function Tasks({ tasks }: { tasks: Task[] }) {
 									</div>
 									<div className="flex items-center gap-2 -mr-1">
 										{task.deadline && (
-											<p className="text-xs text-gray-600">
-												Due{" "}
+											<p className="text-xs text-gray-600 flex items-center gap-1">
+												<span className="-mt-0.5">
+													<Icon icon="mingcute:calendar-fill" />
+												</span>
 												{format(
-													task.deadline,
-													"MMM d, yyyy",
+													new Date(task.deadline),
+													"MMM dd, yyyy",
 												)}
 											</p>
 										)}
