@@ -43,7 +43,10 @@ export default function Subtasks({ taskId }: { taskId: number }) {
 		<div className="space-y-2">
 			<div className="flex justify-between items-center">
 				{loading ? (
-					<span className="text-sm text-gray-500">"Loading…"</span>
+					<div>
+						<h3 className="text-lg font-semibold mb-3">Subtasks</h3>
+						<span className="text-sm text-gray-500">Loading…</span>
+					</div>
 				) : (
 					<h3 className="text-lg font-semibold mb-3">Subtasks</h3>
 				)}
