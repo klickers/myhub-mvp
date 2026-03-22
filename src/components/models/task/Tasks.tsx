@@ -11,6 +11,7 @@ import EditableText from "@/components/form/EditableText"
 import { Icon } from "@iconify/react"
 import minutesToHours from "@/helpers/time/minutesToHours"
 import EditableMakeTimeType from "@/components/form/EditableMakeTimeType"
+import SideTray from "@/components/SideTray"
 
 export default function Tasks({ tasks }: { tasks: Task[] }) {
 	const [selectedTask, setSelectedTask] = useState<Task | null>(null)
@@ -102,158 +103,11 @@ export default function Tasks({ tasks }: { tasks: Task[] }) {
 
 			{/* SIDE TRAY */}
 			{selectedTask && (
-				<>
-					{/* BACKDROP */}
-					<div
-						className="fixed inset-0 z-40"
-						onClick={() => setSelectedTask(null)}
-					/>
-
-					{/* TRAY */}
-					<div
-						className="fixed right-0 top-0 h-screen w-1/2 bg-white shadow-lg p-6 z-50 overflow-y-auto"
-						onClick={(e) => e.stopPropagation()}
-					>
-						<div className="flex justify-between items-start mb-6">
-							<div className="flex items-center gap-1">
-								<EditableText
-									value={selectedTask.name}
-									onSave={async (name) => {
-										const updated =
-											await actions.task.update({
-												id: selectedTask.id,
-												name,
-											})
-										setSelectedTask((t) =>
-											t ? { ...t, name } : t,
-										)
-									}}
-									className="text-xl font-semibold"
-								/>
-								<SessionPlayButton
-									itemType="task"
-									itemId={selectedTask.id}
-								/>
-							</div>
-							<button
-								onClick={() => setSelectedTask(null)}
-								className="text-sm text-gray-500 hover:underline"
-							>
-								Close
-							</button>
-						</div>
-
-						<table className="text-sm mb-8 leading-relaxed">
-							<tbody className="space-y-2">
-								<tr>
-									<td className="pr-4 text-gray-600">
-										Estimated Time
-									</td>
-									<td>
-										<EditableNumber
-											value={selectedTask.estimatedTime}
-											onSave={async (v) => {
-												const updated =
-													await actions.task.update({
-														id: selectedTask.id,
-														estimatedTime:
-															v ?? undefined,
-													})
-												setSelectedTask((t) =>
-													t
-														? {
-																...t,
-																estimatedTime:
-																	v,
-															}
-														: t,
-												)
-											}}
-										/>
-									</td>
-								</tr>
-								<tr>
-									<td className="pr-4 text-gray-600">
-										Make Time Type
-									</td>
-									<td>
-										<EditableMakeTimeType
-											value={
-												selectedTask.makeTimeType as MakeTimeType
-											}
-											onSave={async (makeTimeType) => {
-												const updated =
-													await actions.task.update({
-														id: selectedTask.id,
-														makeTimeType,
-													})
-												setSelectedTask((t) =>
-													t
-														? { ...t, makeTimeType }
-														: t,
-												)
-											}}
-										/>
-									</td>
-								</tr>
-								<tr>
-									<td className="pr-4 text-gray-600">
-										Status
-									</td>
-									<td>
-										<EditableStatus
-											value={
-												selectedTask.status as Status
-											}
-											onSave={async (status) => {
-												const updated =
-													await actions.task.update({
-														id: selectedTask.id,
-														status,
-													})
-												setSelectedTask((t) =>
-													t ? { ...t, status } : t,
-												)
-											}}
-										/>
-									</td>
-								</tr>
-								<tr>
-									<td className="pr-4 text-gray-600">
-										Deadline
-									</td>
-									<td>
-										<EditableDate
-											value={
-												selectedTask.deadline
-													? selectedTask.deadline.toISOString()
-													: null
-											}
-											onSave={async (date) => {
-												const d = date
-													? new Date(date)
-													: null
-												await actions.task.update({
-													id: selectedTask.id,
-													deadline: d,
-												})
-												setSelectedTask((t) =>
-													t
-														? { ...t, deadline: d }
-														: t,
-												)
-											}}
-										/>
-									</td>
-								</tr>
-							</tbody>
-						</table>
-
-						<Subtasks taskId={selectedTask.id} />
-
-						{/* TODO: add past sessions */}
-					</div>
-				</>
+				<SideTray
+					type="task"
+					selected={selectedTask}
+					setSelected={setSelectedTask}
+				/>
 			)}
 		</div>
 	)
