@@ -1,6 +1,7 @@
 import { defineAction } from "astro:actions"
 import { z } from "zod"
 import prisma from "@/helpers/prisma"
+import { addDays } from "date-fns"
 
 const dailyHighlightInput = z.object({
 	date: z.coerce.date(),
@@ -17,8 +18,8 @@ export const dailyHighlight = {
 			return prisma.dailyHighlight.findMany({
 				where: {
 					date: {
-						gte: from,
-						lte: to,
+						gte: from && addDays(from, -1),
+						lte: to && addDays(to, 1),
 					},
 				},
 			})
