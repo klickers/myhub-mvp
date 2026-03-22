@@ -211,8 +211,11 @@
 	@apply overflow-hidden rounded-lg bg-white;
 	&.calendar-task {
 		@apply border-gray-400;
-		&.calendar-inprogress svg {
-			@apply text-yellow-600;
+		&.calendar-inprogress {
+			@apply bg-yellow-50;
+			svg {
+				@apply text-yellow-600;
+			}
 		}
 		&.calendar-onhold {
 			@apply bg-gray-300 border-gray-300;
@@ -228,7 +231,10 @@
 		}
 	}
 	&.calendar-highlight {
-		@apply bg-amber-400 border-amber-600;
+		@apply bg-amber-300 border-amber-600;
+		&.calendar-inprogress {
+			@apply bg-amber-400;
+		}
 	}
 	&.calendar-batch {
 		@apply bg-blue-300 border-blue-500;
