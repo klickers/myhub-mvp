@@ -134,9 +134,12 @@ export default function Calendar() {
 	return (
 		<FullCalendar
 			plugins={[dayGridPlugin, interactionPlugin]}
-			initialView="dayGridMonth"
+			initialView="dayGridWeek"
 			height="auto"
 			initialEvents={[]}
+			headerToolbar={{
+				center: "dayGridWeek,dayGridMonth",
+			}}
 			/* ===============================
 			   Load only events in view range
 			   =============================== */
