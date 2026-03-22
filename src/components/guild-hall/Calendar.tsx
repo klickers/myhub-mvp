@@ -7,6 +7,7 @@ import { Icon } from "@iconify/react"
 import { useCallback, useRef, useState } from "react"
 import type { EventImpl } from "@fullcalendar/core/internal"
 import getItemUrl from "@/helpers/getItemUrl"
+import getItemName from "@/helpers/getItemName"
 
 type CalendarEvent = {
 	id: string
@@ -80,6 +81,7 @@ export default function Calendar() {
 							contract: {
 								id: contract.id,
 								slug: contract.slug,
+								name: contract.name,
 							},
 						},
 					}),
@@ -101,18 +103,21 @@ export default function Calendar() {
 								contract: {
 									id: task.contractId,
 									slug: task.contract.slug,
+									name: task.contract.name,
 								},
 							}),
 							...(task.guild && {
 								guild: {
 									id: task.guildId,
 									slug: task.guild.slug,
+									name: task.guild.name,
 								},
 							}),
 							...(task.experiment && {
 								experiment: {
 									id: task.experimentId,
 									slug: task.experiment.slug,
+									name: task.experiment.name,
 								},
 							}),
 						},
@@ -224,25 +229,50 @@ export default function Calendar() {
 					event.extendedProps.guild,
 					event.extendedProps.experiment,
 				)
+				const parentName = getItemName(
+					event.extendedProps.contract,
+					event.extendedProps.guild,
+					event.extendedProps.experiment,
+				)
+
+				const isCompleted =
+					event.extendedProps.status === Status.completed
+				const isOnHold = event.extendedProps.status === Status.onhold
 
 				return (
-					<a
-						href={url}
-						className="flex gap-1 items-center px-1 py-0.5"
+					<div
+						className={`flex gap-1 px-1 py-1 ${isCompleted || isOnHold ? "items-center" : ""}`}
 					>
-						{type === "contract" ? (
+						{/* {type === "contract" ? (
 							<Icon
 								icon="mingcute:document-2-fill"
 								className="flex-none"
+							/>
+						) : isCompleted ? (
+							<Icon
+								icon="mingcute:check-circle-fill"
+								className="flex-none text-white"
 							/>
 						) : (
 							<Icon
 								icon="mingcute:check-circle-line"
 								className="flex-none"
 							/>
-						)}
-						<span>{event.title}</span>
-					</a>
+						)} */}
+						<div
+							className={`${isCompleted || isOnHold ? "text-white" : "text-wrap"} leading-tight`}
+						>
+							{type == "task" && parentName && (
+								<a
+									href={url}
+									className="text-xs block mb-0.5 text-gray-500"
+								>
+									{parentName}
+								</a>
+							)}
+							<span>{event.title}</span>
+						</div>
+					</div>
 				)
 			}}
 			/* ===============================
@@ -266,7 +296,7 @@ export default function Calendar() {
 							onMouseDown={(e) => e.stopPropagation()}
 							onTouchStart={(e) => e.stopPropagation()}
 							onClick={(e) => e.stopPropagation()}
-							className={`${highlights[dateKey] ? "bg-yellow-50" : ""} w-full resize-none border border-gray-300 rounded px-1 py-0.5 text-sm leading-snug`}
+							className={`${highlights[dateKey] ? "bg-yellow-50" : ""} w-full resize-none border border-gray-300 rounded-lg px-1 py-0.5 text-sm leading-snug`}
 							style={{ minHeight: "2.5em" }}
 						/>
 					</div>
