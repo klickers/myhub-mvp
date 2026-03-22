@@ -217,8 +217,7 @@
 		&.calendar-onhold {
 			@apply bg-gray-300 border-gray-300;
 		}
-		div,
-		span {
+		div {
 			@apply text-gray-800;
 		}
 	}

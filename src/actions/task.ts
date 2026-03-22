@@ -301,6 +301,7 @@ export const task = {
 			includeContract: z.boolean().default(false),
 			includeGuild: z.boolean().default(false),
 			includeExperiment: z.boolean().default(false),
+			includeParentTask: z.boolean().default(false),
 		}),
 		handler: async ({
 			status,
@@ -309,6 +310,7 @@ export const task = {
 			includeContract,
 			includeGuild,
 			includeExperiment,
+			includeParentTask,
 		}) => {
 			return prisma.task.findMany({
 				where: {
@@ -326,6 +328,7 @@ export const task = {
 					contract: includeContract,
 					guild: includeGuild,
 					experiment: includeExperiment,
+					parentTask: includeParentTask,
 				},
 				orderBy: { deadline: "asc" },
 			})

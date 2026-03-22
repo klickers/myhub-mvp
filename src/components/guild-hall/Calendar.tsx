@@ -69,6 +69,7 @@ export default function Calendar() {
 						includeContract: true,
 						includeGuild: true,
 						includeExperiment: true,
+						includeParentTask: true,
 					}),
 				])
 
@@ -106,13 +107,9 @@ export default function Calendar() {
 							status: task.status,
 							taskId: task.id,
 							task: task,
-							// ...(task.parentTask && {
-							// 	parentTask: {
-							// 		id: task.parentTask.id,
-							// 		slug: task.parentTask.slug,
-							// 		name: task.parentTask.name,
-							// 	},
-							// }),
+							...(task.parentTask && {
+								parentTask: task.parentTask,
+							}),
 							...(task.contract && {
 								contract: {
 									id: task.contractId,
@@ -258,6 +255,7 @@ export default function Calendar() {
 						event.extendedProps.contract,
 						event.extendedProps.guild,
 						event.extendedProps.experiment,
+						event.extendedProps.parentTask,
 					)
 
 					const isCompleted =
@@ -288,14 +286,28 @@ export default function Calendar() {
 							<div
 								className={`${isCompleted || isOnHold ? "text-white" : "text-wrap"} leading-tight`}
 							>
-								{type == "task" && parentName && (
-									<a
-										href={url}
-										className="text-xs block mb-0.5 text-gray-500"
-									>
-										{parentName}
-									</a>
-								)}
+								{type == "task" &&
+									parentName &&
+									(event.extendedProps.parentTask ? (
+										<span
+											className="text-xs block mb-0.5 text-gray-500"
+											onClick={() =>
+												setSelectedTask(
+													event.extendedProps
+														.parentTask,
+												)
+											}
+										>
+											{parentName}
+										</span>
+									) : (
+										<a
+											href={url}
+											className="text-xs block mb-0.5 text-gray-500"
+										>
+											{parentName}
+										</a>
+									))}
 								{event.extendedProps.task ? (
 									<span
 										onClick={() =>
