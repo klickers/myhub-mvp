@@ -1,16 +1,9 @@
 import { useEffect, useState } from "react"
 import { format } from "date-fns"
-import { actions } from "astro:actions"
-import Subtasks from "./Subtasks"
 import SessionPlayButton from "@/components/models/session/SessionPlayButton"
-import type { MakeTimeType, Status, Task } from "@/generated/prisma/client"
-import EditableDate from "@/components/form/EditableDate"
-import EditableStatus from "@/components/form/EditableStatus"
-import EditableNumber from "@/components/form/EditableNumber"
-import EditableText from "@/components/form/EditableText"
+import type { Task } from "@/generated/prisma/client"
 import { Icon } from "@iconify/react"
 import minutesToHours from "@/helpers/time/minutesToHours"
-import EditableMakeTimeType from "@/components/form/EditableMakeTimeType"
 import SideTray from "@/components/SideTray"
 
 export default function Tasks({ tasks }: { tasks: Task[] }) {
