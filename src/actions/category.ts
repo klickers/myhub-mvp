@@ -82,6 +82,15 @@ export const category = {
 					experiments: withExperiments
 						? {
 								orderBy: { name: "asc" },
+								where: {
+									status: {
+										in: [
+											"notstarted",
+											"inprogress",
+											"onhold",
+										],
+									},
+								},
 							}
 						: false,
 				},
