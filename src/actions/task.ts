@@ -344,7 +344,13 @@ export const task = {
 			return prisma.task.findMany({
 				where: {
 					contractId,
-					status: { in: status },
+					...(status
+						? {
+								status: { in: status },
+							}
+						: {
+								status: { not: Status.archived },
+							}),
 				},
 				include: {
 					...(includeSubtasks && { subtasks: true }),
@@ -363,7 +369,13 @@ export const task = {
 			return prisma.task.findMany({
 				where: {
 					guildId,
-					status: { in: status },
+					...(status
+						? {
+								status: { in: status },
+							}
+						: {
+								status: { not: Status.archived },
+							}),
 				},
 				include: {
 					...(includeSubtasks && { subtasks: true }),
@@ -382,7 +394,13 @@ export const task = {
 			return prisma.task.findMany({
 				where: {
 					experimentId,
-					status: { in: status },
+					...(status
+						? {
+								status: { in: status },
+							}
+						: {
+								status: { not: Status.archived },
+							}),
 				},
 				include: {
 					...(includeSubtasks && { subtasks: true }),
