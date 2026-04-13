@@ -239,12 +239,10 @@ export default function TasksCalendar() {
 				/* ===============================
 			   Custom event rendering
 			   =============================== */
-				//    TODO: clicking event opens details, or side tray
 				eventContent={(arg) => {
 					const { event } = arg
 					const { type } = event.extendedProps
 
-					// TODO: open task in side tray on click; handle subtasks
 					const url = getItemUrl(
 						event.extendedProps.contract,
 						event.extendedProps.guild,
