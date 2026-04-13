@@ -38,7 +38,7 @@ const completedTasks = await Astro.callAction(actions.task.listByExperiment, {
 >
 	<div class="flex gap-8 min-h-screen">
 		<div class="w-full">
-			<div class="sticky top-8 float-right flex items-center gap-0.5">
+			<div class="sticky top-14 float-right flex items-center gap-0.5">
 				<SessionPlayButton
 					itemType="experiment"
 					itemId={experiment.data.id}
@@ -84,7 +84,7 @@ const completedTasks = await Astro.callAction(actions.task.listByExperiment, {
 			</div>
 		</div>
 		<div class="space-y-4 w-[240px] flex-none">
-			<div class="sticky top-8">
+			<div class="sticky top-14">
 				<h2>Previous Sessions</h2>
 				<PreviousSessions sessions={experiment.data.sessions} />
 			</div>
