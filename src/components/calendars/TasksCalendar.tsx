@@ -26,7 +26,7 @@ type CalendarEvent = {
 	}
 }
 
-export default function Calendar() {
+export default function TasksCalendar() {
 	const [highlights, setHighlights] = useState<Record<string, string>>({})
 	const loadedRange = useRef<string>("")
 
