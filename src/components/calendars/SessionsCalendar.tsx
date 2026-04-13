@@ -61,6 +61,7 @@ export default function TasksCalendar() {
 			<FullCalendar
 				plugins={[interactionPlugin, timeGridPlugin]}
 				initialView="timeGridWeek"
+				allDaySlot={false}
 				height="auto"
 				initialEvents={[]}
 				events={loadEvents}
