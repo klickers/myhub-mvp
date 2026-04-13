@@ -83,7 +83,7 @@ const completedTasks = await Astro.callAction(actions.task.listByExperiment, {
 				/>
 			</div>
 		</div>
-		<div class="space-y-4 w-[240px] flex-none">
+		<div class="space-y-4 w-[220px] flex-none">
 			<div class="sticky top-14">
 				<h2>Previous Sessions</h2>
 				<PreviousSessions sessions={experiment.data.sessions} />
