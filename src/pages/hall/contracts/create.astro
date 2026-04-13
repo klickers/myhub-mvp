@@ -2,6 +2,7 @@
 import { actions } from "astro:actions"
 import Layout from "@/layouts/Layout.astro"
 import { Icon } from "astro-icon/components"
+import { GuildHallBreadcrumb } from "@/helpers/data/breadcrumbs"
 
 const result = Astro.getActionResult(actions.contract.create)
 if (result && !result.error)
@@ -11,29 +12,23 @@ const guilds = await Astro.callAction(actions.guild.list, {})
 const guildSlug = Astro.url.searchParams.get("guildSlug")
 ---
 
-<Layout>
-	<p class="mb-3 text-gray-600 text-sm">
+<Layout
+	breadcrumbs={[
+		GuildHallBreadcrumb,
+		guildSlug
+			? {
+					name:
+						guilds.data?.find((g) => g.slug === guildSlug)?.name ||
+						"Guild",
+					href: `/hall/guilds/${guildSlug}`,
+				}
+			: { name: "Contracts", href: "/hall" },
 		{
-			guildSlug ? (
-				<a
-					href={`/hall/guilds/${guildSlug}`}
-					class="flex gap-1 items-center"
-				>
-					<Icon name="mingcute:arrow-left-fill" />
-					Back to Guild
-				</a>
-			) : (
-				<a
-					href="/hall"
-					class="flex gap-1 items-center"
-				>
-					<Icon name="mingcute:arrow-left-fill" />
-					Back to Guild Hall
-				</a>
-			)
-		}
-	</p>
-
+			name: "Create Contract",
+			href: Astro.url.pathname + Astro.url.search,
+		},
+	]}
+>
 	<h1>New Contract</h1>
 
 	<form

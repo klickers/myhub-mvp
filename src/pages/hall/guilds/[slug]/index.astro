@@ -9,6 +9,7 @@ import Button from "@/components/Button.astro"
 import SessionPlayButton from "@/components/models/session/SessionPlayButton"
 import Tasks from "@/components/models/task/Tasks"
 import PreviousSessions from "@/components/models/session/PreviousSessions.astro"
+import { GuildHallBreadcrumb } from "@/helpers/data/breadcrumbs"
 
 const guild = await Astro.callAction(actions.guild.getBySlug, {
 	slug: Astro.params.slug as string,
@@ -30,7 +31,15 @@ const tasks = await Astro.callAction(actions.task.listByGuild, {
 })
 ---
 
-<Layout>
+<Layout
+	breadcrumbs={[
+		GuildHallBreadcrumb,
+		{
+			name: guild.data.name,
+			href: Astro.url.pathname,
+		},
+	]}
+>
 	<div class="flex gap-8 min-h-screen">
 		<div class="w-full">
 			<div class="sticky top-8 float-right flex items-center gap-0.5">
@@ -46,14 +55,6 @@ const tasks = await Astro.callAction(actions.task.listByGuild, {
 					<Icon name="mingcute:settings-5-fill" />
 				</a>
 			</div>
-			<p class="mb-3 text-gray-600 text-sm">
-				<a
-					href="/hall"
-					class="flex gap-1 items-center"
-				>
-					<Icon name="mingcute:arrow-left-fill" />Back to Guild Hall
-				</a>
-			</p>
 			<!-- TODO: double click to edit guild name -->
 			<h1 class="mb-3">{guild.data.name}</h1>
 			<p>{guild.data.description ?? <em>Put a description here.</em>}</p>

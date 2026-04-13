@@ -2,23 +2,22 @@
 import { actions } from "astro:actions"
 import Layout from "@/layouts/Layout.astro"
 import { Icon } from "astro-icon/components"
+import { AlchemyLabBreadcrumb } from "@/helpers/data/breadcrumbs"
 
 const result = Astro.getActionResult(actions.category.create)
 if (result && !result.error) return Astro.redirect(`/lab/`)
 // return Astro.redirect(`/lab/categories/${result.data.slug}`)
 ---
 
-<Layout>
-	<p class="mb-3 text-gray-600 text-sm">
-		<a
-			href="/lab"
-			class="flex gap-1 items-center"
-		>
-			<Icon name="mingcute:arrow-left-fill" />
-			Back to Lab
-		</a>
-	</p>
-
+<Layout
+	breadcrumbs={[
+		AlchemyLabBreadcrumb,
+		{
+			name: "Create Category",
+			href: Astro.url.pathname,
+		},
+	]}
+>
 	<h1>New Category</h1>
 
 	<form

@@ -4,6 +4,7 @@ import { actions } from "astro:actions"
 import Button from "@/components/Button.astro"
 import { Status } from "@/generated/prisma/enums"
 import ExperimentCard from "@/components/lab/ExperimentCard.astro"
+import { AlchemyLabBreadcrumb } from "@/helpers/data/breadcrumbs"
 
 const categories = await Astro.callAction(actions.category.list, {
 	withExperiments: true,
@@ -16,7 +17,7 @@ const experiments = await Astro.callAction(
 )
 ---
 
-<Layout>
+<Layout breadcrumbs={[AlchemyLabBreadcrumb]}>
 	<div class="space-y-20">
 		<div class="flex gap-2">
 			<Button

@@ -3,6 +3,7 @@ import { actions } from "astro:actions"
 import prisma from "@/helpers/prisma"
 import Layout from "@/layouts/Layout.astro"
 import { Icon } from "astro-icon/components"
+import { GuildHallBreadcrumb } from "@/helpers/data/breadcrumbs"
 
 const result = Astro.getActionResult(actions.guild.create)
 if (result && !result.error)
@@ -13,16 +14,17 @@ const personas = await prisma.persona.findMany({
 })
 ---
 
-<Layout>
-	<p class="mb-3 text-gray-600 text-sm">
-		<a
-			href="/hall"
-			class="flex gap-1 items-center"
-		>
-			<Icon name="mingcute:arrow-left-fill" />Back to Guild Hall
-		</a>
-	</p>
+<Layout
+	breadcrumbs={[
+		GuildHallBreadcrumb,
+		{
+			name: "Create Guild",
+			href: Astro.url.pathname,
+		},
+	]}
+>
 	<h1>New Guild</h1>
+
 	<form
 		method="POST"
 		action={actions.guild.create}

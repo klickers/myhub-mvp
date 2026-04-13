@@ -47,7 +47,7 @@ const getItemHref = (s: any) => {
 }
 ---
 
-<Layout>
+<Layout breadcrumbs={[{ name: "Timekeeper", href: "/timekeeper" }]}>
 	<main>
 		<!-- TODO: allow easy play by guild, contract, task -->
 		<div class="card">
@@ -96,7 +96,7 @@ const getItemHref = (s: any) => {
 												{JSON.stringify(
 													s.notesJson,
 													null,
-													2
+													2,
 												)}
 											</pre>
 										</details>

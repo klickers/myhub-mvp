@@ -2,6 +2,7 @@
 import { actions } from "astro:actions"
 import Layout from "@/layouts/Layout.astro"
 import { Icon } from "astro-icon/components"
+import { AlchemyLabBreadcrumb } from "@/helpers/data/breadcrumbs"
 
 const result = Astro.getActionResult(actions.experiment.update)
 if (result && !result.error)
@@ -17,17 +18,19 @@ if (!experimentRes.data) throw new Error("Experiment not found")
 const experiment = experimentRes.data
 ---
 
-<Layout>
-	<p class="mb-3 text-gray-600 text-sm">
-		<a
-			href={`/lab/experiments/${slug}`}
-			class="flex gap-1 items-center"
-		>
-			<Icon name="mingcute:arrow-left-fill" />
-			Back to Experiment
-		</a>
-	</p>
-
+<Layout
+	breadcrumbs={[
+		AlchemyLabBreadcrumb,
+		{
+			name: experiment.name,
+			href: `/lab/experiments/${slug}`,
+		},
+		{
+			name: "Edit",
+			href: Astro.url.pathname,
+		},
+	]}
+>
 	<h1>Edit Experiment</h1>
 
 	<form

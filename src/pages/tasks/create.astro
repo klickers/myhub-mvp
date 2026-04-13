@@ -1,7 +1,10 @@
 ---
 import { actions } from "astro:actions"
 import Layout from "@/layouts/Layout.astro"
-import { Icon } from "astro-icon/components"
+import {
+	GuildHallBreadcrumb,
+	AlchemyLabBreadcrumb,
+} from "@/helpers/data/breadcrumbs"
 
 const result = Astro.getActionResult(actions.task.create)
 if (result && !result.error) {
@@ -29,31 +32,30 @@ const guild = guilds.data?.find((g) => g.slug === guildSlug)
 const experiment = experiments.data?.find((e) => e.slug === experimentSlug)
 ---
 
-<Layout>
-	{
-		(contractSlug || guildSlug || experimentSlug) && (
-			<p class="mb-3 text-gray-600 text-sm">
-				<a
-					href={
-						contractSlug
+<Layout
+	breadcrumbs={[
+		...(contract || guild
+			? [
+					GuildHallBreadcrumb,
+					{
+						name: guild?.name ?? contract?.name ?? "Parent",
+						href: contractSlug
 							? `/hall/contracts/${contractSlug}`
-							: guildSlug
-								? `/hall/guilds/${guildSlug}`
-								: `/lab/experiments/${experimentSlug}`
-					}
-					class="flex gap-1 items-center"
-				>
-					<Icon name="mingcute:arrow-left-fill" />
-					Back to{" "}
-					{contract?.name ??
-						guild?.name ??
-						experiment?.name ??
-						"Parent"}
-				</a>
-			</p>
-		)
-	}
-
+							: `/hall/guilds/${guildSlug}`,
+					},
+				]
+			: experiment
+				? [
+						AlchemyLabBreadcrumb,
+						{
+							name: experiment.name,
+							href: `/lab/experiments/${experimentSlug}`,
+						},
+					]
+				: []),
+		{ name: "Create Task", href: Astro.url.pathname + Astro.url.search },
+	]}
+>
 	<h1>New Task</h1>
 
 	<form

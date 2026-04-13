@@ -3,6 +3,14 @@ import Layout from "@/layouts/Layout.astro"
 import Calendar from "@/components/guild-hall/Calendar"
 ---
 
-<Layout>
+<Layout
+	breadcrumbs={[
+		{
+			icon: "mingcute:calendar-2-fill",
+			name: "Calendar",
+			href: "/calendar",
+		},
+	]}
+>
 	<Calendar client:load />
 </Layout>

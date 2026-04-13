@@ -2,6 +2,7 @@
 import { actions } from "astro:actions"
 import Layout from "@/layouts/Layout.astro"
 import { Icon } from "astro-icon/components"
+import { AlchemyLabBreadcrumb } from "@/helpers/data/breadcrumbs"
 
 const result = Astro.getActionResult(actions.experiment.create)
 if (result && !result.error)
@@ -11,29 +12,22 @@ const categories = await Astro.callAction(actions.category.list, {})
 const categorySlug = Astro.url.searchParams.get("categorySlug")
 ---
 
-<Layout>
-	<p class="mb-3 text-gray-600 text-sm">
+<Layout
+	breadcrumbs={[
+		AlchemyLabBreadcrumb,
 		{
-			categorySlug ? (
-				<a
-					href={`/lab/categories/${categorySlug}`}
-					class="flex gap-1 items-center"
-				>
-					<Icon name="mingcute:arrow-left-fill" />
-					Back to Category
-				</a>
-			) : (
-				<a
-					href="/lab"
-					class="flex gap-1 items-center"
-				>
-					<Icon name="mingcute:arrow-left-fill" />
-					Back to Lab
-				</a>
-			)
-		}
-	</p>
-
+			name: categorySlug
+				? categories.data?.find((c) => c.slug === categorySlug)?.name ||
+					"Category"
+				: "Experiments",
+			href: categorySlug ? `/lab/categories/${categorySlug}` : "/lab",
+		},
+		{
+			name: "Create Experiment",
+			href: Astro.url.pathname + Astro.url.search,
+		},
+	]}
+>
 	<h1>New Experiment</h1>
 
 	<form

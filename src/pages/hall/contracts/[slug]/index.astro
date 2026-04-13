@@ -7,6 +7,7 @@ import Button from "@/components/Button.astro"
 import SessionPlayButton from "@/components/models/session/SessionPlayButton"
 import Tasks from "@/components/models/task/Tasks"
 import PreviousSessions from "@/components/models/session/PreviousSessions.astro"
+import { GuildHallBreadcrumb } from "@/helpers/data/breadcrumbs"
 
 const contract = await Astro.callAction(actions.contract.getBySlug, {
 	slug: Astro.params.slug as string,
@@ -27,7 +28,21 @@ const completedTasks = await Astro.callAction(actions.task.listByContract, {
 })
 ---
 
-<Layout>
+<Layout
+	breadcrumbs={[
+		GuildHallBreadcrumb,
+		{
+			name: contract.data.guild ? contract.data.guild.name : "No Guild",
+			href: contract.data.guild
+				? `/hall/guilds/${contract.data.guild.slug}`
+				: "/hall",
+		},
+		{
+			name: contract.data.name,
+			href: Astro.url.pathname,
+		},
+	]}
+>
 	<div class="flex gap-8 min-h-screen">
 		<div class="w-full">
 			<div class="sticky top-8 float-right flex items-center gap-0.5">
@@ -49,28 +64,6 @@ const completedTasks = await Astro.callAction(actions.task.listByContract, {
 					<Icon name="mingcute:settings-5-fill" />
 				</a>
 			</div>
-			<p class="mb-3 text-gray-600 text-sm flex gap-2">
-				<a
-					href="/hall"
-					class="flex gap-1 items-center"
-				>
-					<Icon
-						name="mingcute:building-4-fill"
-						class="-mt-0.5"
-					/>
-					Guild Hall
-				</a>
-				{
-					contract.data.guild ? (
-						<a
-							href={`/hall/guilds/${contract.data.guild.slug}`}
-							class="flex gap-1 items-center"
-						>
-							/&nbsp;&nbsp;{contract.data.guild.name}
-						</a>
-					) : null
-				}
-			</p>
 			<!-- TODO: double click to edit contract name -->
 			<h1 class="mb-3">{contract.data.name}</h1>
 			<p>

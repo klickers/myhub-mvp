@@ -6,6 +6,7 @@ import Button from "@/components/Button.astro"
 import SessionPlayButton from "@/components/models/session/SessionPlayButton"
 import Tasks from "@/components/models/task/Tasks"
 import PreviousSessions from "@/components/models/session/PreviousSessions.astro"
+import { AlchemyLabBreadcrumb } from "@/helpers/data/breadcrumbs"
 
 const experiment = await Astro.callAction(actions.experiment.getBySlug, {
 	slug: Astro.params.slug as string,
@@ -26,7 +27,15 @@ const completedTasks = await Astro.callAction(actions.task.listByExperiment, {
 })
 ---
 
-<Layout>
+<Layout
+	breadcrumbs={[
+		AlchemyLabBreadcrumb,
+		{
+			name: experiment.data.name,
+			href: Astro.url.pathname,
+		},
+	]}
+>
 	<div class="flex gap-8 min-h-screen">
 		<div class="w-full">
 			<div class="sticky top-8 float-right flex items-center gap-0.5">
@@ -42,28 +51,6 @@ const completedTasks = await Astro.callAction(actions.task.listByExperiment, {
 					<Icon name="mingcute:settings-5-fill" />
 				</a>
 			</div>
-			<p class="mb-3 text-gray-600 text-sm flex gap-2">
-				<a
-					href="/lab"
-					class="flex gap-1 items-center"
-				>
-					<Icon
-						name="mingcute:flask-3-fill"
-						class="-mt-0.5"
-					/>
-					Alchemy Lab
-				</a>
-				<!-- {
-					experiment.data.category ? (
-						<a
-							href={`/lab/categories/${experiment.data.category.slug}`}
-							class="flex gap-1 items-center"
-						>
-							/&nbsp;&nbsp;{experiment.data.category.name}
-						</a>
-					) : null
-				} -->
-			</p>
 			<!-- TODO: double click to edit experiment name -->
 			<h1 class="mb-3">{experiment.data.name}</h1>
 			<p>

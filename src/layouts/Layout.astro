@@ -1,8 +1,20 @@
 ---
 import "@/styles/global.css"
 import Sidebar from "@/components/Sidebar.astro"
+import { Icon } from "astro-icon/components"
+
+type Breadcrumb = {
+	icon?: string
+	name: string
+	href: string
+}
+
+interface Props {
+	breadcrumbs: Breadcrumb[]
+}
 
 const path = Astro.url.pathname
+const breadcrumbs = Astro.props.breadcrumbs || [{ name: "Home", href: "/" }]
 ---
 
 <!doctype html>
@@ -27,9 +39,35 @@ const path = Astro.url.pathname
 	<body class="bg-gray-50">
 		<div class="flex w-full min-h-screen mb-10">
 			<Sidebar path={path} />
-			<main class="ml-[240px] w-full pl-10 pr-8 py-8">
-				<slot />
-			</main>
+			<div class="ml-[240px] w-full pb-8">
+				<div
+					class="text-sm fixed flex items-center bg-white pl-10 pr-8 py-3 w-full z-10 border-b border-gray-300"
+				>
+					{
+						breadcrumbs.map((breadcrumb, index) => (
+							<div class="flex items-center">
+								<a
+									href={breadcrumb.href}
+									class="text-gray-600 hover:text-gray-800 flex gap-1 items-center"
+								>
+									{/* TODO: disable if last item */}
+									{breadcrumb.icon && (
+										<Icon
+											name={breadcrumb.icon}
+											class="-mt-[1px]"
+										/>
+									)}
+									<span>{breadcrumb.name}</span>
+								</a>
+								{index < breadcrumbs.length - 1 && (
+									<span class="mx-2 text-gray-400">/</span>
+								)}
+							</div>
+						))
+					}
+				</div>
+				<main class="mt-20 pl-10 pr-8"><slot /></main>
+			</div>
 		</div>
 	</body>
 </html>

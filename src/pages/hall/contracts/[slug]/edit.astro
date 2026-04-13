@@ -3,6 +3,7 @@ import { actions } from "astro:actions"
 import Layout from "@/layouts/Layout.astro"
 import { Icon } from "astro-icon/components"
 import { format } from "date-fns"
+import { GuildHallBreadcrumb } from "@/helpers/data/breadcrumbs"
 
 const result = Astro.getActionResult(actions.contract.update)
 if (result && !result.error)
@@ -18,17 +19,25 @@ if (!contractRes.data) throw new Error("Contract not found")
 const contract = contractRes.data
 ---
 
-<Layout>
-	<p class="mb-3 text-gray-600 text-sm">
-		<a
-			href={`/hall/contracts/${slug}`}
-			class="flex gap-1 items-center"
-		>
-			<Icon name="mingcute:arrow-left-fill" />
-			Back to Contract
-		</a>
-	</p>
-
+<Layout
+	breadcrumbs={[
+		GuildHallBreadcrumb,
+		{
+			name: contract.guild ? contract.guild.name : "Guild",
+			href: contract.guild
+				? `/hall/guilds/${contract.guild.slug}`
+				: "/hall",
+		},
+		{
+			name: contract.name,
+			href: `/hall/contracts/${slug}`,
+		},
+		{
+			name: "Edit",
+			href: Astro.url.pathname,
+		},
+	]}
+>
 	<h1>Edit Contract</h1>
 
 	<form

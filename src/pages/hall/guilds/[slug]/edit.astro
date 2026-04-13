@@ -3,6 +3,7 @@ import { actions } from "astro:actions"
 import prisma from "@/helpers/prisma"
 import Layout from "@/layouts/Layout.astro"
 import { Icon } from "astro-icon/components"
+import { GuildHallBreadcrumb } from "@/helpers/data/breadcrumbs"
 
 const result = Astro.getActionResult(actions.guild.update)
 if (result && !result.error)
@@ -20,17 +21,19 @@ if (!guildRes.data) throw new Error("Guild not found")
 const guild = guildRes.data
 ---
 
-<Layout>
-	<p class="mb-3 text-gray-600 text-sm">
-		<a
-			href={`/hall/guilds/${slug}`}
-			class="flex gap-1 items-center"
-		>
-			<Icon name="mingcute:arrow-left-fill" />
-			Back to Guild
-		</a>
-	</p>
-
+<Layout
+	breadcrumbs={[
+		GuildHallBreadcrumb,
+		{
+			name: guild.name,
+			href: `/hall/guilds/${slug}`,
+		},
+		{
+			name: "Edit Guild",
+			href: Astro.url.pathname,
+		},
+	]}
+>
 	<h1>Edit Guild</h1>
 
 	<form
