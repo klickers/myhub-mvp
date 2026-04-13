@@ -44,26 +44,39 @@ const breadcrumbs = Astro.props.breadcrumbs || [{ name: "Home", href: "/" }]
 					class="text-sm fixed flex items-center bg-white pl-10 pr-8 py-3 w-full z-10 border-b border-gray-300"
 				>
 					{
-						breadcrumbs.map((breadcrumb, index) => (
-							<div class="flex items-center">
-								<a
-									href={breadcrumb.href}
-									class="text-gray-600 hover:text-gray-800 flex gap-1 items-center"
-								>
-									{/* TODO: disable if last item */}
-									{breadcrumb.icon && (
-										<Icon
-											name={breadcrumb.icon}
-											class="-mt-[1px]"
-										/>
+						breadcrumbs.map((breadcrumb, index) => {
+							const isLast = index === breadcrumbs.length - 1
+
+							return (
+								<div class="flex items-center">
+									<a
+										href={
+											isLast ? undefined : breadcrumb.href
+										}
+										aria-disabled={isLast}
+										class={
+											"flex gap-1 items-center" +
+											(isLast
+												? " text-gray-400 pointer-events-none"
+												: " text-gray-600 hover:underline")
+										}
+									>
+										{breadcrumb.icon && (
+											<Icon
+												name={breadcrumb.icon}
+												class="-mt-[1px]"
+											/>
+										)}
+										<span>{breadcrumb.name}</span>
+									</a>
+									{index < breadcrumbs.length - 1 && (
+										<span class="mx-2 text-gray-400">
+											/
+										</span>
 									)}
-									<span>{breadcrumb.name}</span>
-								</a>
-								{index < breadcrumbs.length - 1 && (
-									<span class="mx-2 text-gray-400">/</span>
-								)}
-							</div>
-						))
+								</div>
+							)
+						})
 					}
 				</div>
 				<main class="mt-20 pl-10 pr-8"><slot /></main>
