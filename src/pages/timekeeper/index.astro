@@ -1,50 +1,10 @@
 ---
-import SessionPlayButton from "@/components/models/session/SessionPlayButton"
+import PreviousSessions from "@/components/models/session/PreviousSessions.astro"
 import SessionPlayer from "@/components/models/session/SessionPlayer"
 import Layout from "@/layouts/Layout.astro"
 import { actions } from "astro:actions"
 
 const sessions = await Astro.callAction(actions.session.list, {})
-
-const fmt = (d?: string | Date) =>
-	d
-		? new Date(d).toLocaleString(undefined, {
-				year: "numeric",
-				month: "short",
-				day: "2-digit",
-				hour: "2-digit",
-				minute: "2-digit",
-			})
-		: "—"
-
-const getTitle = (s: any) =>
-	s?.title ||
-	s?.task?.name ||
-	s?.guild?.name ||
-	s?.contract?.name ||
-	s?.experiment?.name ||
-	s?.objective?.name ||
-	"(untitled)"
-
-const getItemHref = (s: any) => {
-	// adjust routes to your app
-	switch (s?.itemType) {
-		case "task":
-			return /*s?.taskId ? `/tasks/${s.taskId}` :*/ null
-		case "guild":
-			return s?.guildId ? `/hall/guilds/${s.guild.slug}` : null
-		case "contract":
-			return s?.contractId ? `/hall/contracts/${s.contract.slug}` : null
-		case "experiment":
-			return s?.experimentId
-				? `/lab/experiments/${s.experiment.slug}`
-				: null
-		case "objective":
-			return s?.objectiveId ? `/objectives/${s.objective.slug}` : null
-		default:
-			return null
-	}
-}
 ---
 
 <Layout
@@ -56,67 +16,30 @@ const getItemHref = (s: any) => {
 		},
 	]}
 >
-	<main>
-		<!-- TODO: allow easy play by guild, contract, task -->
-		<div class="card">
-			<div class="card__content">
-				<SessionPlayer client:load />
+	<div class="flex gap-8 min-h-screen">
+		<div class="w-full">
+			<div class="sticky top-14">
+				<h2>Current Session</h2>
+				<!-- TODO: allow easy play by guild, contract, task -->
+				<div class="card">
+					<div class="card__content">
+						<SessionPlayer client:load />
+					</div>
+				</div>
 			</div>
 		</div>
-		<!-- TODO: render plateJS correctly, show time spent per session -->
-		<div class="mt-12">
-			<h1 class="text-2xl">Previous Sessions</h1>
-			<div class="space-y-3 max-w-sm">
+		<div class="space-y-4 w-1/3 flex-none">
+			<div>
+				<h2>Previous Sessions</h2>
 				{
-					sessions.data?.length ? (
-						sessions.data.map((s: any) => {
-							const title = getTitle(s)
-							const href = getItemHref(s)
-							return (
-								<div>
-									<div class="flex gap-1 items-center">
-										{href ? (
-											<a href={href}>{title}</a>
-										) : (
-											title
-										)}
-										<SessionPlayButton
-											itemType={s.itemType}
-											itemId={s[s.itemType].id}
-											client:load
-										/>
-									</div>
-
-									<div class="text-sm text-gray-600">
-										<span>{s.itemType}</span>
-										{" · "}
-										<span>{fmt(s.startTime)}</span>
-										{" → "}
-										<span>{fmt(s.endTime)}</span>
-									</div>
-
-									{s.notesJson ? (
-										<details class="mt-1">
-											<summary style="cursor: pointer;">
-												Notes
-											</summary>
-											<pre style="white-space: pre-wrap; margin: 0.5rem 0 0;">
-												{JSON.stringify(
-													s.notesJson,
-													null,
-													2,
-												)}
-											</pre>
-										</details>
-									) : null}
-								</div>
-							)
-						})
-					) : (
-						<p>No sessions yet.</p>
+					sessions.data && (
+						<PreviousSessions
+							sessions={sessions.data}
+							timekeeper={true}
+						/>
 					)
 				}
 			</div>
 		</div>
-	</main>
+	</div>
 </Layout>
