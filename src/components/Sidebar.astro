@@ -57,7 +57,14 @@ const isActive = (href: string) => {
 >
 	<div class="card card--profile">
 		<div class="card__content flex items-center gap-3">
-			<div class="w-12 h-12 rounded-full bg-gray-300"></div>
+			<div
+				class="w-12 h-12 rounded-full overflow-hidden border border-gray-300"
+			>
+				<img
+					src="/profile.png"
+					class="object-cover"
+				/>
+			</div>
 			<div class="leading-none">
 				<p class="font-semibold mb-1">Catherine</p>
 				<p><small class="text-gray-600">11000 XP</small></p>
