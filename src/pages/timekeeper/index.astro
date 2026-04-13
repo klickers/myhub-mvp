@@ -4,7 +4,7 @@ import SessionPlayer from "@/components/models/session/SessionPlayer"
 import Layout from "@/layouts/Layout.astro"
 import { actions } from "astro:actions"
 
-const sessions = await Astro.callAction(actions.session.list, {})
+const sessions = await Astro.callAction(actions.session.list, { take: 5 })
 ---
 
 <Layout

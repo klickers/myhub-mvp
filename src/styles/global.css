@@ -209,6 +209,12 @@
  ******************************************************/
 .fc-event {
 	@apply overflow-hidden rounded-lg bg-white;
+	&.calendar-session {
+		@apply border-gray-400 bg-gray-100;
+		div {
+			@apply text-gray-800;
+		}
+	}
 	&.calendar-task {
 		@apply border-gray-400;
 		&.calendar-inprogress {
