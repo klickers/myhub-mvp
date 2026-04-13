@@ -82,10 +82,10 @@
 		}
 
 		&.card--profile {
-			@apply bg-gray-100;
+			@apply bg-gray-100 rounded-none border-x-0 border-t-0;
 
 			.card__content {
-				@apply px-4;
+				@apply px-6;
 			}
 		}
 	}
