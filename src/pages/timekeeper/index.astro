@@ -47,7 +47,15 @@ const getItemHref = (s: any) => {
 }
 ---
 
-<Layout breadcrumbs={[{ name: "Timekeeper", href: "/timekeeper" }]}>
+<Layout
+	breadcrumbs={[
+		{
+			icon: "mingcute:time-fill",
+			name: "Timekeeper",
+			href: "/timekeeper",
+		},
+	]}
+>
 	<main>
 		<!-- TODO: allow easy play by guild, contract, task -->
 		<div class="card">
