@@ -52,14 +52,17 @@ const getItemHref = (s: any) => {
 		sessions && sessions.length > 0 ? (
 			<div class="space-y-2">
 				{sessions.map((session) => {
-					const title = getTitle(session)
-					const href = getItemHref(session)
-
 					return (
 						<div class="p-3 border border-gray-200 rounded-md bg-white">
 							{timekeeper && (
 								<div class="flex gap-1 items-center mb-1">
-									{href ? <a href={href}>{title}</a> : title}
+									{getItemHref(session) ? (
+										<a href={getItemHref(session)}>
+											{getTitle(session)}
+										</a>
+									) : (
+										getTitle(session)
+									)}
 									<SessionPlayButton
 										itemType={session.itemType}
 										itemId={session[session.itemType].id}
