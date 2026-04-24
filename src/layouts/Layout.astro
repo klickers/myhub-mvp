@@ -38,8 +38,14 @@ const breadcrumbs = Astro.props.breadcrumbs || [{ name: "Home", href: "/" }]
 	</head>
 	<body class="bg-gray-50">
 		<div class="flex w-full min-h-screen mb-10">
-			<Sidebar path={path} />
-			<div class="ml-[220px] w-full pb-8">
+			<Sidebar
+				path={path}
+				transition:persist
+			/>
+			<div
+				class="ml-[220px] w-full pb-8"
+				transition:persist
+			>
 				<div
 					class="text-sm fixed flex items-center bg-white pl-10 pr-8 py-3 w-full z-10 border-b border-gray-300"
 				>
