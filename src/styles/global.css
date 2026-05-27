@@ -264,6 +264,10 @@
 		@apply overflow-hidden rounded-lg border border-gray-300/70 bg-white/65 p-3 shadow-xl shadow-slate-900/5 ring-1 ring-white/45 backdrop-blur-2xl backdrop-saturate-150;
 	}
 
+	.calendar-shell--home {
+		@apply bg-white/70;
+	}
+
 	.calendar-shell .fc {
 		@apply text-sm text-gray-800;
 	}
@@ -369,6 +373,16 @@
 
 	.calendar-shell .calendar-session div {
 		@apply text-blue-950;
+	}
+
+	.calendar-shell .calendar-home-event {
+		@apply !border-blue-300/80 !bg-blue-50/95;
+	}
+
+	.calendar-shell .calendar-home-event .fc-event-main,
+	.calendar-shell .calendar-home-event .fc-event-time,
+	.calendar-shell .calendar-home-event .fc-event-title {
+		@apply !text-blue-950;
 	}
 
 	.calendar-shell .calendar-task {

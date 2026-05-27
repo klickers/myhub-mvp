@@ -55,6 +55,7 @@ export default function Calendar() {
 			headerToolbar={false}
 			nowIndicator
 			slotMinTime="07:00:00"
+			eventClassNames={["calendar-home-event"]}
 		/>
 	)
 }

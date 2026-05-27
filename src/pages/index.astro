@@ -13,12 +13,14 @@ import InspiringQuote from "@/components/InspiringQuote"
 		<div class="w-full">
 			<TimeGreeting name="Catherine" />
 			<div class="flex gap-4 mt-8">
-				<div class="card card--static w-1/2">
-					<div class="card__content">
-						<h2>Calendar</h2>
-						<DayCalendar client:load />
+				<section class="calendar-shell calendar-shell--home w-1/2">
+					<div class="mb-3 flex items-center justify-between px-1">
+						<h2 class="mb-0 text-lg font-semibold text-gray-950">
+							Calendar
+						</h2>
 					</div>
-				</div>
+					<DayCalendar client:load />
+				</section>
 				<div class="card card--static w-1/2">
 					<div class="card__content">
 						<h2>Agenda</h2>
