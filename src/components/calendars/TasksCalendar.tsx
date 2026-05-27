@@ -9,6 +9,7 @@ import getItemUrl from "@/helpers/getItemUrl"
 import getItemName from "@/helpers/getItemName"
 import type { Task } from "@/generated/prisma/client"
 import SideTray from "@/components/SideTray"
+import { addHours } from "date-fns"
 
 // TODO: filter by project (e.g. SH) or type (e.g. Learning)
 
@@ -359,13 +360,16 @@ export default function TasksCalendar() {
 						await actions.contract.updateJson({
 							id: info.event.extendedProps.contract.id,
 							...(info.event.start && {
-								dueDate: info.event.start.toISOString(),
+								dueDate: addHours(
+									info.event.start!,
+									3,
+								).toISOString(),
 							}),
 						})
 					} else if (type === "task") {
 						await actions.task.update({
 							id: info.event.extendedProps.taskId,
-							deadline: info.event.start,
+							deadline: addHours(info.event.start!, 3), // adjust for timezone differences
 						})
 					}
 				}}
