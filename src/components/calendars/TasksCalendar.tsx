@@ -48,7 +48,10 @@ export default function TasksCalendar() {
 	}
 
 	const loadEvents = useCallback(
-		async (info, successCallback) => {
+		async (
+			info: { start: Date; end: Date },
+			successCallback: (events: CalendarEvent[]) => void,
+		) => {
 			try {
 				const start = info.start.toISOString()
 				const end = info.end.toISOString()
@@ -143,14 +146,16 @@ export default function TasksCalendar() {
 	)
 
 	return (
-		<>
+		<div className="calendar-shell calendar-shell--tasks">
 			<FullCalendar
 				plugins={[dayGridPlugin, interactionPlugin]}
 				initialView="dayGridWeek"
 				height="auto"
 				initialEvents={[]}
 				headerToolbar={{
-					center: "dayGridFourDay,dayGridWeek,dayGridMonth",
+					left: "prev,next today",
+					center: "title",
+					right: "dayGridFourDay,dayGridWeek,dayGridMonth",
 				}}
 				views={{
 					dayGridFourDay: {
@@ -263,7 +268,7 @@ export default function TasksCalendar() {
 
 					return (
 						<div
-							className={`flex gap-1 px-1 py-1 ${isCompleted || isOnHold ? "items-center" : ""}`}
+							className={`calendar-event-card flex gap-1 px-2 py-1.5 ${isCompleted || isOnHold ? "items-center" : ""}`}
 						>
 							{/* {type === "contract" ? (
 							<Icon
@@ -288,7 +293,7 @@ export default function TasksCalendar() {
 									parentName &&
 									(event.extendedProps.parentTask ? (
 										<span
-											className="text-xs block mb-0.5 text-gray-500"
+											className="calendar-event-card__meta block cursor-pointer text-xs"
 											onClick={() =>
 												setSelectedTask(
 													event.extendedProps
@@ -301,13 +306,14 @@ export default function TasksCalendar() {
 									) : (
 										<a
 											href={url}
-											className="text-xs block mb-0.5 text-gray-500"
+											className="calendar-event-card__meta block text-xs"
 										>
 											{parentName}
 										</a>
 									))}
 								{event.extendedProps.task ? (
 									<span
+										className="cursor-pointer"
 										onClick={() =>
 											setSelectedTask(
 												event.extendedProps.task,
@@ -344,7 +350,7 @@ export default function TasksCalendar() {
 								onMouseDown={(e) => e.stopPropagation()}
 								onTouchStart={(e) => e.stopPropagation()}
 								onClick={(e) => e.stopPropagation()}
-								className={`${highlights[dateKey] ? "bg-yellow-50" : ""} w-full resize-none border border-gray-300 rounded-lg px-1 py-0.5 text-sm leading-snug`}
+								className={`calendar-highlight-input ${highlights[dateKey] ? "calendar-highlight-input--filled" : ""}`}
 								style={{ minHeight: "2.5em" }}
 							/>
 						</div>
@@ -381,6 +387,6 @@ export default function TasksCalendar() {
 					setSelected={setSelectedTask}
 				/>
 			)}
-		</>
+		</div>
 	)
 }

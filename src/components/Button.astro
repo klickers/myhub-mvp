@@ -13,7 +13,10 @@ const { href, icon, label } = Astro.props
 
 <a
 	href={href}
-	class="flex gap-1 items-center py-1 px-3 bg-white border border-gray-400 rounded-full duration-300 hover:bg-gray-100"
+	class="button button--primary"
 >
-	<Icon name={icon} />{label}
+	<Icon
+		name={icon}
+		aria-hidden="true"
+	/>{label}
 </a>

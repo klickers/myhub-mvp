@@ -35,31 +35,36 @@ const breadcrumbs = Astro.props.breadcrumbs || [{ name: "Home", href: "/" }]
 			content={Astro.generator}
 		/>
 		<title>MyHub</title>
+		<script is:inline>
+			;(() => {
+				try {
+					const state =
+						localStorage.getItem("myhub:sidebar-state") ===
+						"collapsed"
+							? "collapsed"
+							: "expanded"
+
+					document.documentElement.dataset.sidebar = state
+				} catch {
+					document.documentElement.dataset.sidebar = "expanded"
+				}
+			})()
+		</script>
 	</head>
-	<body
-		class="bg-gray-50 bg-fixed bg-cover bg-center relative"
-		style="background-color: #dbeafe; background-image: linear-gradient(135deg, #dbeafe 0%, #ede9fe 50%, #f3e8ff 100%);"
-	>
-		<!-- <div
-			class="bg-white opacity-50 h-screen w-screen absolute top-0 right-0 -z-10"
-		>
-		</div> -->
-		<div class="flex w-full min-h-screen mb-10">
+	<body class="app-body">
+		<div class="app-shell">
 			<Sidebar
 				path={path}
 				transition:persist
 			/>
 			<div
-				class="ml-[200px] w-full pb-8"
+				class="app-content"
 				transition:persist
 			>
-				<div
-					class="text-sm fixed flex items-center pl-10 pr-8 py-3 w-full z-10 border-b border-gray-300"
+				<nav
+					class="app-topbar"
+					aria-label="Breadcrumb"
 				>
-					<div
-						class="bg-white opacity-50 absolute left-0 top-0 h-full w-full -z-10"
-					>
-					</div>
 					{
 						breadcrumbs.map((breadcrumb, index) => {
 							const isLast = index === breadcrumbs.length - 1
@@ -71,6 +76,7 @@ const breadcrumbs = Astro.props.breadcrumbs || [{ name: "Home", href: "/" }]
 											isLast ? undefined : breadcrumb.href
 										}
 										aria-disabled={isLast}
+										aria-current={isLast ? "page" : undefined}
 										class={
 											"flex gap-1 items-center" +
 											(isLast
@@ -81,7 +87,7 @@ const breadcrumbs = Astro.props.breadcrumbs || [{ name: "Home", href: "/" }]
 										{breadcrumb.icon && (
 											<Icon
 												name={breadcrumb.icon}
-												class="-mt-[1px]"
+												class="-mt-[1px] text-gray-500"
 											/>
 										)}
 										<span>{breadcrumb.name}</span>
@@ -95,8 +101,8 @@ const breadcrumbs = Astro.props.breadcrumbs || [{ name: "Home", href: "/" }]
 							)
 						})
 					}
-				</div>
-				<main class="mt-20 pl-10 pr-8"><slot /></main>
+				</nav>
+				<main class="app-main"><slot /></main>
 			</div>
 		</div>
 	</body>

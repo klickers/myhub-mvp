@@ -16,5 +16,25 @@ import SessionsCalendar from "@/components/calendars/SessionsCalendar"
 		},
 	]}
 >
-	<SessionsCalendar client:load />
+	<div class="calendar-page">
+		<nav
+			class="calendar-tabs"
+			aria-label="Calendar views"
+		>
+			<a
+				href="/calendar"
+				class="calendar-tabs__link"
+			>
+				Tasks
+			</a>
+			<a
+				href="/calendar/sessions"
+				class="calendar-tabs__link calendar-tabs__link--active"
+				aria-current="page"
+			>
+				Sessions
+			</a>
+		</nav>
+		<SessionsCalendar client:load />
+	</div>
 </Layout>

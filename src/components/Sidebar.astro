@@ -53,44 +53,70 @@ const isActive = (href: string) => {
 ---
 
 <aside
-	class="fixed h-screen w-[200px] flex-none border-r border-gray-300 pb-6 space-y-6"
+	class="sidebar"
+	aria-label="Primary sidebar"
 >
-	<div
-		class="bg-white opacity-50 absolute left-0 top-0 h-screen w-full -z-10"
+	<button
+		type="button"
+		class="sidebar__toggle"
+		aria-controls="primary-navigation"
+		aria-expanded="true"
+		aria-label="Collapse sidebar"
+		title="Collapse sidebar"
+		data-sidebar-toggle
 	>
-	</div>
-	<div class="card card--profile">
-		<div class="card__content flex items-center gap-3">
-			<div
-				class="w-12 h-12 rounded-full overflow-hidden border border-gray-300"
-			>
-				<img
-					src="/profile.png"
-					class="object-cover"
-				/>
-			</div>
-			<div class="leading-none">
-				<p class="font-semibold mb-1">Catherine</p>
-				<p><small class="text-gray-600">11000 XP</small></p>
-			</div>
+		<Icon
+			name="mingcute:left-line"
+			class="sidebar__toggle-icon sidebar__toggle-icon--expanded"
+			aria-hidden="true"
+		/>
+		<Icon
+			name="mingcute:right-line"
+			class="sidebar__toggle-icon sidebar__toggle-icon--collapsed"
+			aria-hidden="true"
+		/>
+	</button>
+	<section
+		class="sidebar__profile-card"
+		aria-label="Catherine profile summary"
+	>
+		<div class="sidebar__avatar">
+			<img
+				src="/profile.png"
+				alt="Catherine profile avatar"
+			/>
 		</div>
-	</div>
-	<nav class="space-y-4 px-3">
+		<div class="sidebar__profile-copy">
+			<p class="sidebar__profile-name">Catherine</p>
+			<p class="sidebar__profile-meta">11000 XP</p>
+		</div>
+	</section>
+	<nav
+		id="primary-navigation"
+		class="sidebar__nav"
+		aria-label="Primary"
+	>
 		{
 			links.map((group) => (
-				<div class="space-y-1">
+				<div class="sidebar__nav-group">
 					{group.map((link) => (
 						<a
 							href={link.href}
+							aria-label={link.name}
+							aria-current={isActive(link.href) ? "page" : undefined}
 							class={
-								"duration-300 px-4 py-2 flex gap-2 items-center rounded-xl" +
+								"sidebar__link" +
 								(isActive(link.href)
-									? " bg-black text-white hover:bg-black"
-									: " hover:bg-white")
+									? " sidebar__link--active"
+									: "")
 							}
 						>
-							<Icon name={link.icon} />
-							<span>{link.name}</span>
+							<Icon
+								name={link.icon}
+								class="sidebar__link-icon"
+								aria-hidden="true"
+							/>
+							<span class="sidebar__link-label">{link.name}</span>
 						</a>
 					))}
 				</div>
@@ -98,3 +124,68 @@ const isActive = (href: string) => {
 		}
 	</nav>
 </aside>
+
+<script>
+	const sidebarStorageKey = "myhub:sidebar-state"
+
+	type SidebarState = "collapsed" | "expanded"
+
+	const getSavedSidebarState = (): SidebarState => {
+		try {
+			return localStorage.getItem(sidebarStorageKey) === "collapsed"
+				? "collapsed"
+				: "expanded"
+		} catch {
+			return "expanded"
+		}
+	}
+
+	const updateSidebarControls = (state: SidebarState) => {
+		const isCollapsed = state === "collapsed"
+
+		document.documentElement.dataset.sidebar = state
+
+		document
+			.querySelectorAll<HTMLElement>("[data-sidebar-toggle]")
+			.forEach((toggle) => {
+				toggle.setAttribute("aria-expanded", String(!isCollapsed))
+				toggle.setAttribute(
+					"aria-label",
+					isCollapsed ? "Expand sidebar" : "Collapse sidebar",
+				)
+				toggle.setAttribute(
+					"title",
+					isCollapsed ? "Expand sidebar" : "Collapse sidebar",
+				)
+			})
+	}
+
+	const initSidebarToggle = () => {
+		updateSidebarControls(getSavedSidebarState())
+
+		document
+			.querySelectorAll<HTMLElement>("[data-sidebar-toggle]")
+			.forEach((toggle) => {
+				if (toggle.dataset.sidebarReady === "true") return
+
+				toggle.dataset.sidebarReady = "true"
+				toggle.addEventListener("click", () => {
+					const nextState: SidebarState =
+						document.documentElement.dataset.sidebar === "collapsed"
+							? "expanded"
+							: "collapsed"
+
+					try {
+						localStorage.setItem(sidebarStorageKey, nextState)
+					} catch {
+						// The UI still updates when storage is unavailable.
+					}
+
+					updateSidebarControls(nextState)
+				})
+			})
+	}
+
+	initSidebarToggle()
+	document.addEventListener("astro:page-load", initSidebarToggle)
+</script>

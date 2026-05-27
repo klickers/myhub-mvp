@@ -13,15 +13,19 @@
 
 @layer base {
 	html {
-		@apply font-default tracking-wide;
+		@apply font-default tracking-normal;
+	}
+
+	body {
+		@apply text-gray-900 antialiased;
 	}
 
 	h1 {
-		@apply text-5xl font-semibold mb-10;
+		@apply text-4xl font-semibold mb-10 leading-tight;
 	}
 
 	h2 {
-		@apply font-semibold text-2xl mb-4;
+		@apply font-semibold text-2xl mb-4 leading-tight;
 	}
 
 	button {
@@ -40,28 +44,165 @@
 		input,
 		textarea,
 		select {
-			@apply px-3 py-1 bg-white rounded-xl border border-gray-300;
+			@apply rounded-lg border border-gray-300 bg-white/80 px-3 py-2 shadow-sm transition-[background-color,border-color,box-shadow] duration-200 ease-out;
 
 			&:focus {
-				@apply outline-none ring-1 ring-black;
+				@apply border-gray-500 bg-white outline-none ring-2 ring-brand/35;
 			}
 		}
 
 		button {
-			@apply bg-gray-200 px-4 py-1 rounded-xl;
+			@apply rounded-lg border border-gray-300 bg-white/75 px-4 py-2 shadow-sm;
 		}
 	}
 }
 
 @layer components {
+	.app-body {
+		@apply min-h-screen bg-[#dbeafe] bg-[linear-gradient(135deg,#dbeafe_0%,#ede9fe_49%,#f3e8ff_100%)] bg-fixed bg-center bg-cover;
+	}
+
+	.app-shell {
+		@apply min-h-screen w-full;
+	}
+
+	.app-content {
+		@apply ml-[var(--sidebar-width)] min-h-screen min-w-0 w-auto pb-8 transition-[margin-left] duration-[240ms] ease-out motion-reduce:transition-none;
+	}
+
+	.app-topbar {
+		@apply fixed top-3 left-[calc(var(--sidebar-width)+1.25rem)] right-4 z-30 flex min-h-10 items-center rounded-lg border border-gray-300/70 bg-white/60 px-3 py-1.5 text-xs shadow-lg shadow-slate-900/5 ring-1 ring-white/45 backdrop-blur-xl backdrop-saturate-150 transition-[background-color,border-color,left] duration-[240ms] ease-out motion-reduce:transition-none;
+	}
+
+	.app-topbar a {
+		@apply rounded-md px-1.5 py-0.5 transition-colors duration-150;
+	}
+
+	.app-topbar a:not([aria-disabled="true"]):hover {
+		@apply bg-white/65 text-gray-900 no-underline;
+	}
+
+	.app-topbar a:focus-visible {
+		@apply outline-none ring-2 ring-brand/40;
+	}
+
+	.app-main {
+		@apply px-8 pb-8 pl-10 pt-20;
+	}
+
+	.sidebar {
+		@apply fixed inset-y-0 left-0 z-40 flex w-[var(--sidebar-width)] min-w-[var(--sidebar-width)] flex-col border-r border-gray-300/70 bg-white/50 px-3 py-3 shadow-xl shadow-slate-900/5 ring-1 ring-white/40 backdrop-blur-2xl backdrop-saturate-150 transition-[box-shadow,min-width,width] duration-[240ms] ease-out motion-reduce:transition-none;
+	}
+
+	.sidebar__toggle {
+		@apply absolute -right-3.5 top-5 inline-flex size-8 items-center justify-center rounded-full border border-gray-300/90 bg-white/90 text-gray-700 shadow-lg shadow-slate-900/10 transition-[background-color,border-color,color,transform] duration-200 hover:translate-x-px hover:bg-white hover:text-gray-950 motion-reduce:transition-none;
+	}
+
+	.sidebar__toggle:focus-visible {
+		@apply outline-none ring-2 ring-brand/45 ring-offset-2;
+	}
+
+	.sidebar__toggle-icon {
+		@apply size-4;
+	}
+
+	.sidebar__toggle-icon--collapsed {
+		@apply hidden;
+	}
+
+	.sidebar__profile-card {
+		@apply mb-5 flex min-h-16 items-center gap-3 rounded-lg border border-gray-300/70 bg-white/60 p-2.5 shadow-sm ring-1 ring-white/40 transition-[background-color,border-color,padding,width] duration-[240ms] ease-out motion-reduce:transition-none;
+	}
+
+	.sidebar__avatar {
+		@apply size-11 flex-none overflow-hidden rounded-full border border-gray-400/80 bg-white shadow-md shadow-slate-900/10 transition-[height,width] duration-[240ms] ease-out motion-reduce:transition-none;
+	}
+
+	.sidebar__avatar img {
+		@apply size-full object-cover;
+	}
+
+	.sidebar__profile-copy {
+		@apply min-w-0 overflow-hidden whitespace-nowrap transition-[opacity,transform,width] duration-200 ease-out motion-reduce:transition-none;
+	}
+
+	.sidebar__profile-name {
+		@apply mb-1 font-semibold leading-none text-gray-900;
+	}
+
+	.sidebar__profile-meta {
+		@apply text-xs font-medium text-gray-600;
+	}
+
+	.sidebar__nav {
+		@apply flex flex-col gap-3.5;
+	}
+
+	.sidebar__nav-group {
+		@apply flex flex-col gap-1;
+	}
+
+	.sidebar__nav-group + .sidebar__nav-group {
+		@apply border-t border-gray-300/60 pt-3.5;
+	}
+
+	.sidebar__link {
+		@apply flex min-h-11 items-center gap-2.5 rounded-lg border border-transparent px-3.5 text-[0.95rem] font-semibold leading-none text-gray-700 no-underline transition-[background-color,border-color,box-shadow,color,gap,padding,width] duration-[240ms] ease-out hover:border-white/80 hover:bg-white/65 hover:text-gray-950 hover:shadow-md hover:shadow-slate-900/5 motion-reduce:transition-none;
+	}
+
+	.sidebar__link:focus-visible {
+		@apply outline-none ring-2 ring-brand/45 ring-offset-2;
+	}
+
+	.sidebar__link--active {
+		@apply border-gray-900 bg-gray-900 text-white shadow-lg shadow-gray-900/15 hover:border-gray-900 hover:bg-gray-900 hover:text-white;
+	}
+
+	.sidebar__link-icon {
+		@apply size-5 flex-none;
+	}
+
+	.sidebar__link-label {
+		@apply min-w-0 overflow-hidden whitespace-nowrap transition-[opacity,transform,width] duration-200 ease-out motion-reduce:transition-none;
+	}
+
+	:root[data-sidebar="collapsed"] .sidebar__toggle-icon--expanded {
+		@apply hidden;
+	}
+
+	:root[data-sidebar="collapsed"] .sidebar__toggle-icon--collapsed {
+		@apply block;
+	}
+
+	:root[data-sidebar="collapsed"] .sidebar__profile-card {
+		@apply mx-auto w-[3.25rem] justify-center gap-0 border-transparent bg-transparent p-0 shadow-none ring-0;
+	}
+
+	:root[data-sidebar="collapsed"] .sidebar__avatar {
+		@apply size-10;
+	}
+
+	:root[data-sidebar="collapsed"] .sidebar__profile-copy,
+	:root[data-sidebar="collapsed"] .sidebar__link-label {
+		@apply w-0 -translate-x-1 opacity-0;
+	}
+
+	:root[data-sidebar="collapsed"] .sidebar__link {
+		@apply mx-auto w-11 justify-center gap-0 px-0;
+	}
+
 	.button {
-		@apply inline-block cursor-pointer duration-300;
+		@apply inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg text-sm font-semibold duration-200;
 
 		&.button--primary {
-			@apply px-4 py-1 border border-black;
+			@apply border border-gray-400/80 bg-white/75 px-4 py-2 text-gray-800 shadow-sm backdrop-blur-md;
 
 			&:hover {
-				@apply bg-black text-white;
+				@apply -translate-y-px bg-white text-gray-950 shadow-md;
+			}
+
+			&:focus-visible {
+				@apply outline-none ring-2 ring-brand/45 ring-offset-2;
 			}
 
 			&:disabled {
@@ -75,18 +216,228 @@
 	}
 
 	.card {
-		@apply w-full bg-white rounded-xl border border-gray-300 overflow-hidden;
+		@apply w-full overflow-hidden rounded-lg border border-gray-300/70 bg-white/75 shadow-lg shadow-slate-900/5 ring-1 ring-white/40 backdrop-blur-xl backdrop-saturate-150 transition-[background-color,border-color,box-shadow,transform] duration-200 ease-out motion-reduce:transition-none;
 
 		.card__content {
-			@apply px-6 py-4;
+			@apply px-5 py-4;
 		}
 
 		&.card--profile {
-			@apply bg-gray-100 rounded-none border-x-0 border-t-0;
+			@apply bg-white/60 rounded-lg border-gray-300/70;
 
 			.card__content {
-				@apply px-6;
+				@apply px-5;
 			}
+		}
+	}
+
+	.card--static {
+		@apply transition-none;
+	}
+
+	.side-tray input,
+	.side-tray select {
+		@apply max-w-full rounded-md border border-gray-300 bg-white/80 px-2 py-1 text-sm shadow-sm transition-[background-color,border-color,box-shadow] duration-150 focus:border-gray-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand/35;
+	}
+
+	.side-tray dl button {
+		@apply rounded-md px-2 py-1 text-left transition-colors duration-150 hover:bg-white/80 hover:no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/35;
+	}
+
+	.calendar-page {
+		@apply flex flex-col gap-4;
+	}
+
+	.calendar-tabs {
+		@apply inline-flex w-fit rounded-lg border border-gray-300/70 bg-white/60 p-1 shadow-sm ring-1 ring-white/40 backdrop-blur-xl;
+	}
+
+	.calendar-tabs__link {
+		@apply rounded-md px-3 py-1.5 text-sm font-semibold text-gray-600 transition-colors duration-150 hover:bg-white/70 hover:text-gray-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/35;
+	}
+
+	.calendar-tabs__link--active {
+		@apply bg-gray-900 text-white shadow-sm hover:bg-gray-900 hover:text-white;
+	}
+
+	.calendar-shell {
+		@apply overflow-hidden rounded-lg border border-gray-300/70 bg-white/65 p-3 shadow-xl shadow-slate-900/5 ring-1 ring-white/45 backdrop-blur-2xl backdrop-saturate-150;
+	}
+
+	.calendar-shell .fc {
+		@apply text-sm text-gray-800;
+	}
+
+	.calendar-shell .fc-header-toolbar {
+		@apply !mb-3 flex-wrap gap-2;
+	}
+
+	.calendar-shell .fc-toolbar-title {
+		@apply !text-lg !font-semibold !leading-tight !text-gray-950;
+	}
+
+	.calendar-shell .fc-button-primary {
+		@apply !rounded-lg !border-gray-300/80 !bg-white/70 !px-3 !py-1.5 !text-sm !font-semibold !text-gray-700 !shadow-sm !transition-colors !duration-150 hover:!border-gray-400/80 hover:!bg-white hover:!text-gray-950 focus:!shadow-none focus:!ring-2 focus:!ring-brand/35;
+	}
+
+	.calendar-shell .fc-button-primary:disabled {
+		@apply !border-gray-200 !bg-white/40 !text-gray-400 !opacity-100;
+	}
+
+	.calendar-shell .fc-button-active {
+		@apply !border-gray-900 !bg-gray-900 !text-white hover:!border-gray-900 hover:!bg-gray-900 hover:!text-white;
+	}
+
+	.calendar-shell .fc-scrollgrid {
+		@apply !border-0;
+	}
+
+	.calendar-shell .fc-theme-standard td,
+	.calendar-shell .fc-theme-standard th {
+		@apply !border-gray-200/70;
+	}
+
+	.calendar-shell .fc-col-header-cell {
+		@apply !bg-white/45;
+	}
+
+	.calendar-shell .fc-col-header-cell-cushion {
+		@apply !py-2 !text-xs !font-semibold !uppercase !text-gray-500;
+	}
+
+	.calendar-shell .fc-daygrid-day,
+	.calendar-shell .fc-timegrid-col {
+		@apply !bg-white/35;
+	}
+
+	.calendar-shell .fc-day-today {
+		@apply !bg-blue-50/70;
+	}
+
+	.calendar-shell .fc-daygrid-day-frame {
+		@apply !p-1.5;
+	}
+
+	.calendar-shell .fc-daygrid-day-number {
+		@apply !text-xs !font-semibold !text-gray-500;
+	}
+
+	.calendar-shell .fc-timegrid-slot-label,
+	.calendar-shell .fc-timegrid-axis-cushion {
+		@apply !text-xs !font-medium !text-gray-500;
+	}
+
+	.calendar-shell .fc-timegrid-slot {
+		@apply !h-10;
+	}
+
+	.calendar-shell .fc-timegrid-now-indicator-line {
+		@apply !border-brand;
+	}
+
+	.calendar-shell .fc-timegrid-now-indicator-arrow {
+		@apply !border-r-brand;
+	}
+
+	.calendar-shell .fc-event {
+		@apply !overflow-hidden !rounded-md !border !shadow-sm !shadow-slate-900/5;
+	}
+
+	.calendar-shell .fc-daygrid-event {
+		@apply !my-1 !whitespace-normal;
+	}
+
+	.calendar-event-card {
+		@apply text-xs font-semibold leading-tight text-gray-800;
+	}
+
+	.calendar-event-card__meta {
+		@apply mb-0.5 text-gray-500 no-underline hover:text-gray-700;
+	}
+
+	.calendar-highlight-input {
+		@apply w-full min-h-10 resize-none rounded-md border border-gray-300/70 bg-white/65 px-2 py-1 text-xs leading-snug text-gray-800 shadow-sm transition-[background-color,border-color,box-shadow] duration-150 placeholder:text-gray-400 focus:border-gray-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand/30;
+	}
+
+	.calendar-highlight-input--filled {
+		@apply border-amber-300/80 bg-amber-50/85;
+	}
+
+	.calendar-shell .calendar-session {
+		@apply !border-blue-300/80 !bg-blue-50/95;
+	}
+
+	.calendar-shell .calendar-session div {
+		@apply text-blue-950;
+	}
+
+	.calendar-shell .calendar-task {
+		@apply !border-gray-300/80 !bg-white/90;
+	}
+
+	.calendar-shell .calendar-task div {
+		@apply text-gray-800;
+	}
+
+	.calendar-shell .calendar-contract {
+		@apply !border-violet-300/80 !bg-violet-100/95;
+	}
+
+	.calendar-shell .calendar-contract div {
+		@apply text-violet-950;
+	}
+
+	.calendar-shell .calendar-highlight {
+		@apply !border-amber-300/90 !bg-amber-100/95;
+	}
+
+	.calendar-shell .calendar-highlight div {
+		@apply text-amber-950;
+	}
+
+	.calendar-shell .calendar-batch {
+		@apply !border-blue-300/90 !bg-blue-100/95;
+	}
+
+	.calendar-shell .calendar-batch div {
+		@apply text-blue-950;
+	}
+
+	.calendar-shell .calendar-inprogress {
+		@apply !border-yellow-300/90 !bg-yellow-100/95;
+	}
+
+	.calendar-shell .calendar-inprogress div {
+		@apply text-yellow-950;
+	}
+
+	.calendar-shell .calendar-onhold {
+		@apply !border-gray-300/90 !bg-gray-200/95;
+	}
+
+	.calendar-shell .calendar-onhold div {
+		@apply text-gray-700;
+	}
+
+	.calendar-shell .calendar-completed {
+		@apply !border-emerald-300/90 !bg-emerald-100/95;
+	}
+
+	.calendar-shell .calendar-completed div {
+		@apply text-emerald-950;
+	}
+
+	@media (max-width: 768px) {
+		.app-topbar {
+			@apply left-[calc(var(--sidebar-width)+1rem)] right-3 top-3 overflow-x-auto px-2.5 scrollbar-hide;
+		}
+
+		.app-main {
+			@apply pb-6 pl-5 pr-4 pt-[5.75rem];
+		}
+
+		.sidebar {
+			@apply px-2;
 		}
 	}
 }
@@ -133,6 +484,9 @@
 
 :root {
 	--radius: 0.625rem;
+	--sidebar-expanded-width: 12.5rem;
+	--sidebar-collapsed-width: 4.75rem;
+	--sidebar-width: var(--sidebar-expanded-width);
 	--background: oklch(1 0 0);
 	--foreground: oklch(0.145 0 0);
 	--card: oklch(1 0 0);
@@ -166,6 +520,17 @@
 	--sidebar-ring: oklch(0.708 0 0);
 	--brand: oklch(0.623 0.214 259.815);
 	--highlight: oklch(0.852 0.199 91.936);
+}
+
+:root[data-sidebar="collapsed"] {
+	--sidebar-width: var(--sidebar-collapsed-width);
+}
+
+@media (max-width: 768px) {
+	:root {
+		--sidebar-expanded-width: 11.75rem;
+		--sidebar-collapsed-width: 4.35rem;
+	}
 }
 
 .dark {
@@ -202,50 +567,4 @@
 	--sidebar-ring: oklch(0.556 0 0);
 	--brand: oklch(0.707 0.165 254.624);
 	--highlight: oklch(0.852 0.199 91.936);
-}
-
-/******************************************************
- * Guild Hall Calendar 
- ******************************************************/
-.fc-event {
-	@apply overflow-hidden rounded-lg bg-white;
-	&.calendar-session {
-		@apply border-gray-400 bg-gray-100;
-		div {
-			@apply text-gray-800;
-		}
-	}
-	&.calendar-task {
-		@apply border-gray-400;
-		&.calendar-inprogress {
-			@apply bg-yellow-50;
-			svg {
-				@apply text-yellow-600;
-			}
-		}
-		&.calendar-onhold {
-			@apply bg-gray-300 border-gray-300;
-		}
-		div {
-			@apply text-gray-800;
-		}
-	}
-	&.calendar-contract {
-		@apply bg-violet-500 border-none;
-		&.calendar-inprogress {
-			@apply bg-violet-600;
-		}
-	}
-	&.calendar-highlight {
-		@apply bg-amber-300 border-amber-600;
-		&.calendar-inprogress {
-			@apply bg-amber-400;
-		}
-	}
-	&.calendar-batch {
-		@apply bg-blue-300 border-blue-500;
-	}
-	&.calendar-completed {
-		@apply bg-green-300 border-green-300;
-	}
 }
