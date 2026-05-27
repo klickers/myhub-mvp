@@ -1,0 +1,215 @@
+---
+interface Props {
+	name?: string
+}
+
+const { name = "Catherine" } = Astro.props
+
+const variants = [
+	{
+		start: 5,
+		end: 12,
+		period: "morning",
+		label: "Morning light",
+		greeting: "Good morning",
+		message: "Today will be amazing.",
+	},
+	{
+		start: 12,
+		end: 17,
+		period: "afternoon",
+		label: "Afternoon focus",
+		greeting: "Good afternoon",
+		message: "Focus on the next right thing.",
+	},
+	{
+		start: 17,
+		end: 21,
+		period: "evening",
+		label: "Evening glow",
+		greeting: "Good evening",
+		message: "It's not too late to start something new.",
+	},
+	{
+		start: 21,
+		end: 24,
+		period: "night",
+		label: "Night mode",
+		greeting: "Good night",
+		message: "It's time to rest. Tomorrow will be another great day.",
+	},
+	{
+		start: 0,
+		end: 5,
+		period: "late",
+		label: "Quiet hours",
+		greeting: "Still awake",
+		message: "Good night.",
+	},
+]
+
+const getVariant = (hour: number) =>
+	variants.find(({ start, end }) => hour >= start && hour < end) ??
+	variants[0]
+
+const now = new Date()
+const initialVariant = getVariant(now.getHours())
+const initialTime = now.toLocaleTimeString([], {
+	hour: "numeric",
+	minute: "2-digit",
+})
+---
+
+<section
+	class="time-greeting"
+	data-time-greeting
+	data-name={name}
+	data-period={initialVariant.period}
+>
+	<!-- <div
+		class="time-greeting__accent"
+		aria-hidden="true"
+	>
+	</div>
+	<p class="time-greeting__label">
+		<span data-period-label>{initialVariant.label}</span>
+		<span aria-hidden="true">/</span>
+		<time
+			data-local-time
+			datetime={now.toISOString()}
+		>
+			{initialTime}
+		</time>
+	</p> -->
+	<h1
+		class="mb-3"
+		data-greeting
+	>
+		{initialVariant.greeting}, {name}
+	</h1>
+	<p
+		class="text-gray-600 ml-0.5"
+		data-message
+	>
+		{initialVariant.message}
+	</p>
+</section>
+
+<script define:vars={{ variants }}>
+	const getVariant = (hour) =>
+		variants.find(({ start, end }) => hour >= start && hour < end) ??
+		variants[0]
+
+	const formatTime = (date) =>
+		date.toLocaleTimeString([], {
+			hour: "numeric",
+			minute: "2-digit",
+		})
+
+	const updateTimeGreetings = () => {
+		const now = new Date()
+		const variant = getVariant(now.getHours())
+
+		document.querySelectorAll("[data-time-greeting]").forEach((root) => {
+			const name = root.dataset.name || "friend"
+			const greeting = root.querySelector("[data-greeting]")
+			const message = root.querySelector("[data-message]")
+			const periodLabel = root.querySelector("[data-period-label]")
+			const localTime = root.querySelector("[data-local-time]")
+
+			root.dataset.period = variant.period
+
+			if (greeting) {
+				greeting.textContent = `${variant.greeting}, ${name}`
+			}
+
+			if (message) {
+				message.textContent = variant.message
+			}
+
+			if (periodLabel) {
+				periodLabel.textContent = variant.label
+			}
+
+			if (localTime) {
+				localTime.textContent = formatTime(now)
+				localTime.setAttribute("datetime", now.toISOString())
+			}
+		})
+	}
+
+	// const globalWindow = window
+
+	// updateTimeGreetings()
+
+	// if (!globalWindow.__myhubTimeGreetingTimer) {
+	// 	globalWindow.__myhubTimeGreetingTimer = window.setInterval(
+	// 		updateTimeGreetings,
+	// 		60 * 1000,
+	// 	)
+	// }
+
+	// document.addEventListener("astro:page-load", updateTimeGreetings)
+</script>
+
+<style>
+	.time-greeting {
+		--greeting-accent: #f59e0b;
+		--greeting-accent-soft: #fef3c7;
+		max-width: 760px;
+	}
+
+	.time-greeting[data-period="afternoon"] {
+		--greeting-accent: #0f766e;
+		--greeting-accent-soft: #ccfbf1;
+	}
+
+	.time-greeting[data-period="evening"] {
+		--greeting-accent: #7c3aed;
+		--greeting-accent-soft: #ede9fe;
+	}
+
+	.time-greeting[data-period="night"] {
+		--greeting-accent: #334155;
+		--greeting-accent-soft: #e2e8f0;
+	}
+
+	.time-greeting[data-period="late"] {
+		--greeting-accent: #be123c;
+		--greeting-accent-soft: #ffe4e6;
+	}
+
+	.time-greeting__accent {
+		width: 4.5rem;
+		height: 0.3rem;
+		margin-bottom: 0.85rem;
+		border-radius: 999px;
+		background: linear-gradient(
+			90deg,
+			var(--greeting-accent),
+			var(--greeting-accent-soft)
+		);
+		box-shadow: 0 10px 30px
+			color-mix(in srgb, var(--greeting-accent) 18%, transparent);
+		transition:
+			background 300ms ease,
+			box-shadow 300ms ease;
+	}
+
+	.time-greeting__label {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.45rem;
+		margin: 0 0 0.45rem 0.125rem;
+		color: #6b7280;
+		font-size: 0.75rem;
+		font-weight: 700;
+		letter-spacing: 0;
+		text-transform: uppercase;
+	}
+
+	.time-greeting h1,
+	.time-greeting p {
+		transition: color 200ms ease;
+	}
+</style>

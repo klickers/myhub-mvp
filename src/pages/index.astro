@@ -2,6 +2,7 @@
 import Errands from "@/components/models/task/Errands"
 import DayCalendar from "@/components/DayCalendar"
 import Layout from "@/layouts/Layout.astro"
+import TimeGreeting from "@/components/TimeGreeting.astro"
 import { HomeBreadcrumb } from "@/helpers/data/breadcrumbs"
 ---
 
@@ -9,9 +10,7 @@ import { HomeBreadcrumb } from "@/helpers/data/breadcrumbs"
 <Layout breadcrumbs={[HomeBreadcrumb]}>
 	<div class="flex gap-8">
 		<div class="w-full">
-			<!-- TODO: change greeting and sentence based on time of day -->
-			<h1 class="mb-3">Good morning, Catherine</h1>
-			<p class="text-gray-600 ml-0.5">Today will be amazing.</p>
+			<TimeGreeting name="Catherine" />
 			<div class="flex gap-4 mt-8">
 				<div class="card">
 					<div class="card__content">
