@@ -4,6 +4,7 @@ import DayCalendar from "@/components/DayCalendar"
 import Layout from "@/layouts/Layout.astro"
 import TimeGreeting from "@/components/TimeGreeting.astro"
 import { HomeBreadcrumb } from "@/helpers/data/breadcrumbs"
+import InspiringQuote from "@/components/InspiringQuote"
 ---
 
 <!-- TODO: add focused experiments, e.g. January ones -->
@@ -25,9 +26,7 @@ import { HomeBreadcrumb } from "@/helpers/data/breadcrumbs"
 		</div>
 		<div class="w-[220px] flex-none">
 			<div class="sticky top-14 space-y-4">
-				<div class="card">
-					<div class="card__content">Inspiring Quote</div>
-				</div>
+				<InspiringQuote client:load />
 				<div class="card">
 					<div class="card__content">
 						<Errands client:load />
