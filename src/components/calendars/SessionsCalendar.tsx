@@ -69,7 +69,8 @@ export default function TasksCalendar() {
 	)
 
 	return (
-		<div className="calendar-shell calendar-shell--sessions">
+		<>
+			<div className="calendar-shell calendar-shell--sessions">
 			<FullCalendar
 				plugins={[interactionPlugin, timeGridPlugin]}
 				initialView="timeGridWeek"
@@ -77,9 +78,9 @@ export default function TasksCalendar() {
 				height="auto"
 				initialEvents={[]}
 				headerToolbar={{
-					left: "prev,next today",
+					left: "timeGridDay,timeGridWeek",
 					center: "title",
-					right: "timeGridDay,timeGridWeek",
+					right: "today prev,next",
 				}}
 				nowIndicator
 				slotMinTime="06:00:00"
@@ -120,6 +121,7 @@ export default function TasksCalendar() {
 					)
 				}}
 			/>
+			</div>
 			{selectedTask && (
 				<SideTray
 					type="task"
@@ -127,6 +129,6 @@ export default function TasksCalendar() {
 					setSelected={setSelectedTask}
 				/>
 			)}
-		</div>
+		</>
 	)
 }

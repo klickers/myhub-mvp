@@ -146,16 +146,17 @@ export default function TasksCalendar() {
 	)
 
 	return (
-		<div className="calendar-shell calendar-shell--tasks">
+		<>
+			<div className="calendar-shell calendar-shell--tasks">
 			<FullCalendar
 				plugins={[dayGridPlugin, interactionPlugin]}
 				initialView="dayGridWeek"
 				height="auto"
 				initialEvents={[]}
 				headerToolbar={{
-					left: "prev,next today",
+					left: "dayGridFourDay,dayGridWeek,dayGridMonth",
 					center: "title",
-					right: "dayGridFourDay,dayGridWeek,dayGridMonth",
+					right: "today prev,next",
 				}}
 				views={{
 					dayGridFourDay: {
@@ -380,6 +381,7 @@ export default function TasksCalendar() {
 					}
 				}}
 			/>
+			</div>
 			{selectedTask && (
 				<SideTray
 					type="task"
@@ -387,6 +389,6 @@ export default function TasksCalendar() {
 					setSelected={setSelectedTask}
 				/>
 			)}
-		</div>
+		</>
 	)
 }
