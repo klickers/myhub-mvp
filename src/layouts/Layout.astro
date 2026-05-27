@@ -54,8 +54,12 @@ const breadcrumbs = Astro.props.breadcrumbs || [{ name: "Home", href: "/" }]
 				transition:persist
 			>
 				<div
-					class="text-sm fixed flex items-center bg-white pl-10 pr-8 py-3 w-full z-10 border-b border-gray-300"
+					class="text-sm fixed flex items-center pl-10 pr-8 py-3 w-full z-10 border-b border-gray-300"
 				>
+					<div
+						class="bg-white opacity-50 absolute left-0 top-0 h-full w-full -z-10"
+					>
+					</div>
 					{
 						breadcrumbs.map((breadcrumb, index) => {
 							const isLast = index === breadcrumbs.length - 1
