@@ -53,8 +53,12 @@ const isActive = (href: string) => {
 ---
 
 <aside
-	class="fixed h-screen w-[200px] flex-none bg-white border-r border-gray-300 pb-6 space-y-6"
+	class="fixed h-screen w-[200px] flex-none border-r border-gray-300 pb-6 space-y-6"
 >
+	<div
+		class="bg-white opacity-50 absolute left-0 top-0 h-screen w-full -z-10"
+	>
+	</div>
 	<div class="card card--profile">
 		<div class="card__content flex items-center gap-3">
 			<div
@@ -82,7 +86,7 @@ const isActive = (href: string) => {
 								"duration-300 px-4 py-2 flex gap-2 items-center rounded-xl" +
 								(isActive(link.href)
 									? " bg-black text-white hover:bg-black"
-									: " hover:bg-gray-100")
+									: " hover:bg-white")
 							}
 						>
 							<Icon name={link.icon} />
