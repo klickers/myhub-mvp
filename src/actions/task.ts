@@ -83,6 +83,7 @@ const taskInput = z
 type TaskNode = {
 	id: number
 	name: string
+	makeTimeType: MakeTimeType | null
 	status: Status
 	parentTaskId: number | null
 	estimatedTime: number | null
@@ -185,7 +186,10 @@ export const task = {
 				data: {
 					name: input.name,
 					parentType: input.parentType,
-					makeTimeType: input.makeTimeType,
+					makeTimeType:
+						input.makeTimeType === "none"
+							? null
+							: input.makeTimeType,
 					status: input.status,
 					estimatedTime: input.estimatedTime,
 					deadline: input.deadline && new Date(input.deadline),

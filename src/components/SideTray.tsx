@@ -1,4 +1,4 @@
-import type { MakeTimeType, Status, Task } from "@/generated/prisma/client"
+import type { Status, Task } from "@/generated/prisma/client"
 import EditableText from "./form/EditableText"
 import { actions } from "astro:actions"
 import SessionPlayButton from "./models/session/SessionPlayButton"
@@ -73,7 +73,7 @@ export default function SideTray({
 				onClick={(e) => e.stopPropagation()}
 			>
 				<header className="flex items-start justify-between gap-4 border-b border-gray-300/60 bg-white/45 px-5 py-4">
-					<div className="min-w-0">
+					<div className="min-w-0 flex-1">
 						<p
 							id="side-tray-title"
 							className="mb-1 text-xs font-semibold uppercase text-gray-500"
@@ -92,7 +92,8 @@ export default function SideTray({
 										s ? { ...s, name } : s,
 									)
 								}}
-								className="min-w-0 text-left text-xl font-semibold leading-tight text-gray-950"
+								className="min-h-9 min-w-0 flex-1 rounded-md px-1 py-0.5 text-left text-xl font-semibold leading-tight text-gray-950 transition-colors hover:bg-white/55 hover:no-underline"
+								inputClassName="border-gray-300/80 bg-white/85 shadow-sm focus:ring-brand/35"
 							/>
 							<div className="inline-flex size-9 flex-none items-center justify-center rounded-lg border border-gray-300/70 bg-white/65 shadow-sm">
 								<SessionPlayButton
@@ -117,11 +118,11 @@ export default function SideTray({
 
 				<div className="flex-1 overflow-y-auto px-5 py-5">
 					<section
-						className="mb-5 rounded-lg border border-gray-300/70 bg-white/55 p-3 shadow-sm ring-1 ring-white/40"
+						className="mb-4 rounded-lg border border-gray-300/70 bg-white/55 p-2.5 shadow-sm ring-1 ring-white/40"
 						aria-label="Task details"
 					>
-						<dl className="grid gap-2 text-sm">
-							<div className="grid gap-1 rounded-lg bg-white/45 px-3 py-2 sm:grid-cols-[8.5rem_minmax(0,1fr)] sm:items-center sm:gap-3">
+						<dl className="grid gap-1 text-sm">
+							<div className="grid min-h-8 gap-1 rounded-md bg-white/40 px-2.5 py-1 sm:grid-cols-[7.25rem_minmax(0,1fr)] sm:items-center sm:gap-2">
 								<dt className="text-xs font-semibold text-gray-500">
 									Estimated Time
 								</dt>
@@ -146,15 +147,13 @@ export default function SideTray({
 									/>
 								</dd>
 							</div>
-							<div className="grid gap-1 rounded-lg bg-white/45 px-3 py-2 sm:grid-cols-[8.5rem_minmax(0,1fr)] sm:items-center sm:gap-3">
+							<div className="grid min-h-8 gap-1 rounded-md bg-white/40 px-2.5 py-1 sm:grid-cols-[7.25rem_minmax(0,1fr)] sm:items-center sm:gap-2">
 								<dt className="text-xs font-semibold text-gray-500">
 									Make Time Type
 								</dt>
 								<dd className="min-w-0 text-gray-900">
 									<EditableMakeTimeType
-										value={
-											selected.makeTimeType as MakeTimeType
-										}
+										value={selected.makeTimeType}
 										onSave={async (makeTimeType) => {
 											await actions.task.update({
 												id: selected.id,
@@ -162,14 +161,21 @@ export default function SideTray({
 											})
 											setSelected((s: Task | null) =>
 												s
-													? { ...s, makeTimeType }
+													? {
+															...s,
+															makeTimeType:
+																makeTimeType ===
+																"none"
+																	? null
+																	: makeTimeType,
+														}
 													: s,
 											)
 										}}
 									/>
 								</dd>
 							</div>
-							<div className="grid gap-1 rounded-lg bg-white/45 px-3 py-2 sm:grid-cols-[8.5rem_minmax(0,1fr)] sm:items-center sm:gap-3">
+							<div className="grid min-h-8 gap-1 rounded-md bg-white/40 px-2.5 py-1 sm:grid-cols-[7.25rem_minmax(0,1fr)] sm:items-center sm:gap-2">
 								<dt className="text-xs font-semibold text-gray-500">
 									Status
 								</dt>
@@ -188,7 +194,7 @@ export default function SideTray({
 									/>
 								</dd>
 							</div>
-							<div className="grid gap-1 rounded-lg bg-white/45 px-3 py-2 sm:grid-cols-[8.5rem_minmax(0,1fr)] sm:items-center sm:gap-3">
+							<div className="grid min-h-8 gap-1 rounded-md bg-white/40 px-2.5 py-1 sm:grid-cols-[7.25rem_minmax(0,1fr)] sm:items-center sm:gap-2">
 								<dt className="text-xs font-semibold text-gray-500">
 									Deadline
 								</dt>

@@ -4,13 +4,15 @@ export default function EditableMakeTimeType({
 	value,
 	onSave,
 }: {
-	value: MakeTimeType
-	onSave: (v: MakeTimeType) => Promise<void>
+	value: MakeTimeType | "none" | null
+	onSave: (v: MakeTimeType | "none") => Promise<void>
 }) {
 	return (
 		<select
-			value={value}
-			onChange={(e) => onSave(e.target.value as MakeTimeType)}
+			value={value ?? "none"}
+			onChange={(e) =>
+				onSave(e.target.value as MakeTimeType | "none")
+			}
 			className="border px-1 bg-white"
 		>
 			<option value="none">N/A</option>
