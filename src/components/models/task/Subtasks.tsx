@@ -129,8 +129,8 @@ function Node({
 					</div>
 				</div>
 
-				<div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-gray-600">
-					<div className="inline-flex items-center gap-1 rounded-md bg-white/55 px-2 py-1">
+				<div className="mt-2 flex max-w-full flex-nowrap items-center gap-2 overflow-x-auto pb-1 text-xs text-gray-600">
+					<div className="inline-flex flex-none items-center gap-1 whitespace-nowrap rounded-md bg-white/55 px-2 py-1">
 						<span className="font-semibold text-gray-500">
 							Type
 						</span>
@@ -146,7 +146,7 @@ function Node({
 							}
 						/>
 					</div>
-					<div className="inline-flex items-center gap-1 rounded-md bg-white/55 px-2 py-1">
+					<div className="inline-flex flex-none items-center gap-1 whitespace-nowrap rounded-md bg-white/55 px-2 py-1">
 						<span className="font-semibold text-gray-500">
 							Status
 						</span>
@@ -159,7 +159,7 @@ function Node({
 							}
 						/>
 					</div>
-					<div className="inline-flex items-center gap-1 rounded-md bg-white/55 px-2 py-1">
+					<div className="inline-flex flex-none items-center gap-1 whitespace-nowrap rounded-md bg-white/55 px-2 py-1">
 						<span className="font-semibold text-gray-500">
 							Time
 						</span>
@@ -175,7 +175,7 @@ function Node({
 							}
 						/>
 					</div>
-					<div className="inline-flex items-center gap-1 rounded-md bg-white/55 px-2 py-1">
+					<div className="inline-flex flex-none items-center gap-1 whitespace-nowrap rounded-md bg-white/55 px-2 py-1">
 						<span className="font-semibold text-gray-500">
 							Due
 						</span>
