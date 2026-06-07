@@ -99,6 +99,87 @@ const STATUS_ORDER: Record<Status, number> = {
 	archived: 4,
 }
 
+type TaskAncestor = {
+	id: number
+	name: string
+	parentType: TaskParentType
+	parentTaskId: number | null
+	contractId: number | null
+	experimentId: number | null
+	guildId: number | null
+	makeTimeType: MakeTimeType | null
+	status: Status
+	estimatedTime: number | null
+	deadline: Date | null
+}
+
+async function getTaskAncestors(
+	tasks: Array<{ id: number; parentTaskId: number | null }>,
+) {
+	const ancestorsById = new Map<number, TaskAncestor>()
+	const ancestorsByTaskId = new Map<number, TaskAncestor[]>()
+	let frontier = Array.from(
+		new Set(
+			tasks
+				.map((task) => task.parentTaskId)
+				.filter((id): id is number => id != null),
+		),
+	)
+
+	while (frontier.length > 0) {
+		const ancestors = await prisma.task.findMany({
+			where: {
+				id: { in: frontier },
+			},
+			select: {
+				id: true,
+				name: true,
+				parentType: true,
+				parentTaskId: true,
+				contractId: true,
+				experimentId: true,
+				guildId: true,
+				makeTimeType: true,
+				status: true,
+				estimatedTime: true,
+				deadline: true,
+			},
+		})
+
+		const next = new Set<number>()
+		for (const ancestor of ancestors) {
+			ancestorsById.set(ancestor.id, ancestor)
+			if (
+				ancestor.parentTaskId &&
+				!ancestorsById.has(ancestor.parentTaskId)
+			) {
+				next.add(ancestor.parentTaskId)
+			}
+		}
+
+		frontier = Array.from(next)
+	}
+
+	for (const task of tasks) {
+		const ancestors: TaskAncestor[] = []
+		const seen = new Set<number>()
+		let parentTaskId = task.parentTaskId
+
+		while (parentTaskId && !seen.has(parentTaskId)) {
+			const ancestor = ancestorsById.get(parentTaskId)
+			if (!ancestor) break
+
+			ancestors.push(ancestor)
+			seen.add(parentTaskId)
+			parentTaskId = ancestor.parentTaskId
+		}
+
+		ancestorsByTaskId.set(task.id, ancestors)
+	}
+
+	return ancestorsByTaskId
+}
+
 async function buildSubtaskTree(rootTaskId: number): Promise<TaskNode[]> {
 	// Fetch all descendants using a simple BFS (multiple queries).
 	// Good enough for typical UI usage; if you expect huge trees, we can optimize later.
@@ -306,6 +387,7 @@ export const task = {
 			includeGuild: z.boolean().default(false),
 			includeExperiment: z.boolean().default(false),
 			includeParentTask: z.boolean().default(false),
+			includeTaskAncestors: z.boolean().default(false),
 		}),
 		handler: async ({
 			status,
@@ -315,8 +397,9 @@ export const task = {
 			includeGuild,
 			includeExperiment,
 			includeParentTask,
+			includeTaskAncestors,
 		}) => {
-			return prisma.task.findMany({
+			const tasks = await prisma.task.findMany({
 				where: {
 					...(status && { status: { in: status } }),
 					...(from || to
@@ -336,6 +419,15 @@ export const task = {
 				},
 				orderBy: { deadline: "asc" },
 			})
+
+			if (!includeTaskAncestors) return tasks
+
+			const ancestorsByTaskId = await getTaskAncestors(tasks)
+
+			return tasks.map((task) => ({
+				...task,
+				ancestorTasks: ancestorsByTaskId.get(task.id) ?? [],
+			}))
 		},
 	}),
 	listByContract: defineAction({

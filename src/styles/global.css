@@ -367,6 +367,14 @@
 		@apply border-amber-300/80 bg-amber-50/85;
 	}
 
+	.calendar-day-cell-content {
+		@apply relative z-10;
+	}
+
+	.calendar-day-cell-topline {
+		@apply text-gray-500;
+	}
+
 	.calendar-shell .calendar-session {
 		@apply !border-blue-300/80 !bg-blue-50/95;
 	}
@@ -439,6 +447,119 @@
 
 	.calendar-shell .calendar-completed div {
 		@apply text-emerald-950;
+	}
+
+	.tasks-calendar-toolbar {
+		@apply mb-3 flex flex-wrap items-center justify-between gap-2;
+	}
+
+	.tasks-calendar-view-switcher,
+	.tasks-calendar-navigation {
+		@apply flex flex-wrap items-center gap-1.5;
+	}
+
+	.tasks-calendar-title {
+		@apply !m-0 text-lg font-semibold leading-tight text-gray-950;
+	}
+
+	.tasks-calendar-button {
+		@apply rounded-lg border border-gray-300/80 bg-white/70 px-3 py-1.5 text-sm font-semibold text-gray-700 shadow-sm transition-colors duration-150 hover:border-gray-400/80 hover:bg-white hover:text-gray-950 focus:outline-none focus:ring-2 focus:ring-brand/35;
+	}
+
+	.tasks-calendar-button--active {
+		@apply border-gray-900 bg-gray-900 text-white hover:border-gray-900 hover:bg-gray-900 hover:text-white;
+	}
+
+	.tasks-calendar-weekdays {
+		@apply grid overflow-hidden rounded-t-md border border-gray-200/70 border-b-0;
+	}
+
+	.tasks-calendar-weekday {
+		@apply border-r border-gray-200/70 bg-white/45 px-2 py-2 text-xs font-semibold uppercase text-gray-500 last:border-r-0;
+	}
+
+	.tasks-calendar-grid {
+		@apply overflow-hidden rounded-b-md border border-gray-200/70;
+	}
+
+	.tasks-calendar-row {
+		@apply grid border-t border-gray-200/70 first:border-t-0;
+	}
+
+	.tasks-calendar-day {
+		@apply min-w-0 border-r border-gray-200/70 bg-white/35 p-1.5 last:border-r-0;
+	}
+
+	.tasks-calendar-day--today {
+		@apply bg-blue-50/70;
+	}
+
+	.tasks-calendar-day--outside {
+		@apply bg-white/20 text-gray-400;
+	}
+
+	.tasks-calendar-day__header {
+		@apply mb-1 flex justify-end text-xs font-semibold text-gray-500;
+	}
+
+	.tasks-calendar-lane {
+		@apply transition-[min-height] duration-150 ease-out;
+	}
+
+	.tasks-calendar-lane__content {
+		@apply flex flex-col gap-1;
+	}
+
+	.tasks-calendar-card {
+		@apply my-1 cursor-grab overflow-hidden rounded-md border shadow-sm shadow-slate-900/5 active:cursor-grabbing;
+	}
+
+	.calendar-shell--tasks .calendar-lane-guild {
+		@apply !border-l-[3px] !border-l-violet-600/60;
+	}
+
+	.calendar-shell--tasks .calendar-lane-lab {
+		@apply !border-l-[3px] !border-l-sky-600/70;
+	}
+
+	.calendar-lane-divider-content {
+		@apply my-2 flex min-h-5 items-center gap-1.5 text-[0.62rem] font-bold uppercase leading-none tracking-normal;
+	}
+
+	.calendar-lane-divider-content::before,
+	.calendar-lane-divider-content::after {
+		content: "";
+		@apply h-px flex-1;
+	}
+
+	.calendar-lane-divider-content span {
+		@apply whitespace-nowrap rounded-md px-1.5 py-0.5;
+	}
+
+	.calendar-lane-divider-content--guild {
+		@apply text-violet-700;
+	}
+
+	.calendar-lane-divider-content--guild::before,
+	.calendar-lane-divider-content--guild::after {
+		@apply bg-violet-600/25;
+	}
+
+	.calendar-lane-divider-content--guild span {
+		@apply bg-violet-50/90;
+	}
+
+	.calendar-lane-divider-content--lab {
+		@apply text-sky-700;
+	}
+
+	.calendar-lane-divider-content--lab::before,
+	.calendar-lane-divider-content--lab::after {
+		@apply bg-sky-600/25;
+	}
+
+	.calendar-lane-divider-content--lab span {
+		@apply bg-sky-50/90;
 	}
 
 	@media (max-width: 768px) {
