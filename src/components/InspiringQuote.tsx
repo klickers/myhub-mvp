@@ -1,7 +1,8 @@
 import { RotateCw } from "lucide-react"
 import { useCallback, useEffect, useState } from "react"
 
-const QUOTE_API_URL = "https://dummyjson.com/quotes/random"
+const QUOTE_API_URL =
+	"https://api.api-ninjas.com/v2/randomquotes?categories=inspirational"
 
 type Quote = {
 	author: string
@@ -13,14 +14,14 @@ type QuoteApiResponse = {
 	quote: string
 }
 
-function isQuoteApiResponse(value: unknown): value is QuoteApiResponse {
-	return (
-		typeof value === "object" &&
-		value !== null &&
-		"quote" in value &&
-		typeof value.quote === "string"
-	)
-}
+// function isQuoteApiResponse(value: unknown): value is QuoteApiResponse {
+// 	return (
+// 		typeof value === "array" &&
+// 		value !== null &&
+// 		"quote" in value &&
+// 		typeof value.quote === "string"
+// 	)
+// }
 
 export default function InspiringQuote() {
 	const [quote, setQuote] = useState<Quote | null>(null)
@@ -44,29 +45,32 @@ export default function InspiringQuote() {
 				const response = await fetch(QUOTE_API_URL, {
 					cache: "no-store",
 					signal,
+					headers: {
+						"X-Api-Key": import.meta.env.PUBLIC_API_NINJA_KEY,
+					},
 				})
 
 				if (!response.ok) {
 					throw new Error(
-						`Quote API responded with ${response.status}`
+						`Quote API responded with ${response.status}`,
 					)
 				}
 
 				const data: unknown = await response.json()
 
-				if (!isQuoteApiResponse(data)) {
-					throw new Error("Quote API returned an unexpected response")
-				}
+				// if (!isQuoteApiResponse(data)) {
+				// 	throw new Error("Quote API returned an unexpected response")
+				// }
 
 				setQuote({
 					author:
-						typeof data.author === "string" &&
-						data.author.length > 0
-							? data.author
+						typeof data[0].author === "string" &&
+						data[0].author.length > 0
+							? data[0].author
 							: "Unknown",
-					text: data.quote,
+					text: data[0].quote,
 				})
-				setStatus("Fresh quote")
+				setStatus("Inspirational Quote")
 			} catch (error) {
 				if (signal?.aborted) {
 					return
@@ -81,7 +85,7 @@ export default function InspiringQuote() {
 				}
 			}
 		},
-		[]
+		[],
 	)
 
 	useEffect(() => {
@@ -101,11 +105,11 @@ export default function InspiringQuote() {
 				<div className="flex items-start justify-between gap-3">
 					<div>
 						<p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-700">
-							Inspiring Quote
-						</p>
-						<p className="mt-1 text-[11px] text-gray-500">
 							{status}
 						</p>
+						{/* <p className="mt-1 text-[11px] text-gray-500">
+							{status}
+						</p> */}
 					</div>
 					<button
 						type="button"
