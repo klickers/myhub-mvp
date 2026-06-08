@@ -479,6 +479,14 @@ export default function TasksCalendar() {
 		await loadCalendarData(rangeStart, rangeEnd)
 	}
 
+	const handleSideTrayTaskChange = useCallback(
+		(task: Task) => {
+			setSelectedTask(task)
+			void loadCalendarData(rangeStart, rangeEnd)
+		},
+		[loadCalendarData, rangeEnd, rangeStart],
+	)
+
 	return (
 		<>
 			<div className="calendar-shell calendar-shell--tasks">
@@ -664,6 +672,7 @@ export default function TasksCalendar() {
 					type="task"
 					selected={selectedTask}
 					setSelected={setSelectedTask}
+					onTaskChange={handleSideTrayTaskChange}
 				/>
 			)}
 		</>

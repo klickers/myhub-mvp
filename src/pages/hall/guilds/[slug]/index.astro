@@ -71,7 +71,15 @@ const tasks = await Astro.callAction(actions.task.listByGuild, {
 					</div>
 				</div>
 				<Tasks
-					tasks={tasks.data}
+					tasks={tasks.data ?? []}
+					statuses={[
+						Status.notstarted,
+						Status.inprogress,
+						Status.onhold,
+						Status.completed,
+					]}
+					parentType="guild"
+					parentId={guild.data.id}
 					client:load
 				/>
 			</div>

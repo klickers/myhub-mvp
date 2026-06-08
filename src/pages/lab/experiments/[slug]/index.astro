@@ -7,6 +7,7 @@ import SessionPlayButton from "@/components/models/session/SessionPlayButton"
 import Tasks from "@/components/models/task/Tasks"
 import PreviousSessions from "@/components/models/session/PreviousSessions.astro"
 import { AlchemyLabBreadcrumb } from "@/helpers/data/breadcrumbs"
+import { Status } from "@/generated/prisma/enums"
 
 const experiment = await Astro.callAction(actions.experiment.getBySlug, {
 	slug: Astro.params.slug as string,
@@ -73,12 +74,22 @@ const completedTasks = await Astro.callAction(actions.task.listByExperiment, {
 					</div>
 				</div>
 				<Tasks
-					tasks={tasks.data}
+					tasks={tasks.data ?? []}
+					statuses={[
+						Status.notstarted,
+						Status.inprogress,
+						Status.onhold,
+					]}
+					parentType="experiment"
+					parentId={experiment.data.id}
 					client:load
 				/>
 				<div class="h-1"></div>
 				<Tasks
-					tasks={completedTasks.data}
+					tasks={completedTasks.data ?? []}
+					statuses={[Status.completed]}
+					parentType="experiment"
+					parentId={experiment.data.id}
 					client:load
 				/>
 			</div>

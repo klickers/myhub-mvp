@@ -7,6 +7,7 @@ import EditableMakeTimeType from "./form/EditableMakeTimeType"
 import EditableStatus from "./form/EditableStatus"
 import EditableDate from "./form/EditableDate"
 import Subtasks from "./models/task/Subtasks"
+import { dispatchTaskUpdated } from "@/helpers/taskEvents"
 import { ChevronRight, X } from "lucide-react"
 import {
 	useEffect,
@@ -21,6 +22,7 @@ type Props = {
 	selected: Task
 	selectedId?: never
 	setSelected: Dispatch<SetStateAction<any>>
+	onTaskChange?: (task: Task) => void
 }
 // | {
 // 		type: "task"
@@ -41,6 +43,7 @@ export default function SideTray({
 	selected,
 	// selectedId,
 	setSelected,
+	onTaskChange,
 }: Props) {
 	const [breadcrumbs, setBreadcrumbs] = useState<TaskBreadcrumbItem[]>([])
 	const [breadcrumbsLoading, setBreadcrumbsLoading] = useState(false)
@@ -105,6 +108,13 @@ export default function SideTray({
 		if (res.data) setSelected(res.data)
 	}
 
+	const applySavedTaskChange = (patch: Partial<Task>) => {
+		const updatedTask = { ...selected, ...patch }
+		setSelected(updatedTask)
+		onTaskChange?.(updatedTask)
+		dispatchTaskUpdated(updatedTask)
+	}
+
 	const deadlineValue = selected.deadline
 		? new Date(selected.deadline).toISOString()
 		: null
@@ -148,9 +158,7 @@ export default function SideTray({
 										id: selected.id,
 										name,
 									})
-									setSelected((s: Task | null) =>
-										s ? { ...s, name } : s,
-									)
+									applySavedTaskChange({ name })
 								}}
 								className="min-h-9 min-w-0 flex-1 rounded-md px-1 py-0.5 text-left text-xl font-semibold leading-tight text-gray-950 transition-colors hover:bg-white/55 hover:no-underline"
 								inputClassName="border-gray-300/80 bg-white/85 shadow-sm focus:ring-brand/35"
@@ -190,19 +198,19 @@ export default function SideTray({
 									<EditableNumber
 										value={selected.estimatedTime}
 										onSave={async (v) => {
-											await actions.task.update({
-												id: selected.id,
-												estimatedTime:
-													v ?? undefined,
-											})
-											setSelected((s: Task | null) =>
-												s
-													? {
-															...s,
-															estimatedTime: v,
-														}
-													: s,
+											await actions.task.update(
+												{
+													id: selected.id,
+													estimatedTime: v,
+												} as Parameters<
+													typeof actions.task.update
+												>[0] & {
+													estimatedTime: number | null
+												},
 											)
+											applySavedTaskChange({
+												estimatedTime: v,
+											})
 										}}
 									/>
 								</dd>
@@ -219,18 +227,12 @@ export default function SideTray({
 												id: selected.id,
 												makeTimeType,
 											})
-											setSelected((s: Task | null) =>
-												s
-													? {
-															...s,
-															makeTimeType:
-																makeTimeType ===
-																"none"
-																	? null
-																	: makeTimeType,
-														}
-													: s,
-											)
+											applySavedTaskChange({
+												makeTimeType:
+													makeTimeType === "none"
+														? null
+														: makeTimeType,
+											})
 										}}
 									/>
 								</dd>
@@ -247,9 +249,7 @@ export default function SideTray({
 												id: selected.id,
 												status,
 											})
-											setSelected((s: Task | null) =>
-												s ? { ...s, status } : s,
-											)
+											applySavedTaskChange({ status })
 										}}
 									/>
 								</dd>
@@ -269,11 +269,9 @@ export default function SideTray({
 												id: selected.id,
 												deadline: d,
 											})
-											setSelected((s: Task | null) =>
-												s
-													? { ...s, deadline: d }
-													: s,
-											)
+											applySavedTaskChange({
+												deadline: d,
+											})
 										}}
 									/>
 								</dd>

@@ -463,7 +463,7 @@ export const task = {
 		input: z.object({
 			name: z.string().min(1),
 			status: z.nativeEnum(Status).optional(),
-			estimatedTime: z.number().int().nonnegative().optional(),
+			estimatedTime: z.number().int().nonnegative().nullable().optional(),
 			deadline: z.coerce.date().optional().nullable(),
 		}),
 		handler: async ({

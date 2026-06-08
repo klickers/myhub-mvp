@@ -8,6 +8,7 @@ import SessionPlayButton from "@/components/models/session/SessionPlayButton"
 import Tasks from "@/components/models/task/Tasks"
 import PreviousSessions from "@/components/models/session/PreviousSessions.astro"
 import { GuildHallBreadcrumb } from "@/helpers/data/breadcrumbs"
+import { Status } from "@/generated/prisma/enums"
 
 const contract = await Astro.callAction(actions.contract.getBySlug, {
 	slug: Astro.params.slug as string,
@@ -82,12 +83,22 @@ const completedTasks = await Astro.callAction(actions.task.listByContract, {
 					</div>
 				</div>
 				<Tasks
-					tasks={tasks.data}
+					tasks={tasks.data ?? []}
+					statuses={[
+						Status.notstarted,
+						Status.inprogress,
+						Status.onhold,
+					]}
+					parentType="contract"
+					parentId={contract.data.id}
 					client:load
 				/>
 				<div class="h-1"></div>
 				<Tasks
-					tasks={completedTasks.data}
+					tasks={completedTasks.data ?? []}
+					statuses={[Status.completed]}
+					parentType="contract"
+					parentId={contract.data.id}
 					client:load
 				/>
 			</div>
