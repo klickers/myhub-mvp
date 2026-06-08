@@ -113,6 +113,27 @@ type TaskAncestor = {
 	deadline: Date | null
 }
 
+type TaskBreadcrumbItem = {
+	type: "area" | "guild" | "contract" | "experiment" | "task" | "task-root"
+	id: number | null
+	name: string
+	href: string | null
+}
+
+type BreadcrumbTask = {
+	id: number
+	name: string
+	parentTaskId: number | null
+	contract: {
+		id: number
+		name: string
+		slug: string
+		guild: { id: number; name: string; slug: string } | null
+	} | null
+	guild: { id: number; name: string; slug: string } | null
+	experiment: { id: number; name: string; slug: string } | null
+}
+
 async function getTaskAncestors(
 	tasks: Array<{ id: number; parentTaskId: number | null }>,
 ) {
@@ -178,6 +199,129 @@ async function getTaskAncestors(
 	}
 
 	return ancestorsByTaskId
+}
+
+async function getTaskBreadcrumbs(
+	taskId: number,
+): Promise<TaskBreadcrumbItem[]> {
+	const chain: BreadcrumbTask[] = []
+	const seen = new Set<number>()
+	let currentTaskId: number | null = taskId
+
+	while (currentTaskId && !seen.has(currentTaskId)) {
+		seen.add(currentTaskId)
+		const task: BreadcrumbTask | null = await prisma.task.findUnique({
+			where: { id: currentTaskId },
+			select: {
+				id: true,
+				name: true,
+				parentTaskId: true,
+				contract: {
+					select: {
+						id: true,
+						name: true,
+						slug: true,
+						guild: {
+							select: {
+								id: true,
+								name: true,
+								slug: true,
+							},
+						},
+					},
+				},
+				guild: {
+					select: {
+						id: true,
+						name: true,
+						slug: true,
+					},
+				},
+				experiment: {
+					select: {
+						id: true,
+						name: true,
+						slug: true,
+					},
+				},
+			},
+		})
+
+		if (!task) break
+
+		chain.push(task)
+		currentTaskId = task.parentTaskId
+	}
+
+	const rootTask = chain[chain.length - 1]
+	const breadcrumbs: TaskBreadcrumbItem[] = []
+
+	if (rootTask?.contract) {
+		breadcrumbs.push({
+			type: "area",
+			id: null,
+			name: "Guild Hall",
+			href: "/hall",
+		})
+		if (rootTask.contract.guild) {
+			breadcrumbs.push({
+				type: "guild",
+				id: rootTask.contract.guild.id,
+				name: rootTask.contract.guild.name,
+				href: `/hall/guilds/${rootTask.contract.guild.slug}`,
+			})
+		}
+		breadcrumbs.push({
+			type: "contract",
+			id: rootTask.contract.id,
+			name: rootTask.contract.name,
+			href: `/hall/contracts/${rootTask.contract.slug}`,
+		})
+	} else if (rootTask?.guild) {
+		breadcrumbs.push({
+			type: "area",
+			id: null,
+			name: "Guild Hall",
+			href: "/hall",
+		})
+		breadcrumbs.push({
+			type: "guild",
+			id: rootTask.guild.id,
+			name: rootTask.guild.name,
+			href: `/hall/guilds/${rootTask.guild.slug}`,
+		})
+	} else if (rootTask?.experiment) {
+		breadcrumbs.push({
+			type: "area",
+			id: null,
+			name: "Alchemy Lab",
+			href: "/lab",
+		})
+		breadcrumbs.push({
+			type: "experiment",
+			id: rootTask.experiment.id,
+			name: rootTask.experiment.name,
+			href: `/lab/experiments/${rootTask.experiment.slug}`,
+		})
+	} else if (rootTask) {
+		breadcrumbs.push({
+			type: "task-root",
+			id: null,
+			name: "Task",
+			href: null,
+		})
+	}
+
+	for (const task of chain.slice().reverse()) {
+		breadcrumbs.push({
+			type: "task",
+			id: task.id,
+			name: task.name,
+			href: null,
+		})
+	}
+
+	return breadcrumbs
 }
 
 async function buildSubtaskTree(rootTaskId: number): Promise<TaskNode[]> {
@@ -376,6 +520,15 @@ export const task = {
 			return prisma.task.findUnique({
 				where: { id },
 			})
+		},
+	}),
+	breadcrumbs: defineAction({
+		input: z.object({
+			taskId: z.coerce.number().int().positive(),
+		}),
+		handler: async ({ taskId }) => {
+			const breadcrumbs = await getTaskBreadcrumbs(taskId)
+			return { breadcrumbs }
 		},
 	}),
 	listAll: defineAction({

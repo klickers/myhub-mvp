@@ -7,8 +7,14 @@ import EditableMakeTimeType from "./form/EditableMakeTimeType"
 import EditableStatus from "./form/EditableStatus"
 import EditableDate from "./form/EditableDate"
 import Subtasks from "./models/task/Subtasks"
-import { X } from "lucide-react"
-import { useEffect, type Dispatch, type SetStateAction } from "react"
+import { ChevronRight, X } from "lucide-react"
+import {
+	useEffect,
+	useMemo,
+	useState,
+	type Dispatch,
+	type SetStateAction,
+} from "react"
 
 type Props = {
 	type: "task"
@@ -23,12 +29,21 @@ type Props = {
 // 		setSelected: (id: number) => void
 //   }
 
+type TaskBreadcrumbItem = {
+	type: "area" | "guild" | "contract" | "experiment" | "task" | "task-root"
+	id: number | null
+	name: string
+	href: string | null
+}
+
 export default function SideTray({
 	type,
 	selected,
 	// selectedId,
 	setSelected,
 }: Props) {
+	const [breadcrumbs, setBreadcrumbs] = useState<TaskBreadcrumbItem[]>([])
+	const [breadcrumbsLoading, setBreadcrumbsLoading] = useState(false)
 	const closeTray = () => setSelected(null)
 
 	// useEffect(() => {
@@ -49,14 +64,53 @@ export default function SideTray({
 		return () => document.removeEventListener("keydown", handleKeyDown)
 	}, [setSelected])
 
+	useEffect(() => {
+		let cancelled = false
+
+		setBreadcrumbs([])
+		setBreadcrumbsLoading(true)
+
+		actions.task
+			.breadcrumbs({ taskId: selected.id })
+			.then((res) => {
+				if (cancelled) return
+				setBreadcrumbs(res.data?.breadcrumbs ?? [])
+			})
+			.catch((error) => {
+				if (cancelled) return
+				console.error("Failed to load task breadcrumbs", error)
+				setBreadcrumbs([])
+			})
+			.finally(() => {
+				if (!cancelled) setBreadcrumbsLoading(false)
+			})
+
+		return () => {
+			cancelled = true
+		}
+	}, [selected.id])
+
+	const visibleBreadcrumbs = useMemo(
+		() =>
+			breadcrumbs.map((breadcrumb) =>
+				breadcrumb.type === "task" && breadcrumb.id === selected.id
+					? { ...breadcrumb, name: selected.name }
+					: breadcrumb,
+			),
+		[breadcrumbs, selected.id, selected.name],
+	)
+
+	const openTaskBreadcrumb = async (taskId: number) => {
+		const res = await actions.task.getById({ id: taskId })
+		if (res.data) setSelected(res.data)
+	}
+
 	const deadlineValue = selected.deadline
 		? new Date(selected.deadline).toISOString()
 		: null
 
 	return (
 		<>
-			{/* TODO: add breadcrumbs */}
-
 			{/* BACKDROP */}
 			<div
 				className="fixed inset-0 z-40 bg-slate-900/10 backdrop-blur-[2px]"
@@ -76,10 +130,16 @@ export default function SideTray({
 					<div className="min-w-0 flex-1">
 						<p
 							id="side-tray-title"
-							className="mb-1 text-xs font-semibold uppercase text-gray-500"
+							className="sr-only"
 						>
-							Task
+							Task details for {selected.name}
 						</p>
+						<TaskBreadcrumbs
+							breadcrumbs={visibleBreadcrumbs}
+							isLoading={breadcrumbsLoading}
+							onTaskSelect={openTaskBreadcrumb}
+							selectedTaskId={selected.id}
+						/>
 						<div className="flex min-w-0 items-center gap-2">
 							<EditableText
 								value={selected.name}
@@ -229,5 +289,90 @@ export default function SideTray({
 				{/* TODO: add past sessions, add notes area? */}
 			</aside>
 		</>
+	)
+}
+
+function TaskBreadcrumbs({
+	breadcrumbs,
+	isLoading,
+	onTaskSelect,
+	selectedTaskId,
+}: {
+	breadcrumbs: TaskBreadcrumbItem[]
+	isLoading: boolean
+	onTaskSelect: (taskId: number) => Promise<void>
+	selectedTaskId: number
+}) {
+	const items =
+		breadcrumbs.length > 0
+			? breadcrumbs
+			: [
+					{
+						type: "task-root" as const,
+						id: null,
+						name: isLoading ? "Loading..." : "Task",
+						href: null,
+					},
+				]
+
+	return (
+		<nav
+			aria-label="Task breadcrumbs"
+			className="mb-1 flex min-w-0 flex-wrap items-center gap-x-1 gap-y-0.5 pb-1 text-xs font-medium leading-snug text-gray-500"
+		>
+			{items.map((breadcrumb, index) => {
+				const key = `${breadcrumb.type}-${breadcrumb.id ?? breadcrumb.name}-${index}`
+				const isLast = index === items.length - 1
+				const isSelectedTask =
+					breadcrumb.type === "task" && breadcrumb.id === selectedTaskId
+				const content = (
+					<span className="min-w-0 break-words">
+						{breadcrumb.name}
+					</span>
+				)
+
+				return (
+					<div
+						key={key}
+						className="flex min-w-0 max-w-full items-center gap-1"
+					>
+						{breadcrumb.href && !isLast ? (
+							<a
+								href={breadcrumb.href}
+								className="min-w-0 max-w-full rounded-sm text-gray-600 transition-colors hover:text-gray-950 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/35"
+							>
+								{content}
+							</a>
+						) : breadcrumb.type === "task" &&
+						  breadcrumb.id &&
+						  !isSelectedTask ? (
+							<button
+								type="button"
+								onClick={() => void onTaskSelect(breadcrumb.id!)}
+								className="min-w-0 max-w-full rounded-sm text-left text-gray-600 transition-colors hover:text-gray-950 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/35"
+							>
+								{content}
+							</button>
+						) : (
+							<span
+								aria-current={isLast ? "page" : undefined}
+								className={
+									"min-w-0 max-w-full " +
+									(isLast ? "text-gray-400" : "text-gray-500")
+								}
+							>
+								{content}
+							</span>
+						)}
+						{!isLast && (
+							<ChevronRight
+								className="size-3 flex-none text-gray-400"
+								aria-hidden="true"
+							/>
+						)}
+					</div>
+				)
+			})}
+		</nav>
 	)
 }
