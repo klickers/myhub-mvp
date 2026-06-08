@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react"
 import { actions } from "astro:actions"
 import type { MakeTimeType, Status } from "@/generated/prisma/enums"
+import { dispatchTaskUpdated } from "@/helpers/taskEvents"
 import EditableDate from "@/components/form/EditableDate"
 import EditableStatus from "@/components/form/EditableStatus"
 import EditableNumber from "@/components/form/EditableNumber"
@@ -82,10 +83,18 @@ function Node({
 }: {
 	node: TaskNode
 	depth: number
-	onChange: () => void
+	onChange: () => void | Promise<void>
 }) {
 	const statusStyle = getStatusStyle(node.status)
 	const deadlineValue = getDateValue(node.deadline)
+
+	const saveTaskChange = async (
+		patch: Parameters<typeof actions.task.update>[0],
+	) => {
+		const res = await actions.task.update(patch)
+		if (res.data) dispatchTaskUpdated(res.data)
+		await onChange()
+	}
 
 	return (
 		<div className="space-y-1.5">
@@ -98,9 +107,7 @@ function Node({
 						<EditableText
 							value={node.name}
 							onSave={(name) =>
-								actions.task
-									.update({ id: node.id, name })
-									.then(onChange)
+								saveTaskChange({ id: node.id, name })
 							}
 							className={`w-full rounded-md px-1 py-0.5 text-sm font-semibold leading-snug text-gray-900 hover:bg-white/65 hover:no-underline ${
 								node.status === "completed"
@@ -137,12 +144,10 @@ function Node({
 						<EditableMakeTimeType
 							value={node.makeTimeType ?? "none"}
 							onSave={(makeTimeType) =>
-								actions.task
-									.update({
-										id: node.id,
-										makeTimeType,
-									})
-									.then(onChange)
+								saveTaskChange({
+									id: node.id,
+									makeTimeType,
+								})
 							}
 						/>
 					</div>
@@ -153,9 +158,7 @@ function Node({
 						<EditableStatus
 							value={node.status}
 							onSave={(status) =>
-								actions.task
-									.update({ id: node.id, status })
-									.then(onChange)
+								saveTaskChange({ id: node.id, status })
 							}
 						/>
 					</div>
@@ -166,12 +169,14 @@ function Node({
 						<EditableNumber
 							value={node.estimatedTime}
 							onSave={(v) =>
-								actions.task
-									.update({
-										id: node.id,
-										estimatedTime: v ?? undefined,
-									})
-									.then(onChange)
+								saveTaskChange({
+									id: node.id,
+									estimatedTime: v,
+								} as Parameters<
+									typeof actions.task.update
+								>[0] & {
+									estimatedTime: number | null
+								})
 							}
 						/>
 					</div>
@@ -182,14 +187,10 @@ function Node({
 						<EditableDate
 							value={deadlineValue}
 							onSave={(date) =>
-								actions.task
-									.update({
-										id: node.id,
-										deadline: date
-											? new Date(date)
-											: null,
-									})
-									.then(onChange)
+								saveTaskChange({
+									id: node.id,
+									deadline: date ? new Date(date) : null,
+								})
 							}
 						/>
 					</div>

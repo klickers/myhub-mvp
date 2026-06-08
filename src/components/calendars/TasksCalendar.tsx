@@ -28,6 +28,10 @@ import getItemUrl from "@/helpers/getItemUrl"
 import getItemName from "@/helpers/getItemName"
 import type { Task } from "@/generated/prisma/client"
 import SideTray from "@/components/SideTray"
+import {
+	TASK_UPDATED_EVENT,
+	type TaskUpdatedEvent,
+} from "@/helpers/taskEvents"
 
 type CalendarView = "fourDay" | "week" | "month"
 type TaskCalendarLane = "guild" | "lab"
@@ -375,6 +379,21 @@ export default function TasksCalendar() {
 		setLaneMeasurements({})
 	}, [rows])
 
+	useEffect(() => {
+		const handleTaskUpdated = (event: Event) => {
+			const { task } = (event as TaskUpdatedEvent).detail
+
+			setSelectedTask((currentTask) =>
+				currentTask?.id === task.id ? task : currentTask,
+			)
+			void loadCalendarData(rangeStart, rangeEnd)
+		}
+
+		window.addEventListener(TASK_UPDATED_EVENT, handleTaskUpdated)
+		return () =>
+			window.removeEventListener(TASK_UPDATED_EVENT, handleTaskUpdated)
+	}, [loadCalendarData, rangeEnd, rangeStart])
+
 	const itemsByDate = useMemo(() => {
 		const map = new Map<string, Record<TaskCalendarLane, CalendarItem[]>>()
 
@@ -478,14 +497,6 @@ export default function TasksCalendar() {
 		setDraggedItemId(null)
 		await loadCalendarData(rangeStart, rangeEnd)
 	}
-
-	const handleSideTrayTaskChange = useCallback(
-		(task: Task) => {
-			setSelectedTask(task)
-			void loadCalendarData(rangeStart, rangeEnd)
-		},
-		[loadCalendarData, rangeEnd, rangeStart],
-	)
 
 	return (
 		<>
@@ -672,7 +683,6 @@ export default function TasksCalendar() {
 					type="task"
 					selected={selectedTask}
 					setSelected={setSelectedTask}
-					onTaskChange={handleSideTrayTaskChange}
 				/>
 			)}
 		</>

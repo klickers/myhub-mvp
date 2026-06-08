@@ -463,7 +463,7 @@ export const task = {
 		input: z.object({
 			name: z.string().min(1),
 			status: z.nativeEnum(Status).optional(),
-			estimatedTime: z.number().int().nonnegative().nullable().optional(),
+			estimatedTime: z.number().int().nonnegative().optional(),
 			deadline: z.coerce.date().optional().nullable(),
 		}),
 		handler: async ({
@@ -492,7 +492,7 @@ export const task = {
 				.union([z.nativeEnum(MakeTimeType), z.literal("none")])
 				.transform((val) => (val === "none" ? null : val))
 				.optional(),
-			estimatedTime: z.number().int().nonnegative().optional(),
+			estimatedTime: z.number().int().nonnegative().nullable().optional(),
 			deadline: z.coerce.date().optional().nullable(),
 		}),
 		handler: async ({ id, ...data }) => {
