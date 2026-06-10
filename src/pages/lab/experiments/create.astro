@@ -3,6 +3,7 @@ import { actions } from "astro:actions"
 import Layout from "@/layouts/Layout.astro"
 import { Icon } from "astro-icon/components"
 import { AlchemyLabBreadcrumb } from "@/helpers/data/breadcrumbs"
+import AutoSlugger from "@/components/AutoSlugger.astro"
 
 const result = Astro.getActionResult(actions.experiment.create)
 if (result && !result.error)
@@ -96,4 +97,6 @@ const categorySlug = Astro.url.searchParams.get("categorySlug")
 			<button class="w-auto button py-2 mt-2">Create</button>
 		</div>
 	</form>
+
+	<AutoSlugger />
 </Layout>

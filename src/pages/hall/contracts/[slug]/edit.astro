@@ -4,6 +4,7 @@ import Layout from "@/layouts/Layout.astro"
 import { Icon } from "astro-icon/components"
 import { format } from "date-fns"
 import { GuildHallBreadcrumb } from "@/helpers/data/breadcrumbs"
+import AutoSlugger from "@/components/AutoSlugger.astro"
 
 const result = Astro.getActionResult(actions.contract.update)
 if (result && !result.error)
@@ -131,4 +132,6 @@ const contract = contractRes.data
 			<button class="w-auto button py-2 mt-2">Save Changes</button>
 		</div>
 	</form>
+
+	<AutoSlugger />
 </Layout>

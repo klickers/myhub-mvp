@@ -1,0 +1,46 @@
+---
+// src/components/AutoSlugger.astro
+---
+
+<script>
+	const initAutoSlug = () => {
+		const nameInput = document.querySelector('input[name="name"]') as HTMLInputElement;
+		const slugInput = document.querySelector('input[name="slug"]') as HTMLInputElement;
+
+		if (nameInput && slugInput) {
+			if (nameInput.dataset.autoSlugReady === "true") return;
+			nameInput.dataset.autoSlugReady = "true";
+
+			const slugify = (text: string) => {
+				return text
+					.toString()
+					.toLowerCase()
+					.trim()
+					.replace(/\s+/g, "-") // Replace spaces with -
+					.replace(/[^\w\-]+/g, "") // Remove all non-word chars except -
+					.replace(/\-\-+/g, "-"); // Replace multiple - with single -
+			};
+
+			let isAutoSlugging = slugInput.value === "" || slugInput.value === slugify(nameInput.value);
+
+			nameInput.addEventListener("input", () => {
+				if (isAutoSlugging) {
+					slugInput.value = slugify(nameInput.value);
+				}
+			});
+
+			slugInput.addEventListener("input", () => {
+				if (slugInput.value === "") {
+					isAutoSlugging = true;
+				} else {
+					isAutoSlugging = slugInput.value === slugify(nameInput.value);
+				}
+			});
+		}
+	};
+
+	// Initialize on script load
+	initAutoSlug();
+	// Re-run on Astro page navigations
+	document.addEventListener("astro:page-load", initAutoSlug);
+</script>

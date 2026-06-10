@@ -3,6 +3,7 @@ import { actions } from "astro:actions"
 import Layout from "@/layouts/Layout.astro"
 import { Icon } from "astro-icon/components"
 import { GuildHallBreadcrumb } from "@/helpers/data/breadcrumbs"
+import AutoSlugger from "@/components/AutoSlugger.astro"
 
 const result = Astro.getActionResult(actions.contract.create)
 if (result && !result.error)
@@ -100,4 +101,6 @@ const guildSlug = Astro.url.searchParams.get("guildSlug")
 			<button class="w-auto button py-2 mt-2">Create</button>
 		</div>
 	</form>
+
+	<AutoSlugger />
 </Layout>
