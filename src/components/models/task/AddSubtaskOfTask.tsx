@@ -52,8 +52,8 @@ export default function AddSubtaskOfTask({
 				onClick={() => setOpen(true)}
 				className={
 					compact
-						? "inline-flex size-7 flex-none items-center justify-center rounded-md border border-gray-300/70 bg-white/65 text-gray-500 shadow-sm transition-colors hover:bg-white hover:text-gray-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/35"
-						: "inline-flex min-h-8 items-center gap-1.5 rounded-md border border-gray-300/70 bg-white/70 px-2.5 text-xs font-semibold text-gray-700 shadow-sm transition-colors hover:bg-white hover:text-gray-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/35"
+						? "inline-flex size-7 flex-none items-center justify-center rounded-md border border-gray-300/70 bg-white/65 text-gray-500 shadow-sm transition-colors hover:bg-white hover:text-gray-950 focus-visible:outline-none"
+						: "inline-flex min-h-8 items-center gap-1.5 rounded-md border border-gray-300/70 bg-white/70 px-2.5 text-xs font-semibold text-gray-700 shadow-sm transition-colors hover:bg-white hover:text-gray-950 focus-visible:outline-none"
 				}
 				aria-label={label}
 			>
@@ -86,12 +86,12 @@ export default function AddSubtaskOfTask({
 					if (e.key === "Escape") cancel()
 				}}
 				placeholder="New subtask..."
-				className="min-h-8 flex-1 rounded-md border border-gray-300/70 bg-white/80 px-2.5 text-xs shadow-sm transition-[background-color,border-color,box-shadow] duration-150 placeholder:text-gray-400 focus:border-gray-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand/30"
+				className="min-h-8 flex-1 rounded-md border border-gray-300/70 bg-white/80 px-2.5 text-xs shadow-sm transition-[background-color,border-color,box-shadow] duration-150 placeholder:text-gray-400 focus:border-gray-500 focus:bg-white focus:outline-none"
 			/>
 			<button
 				type="submit"
 				disabled={!name.trim() || saving}
-				className="inline-flex size-8 flex-none items-center justify-center rounded-md border border-gray-300/70 bg-gray-900 text-white shadow-sm transition-colors hover:bg-gray-800 disabled:cursor-not-allowed disabled:border-gray-200 disabled:bg-gray-200 disabled:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/35"
+				className="inline-flex size-8 flex-none items-center justify-center rounded-md border border-gray-300/70 bg-gray-900 text-white shadow-sm transition-colors hover:bg-gray-800 disabled:cursor-not-allowed disabled:border-gray-200 disabled:bg-gray-200 disabled:text-gray-400 focus-visible:outline-none"
 				aria-label="Add subtask"
 			>
 				<Check
@@ -102,7 +102,7 @@ export default function AddSubtaskOfTask({
 			<button
 				type="button"
 				onClick={cancel}
-				className="inline-flex size-8 flex-none items-center justify-center rounded-md border border-gray-300/70 bg-white/70 text-gray-500 shadow-sm transition-colors hover:bg-white hover:text-gray-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/35"
+				className="inline-flex size-8 flex-none items-center justify-center rounded-md border border-gray-300/70 bg-white/70 text-gray-500 shadow-sm transition-colors hover:bg-white hover:text-gray-950 focus-visible:outline-none"
 				aria-label="Cancel subtask"
 			>
 				<X

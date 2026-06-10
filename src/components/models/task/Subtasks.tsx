@@ -99,7 +99,7 @@ function Node({
 	return (
 		<div className="space-y-1.5">
 			<div
-				className={`group rounded-md border px-3 py-2 shadow-sm ring-1 ring-white/35 transition-colors ${statusStyle.row}`}
+				className={`group rounded-md border px-3 py-2 shadow-sm transition-colors ${statusStyle.row}`}
 				style={{ marginLeft: depth * 14 }}
 			>
 				<div className="flex flex-wrap items-center gap-2">

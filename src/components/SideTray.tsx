@@ -133,7 +133,7 @@ export default function SideTray({
 				role="dialog"
 				aria-modal="true"
 				aria-labelledby="side-tray-title"
-				className="side-tray fixed bottom-3 right-3 top-3 z-50 flex w-[min(38rem,calc(100vw-1.5rem))] flex-col overflow-hidden rounded-lg border border-gray-300/70 bg-white/70 shadow-2xl shadow-slate-900/15 ring-1 ring-white/50 backdrop-blur-2xl backdrop-saturate-150 sm:bottom-4 sm:right-4 sm:top-4 sm:w-[min(40rem,calc(100vw-2rem))]"
+				className="side-tray fixed bottom-3 right-3 top-3 z-50 flex w-[min(38rem,calc(100vw-1.5rem))] flex-col overflow-hidden rounded-lg border border-gray-300/70 bg-white/70 shadow-2xl shadow-slate-900/15 backdrop-blur-2xl backdrop-saturate-150 sm:bottom-4 sm:right-4 sm:top-4 sm:w-[min(40rem,calc(100vw-2rem))]"
 				onClick={(e) => e.stopPropagation()}
 			>
 				<header className="flex items-start justify-between gap-4 border-b border-gray-300/60 bg-white/45 px-5 py-4">
@@ -161,7 +161,7 @@ export default function SideTray({
 									applySavedTaskChange({ name })
 								}}
 								className="min-h-9 min-w-0 flex-1 rounded-md px-1 py-0.5 text-left text-xl font-semibold leading-tight text-gray-950 transition-colors hover:bg-white/55 hover:no-underline"
-								inputClassName="border-gray-300/80 bg-white/85 shadow-sm focus:ring-brand/35"
+								inputClassName="border-gray-300/80 bg-white/85 shadow-sm"
 							/>
 							<div className="inline-flex size-9 flex-none items-center justify-center rounded-lg border border-gray-300/70 bg-white/65 shadow-sm">
 								<SessionPlayButton
@@ -174,7 +174,7 @@ export default function SideTray({
 					<button
 						type="button"
 						onClick={closeTray}
-						className="inline-flex size-9 flex-none items-center justify-center rounded-lg border border-gray-300/70 bg-white/70 p-0 text-gray-600 shadow-sm transition-colors hover:bg-white hover:text-gray-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/45 focus-visible:ring-offset-2"
+						className="inline-flex size-9 flex-none items-center justify-center rounded-lg border border-gray-300/70 bg-white/70 p-0 text-gray-600 shadow-sm transition-colors hover:bg-white hover:text-gray-950 focus-visible:outline-none"
 						aria-label="Close task panel"
 					>
 						<X
@@ -186,7 +186,7 @@ export default function SideTray({
 
 				<div className="flex-1 overflow-y-auto px-5 py-5">
 					<section
-						className="mb-4 rounded-lg border border-gray-300/70 bg-white/55 p-2.5 shadow-sm ring-1 ring-white/40"
+						className="mb-4 rounded-lg border border-gray-300/70 bg-white/55 p-2.5 shadow-sm"
 						aria-label="Task details"
 					>
 						<dl className="grid gap-1 text-sm">
@@ -279,7 +279,7 @@ export default function SideTray({
 						</dl>
 					</section>
 
-					<section className="rounded-lg border border-gray-300/70 bg-white/55 p-4 shadow-sm ring-1 ring-white/40">
+					<section className="rounded-lg border border-gray-300/70 bg-white/55 p-4 shadow-sm">
 						<Subtasks taskId={selected.id} />
 					</section>
 				</div>
@@ -337,7 +337,7 @@ function TaskBreadcrumbs({
 						{breadcrumb.href && !isLast ? (
 							<a
 								href={breadcrumb.href}
-								className="min-w-0 max-w-full rounded-sm text-gray-600 transition-colors hover:text-gray-950 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/35"
+								className="min-w-0 max-w-full rounded-sm text-gray-600 transition-colors hover:text-gray-950 hover:underline focus-visible:outline-none"
 							>
 								{content}
 							</a>
@@ -347,7 +347,7 @@ function TaskBreadcrumbs({
 							<button
 								type="button"
 								onClick={() => void onTaskSelect(breadcrumb.id!)}
-								className="min-w-0 max-w-full rounded-sm text-left text-gray-600 transition-colors hover:text-gray-950 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/35"
+								className="min-w-0 max-w-full rounded-sm text-left text-gray-600 transition-colors hover:text-gray-950 hover:underline focus-visible:outline-none"
 							>
 								{content}
 							</button>

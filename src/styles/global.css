@@ -47,7 +47,7 @@
 			@apply rounded-lg border border-gray-300 bg-white/80 px-3 py-2 shadow-sm transition-[background-color,border-color,box-shadow] duration-200 ease-out;
 
 			&:focus {
-				@apply border-gray-500 bg-white outline-none ring-2 ring-brand/35;
+				@apply border-gray-500 bg-white outline-none;
 			}
 		}
 
@@ -71,7 +71,7 @@
 	}
 
 	.app-topbar {
-		@apply fixed top-3 left-[calc(var(--sidebar-width)+1.25rem)] right-4 z-30 flex min-h-10 items-center justify-between gap-3 rounded-lg border border-gray-300/70 bg-white/60 px-3 py-1.5 text-xs shadow-lg shadow-slate-900/5 ring-1 ring-white/45 backdrop-blur-xl backdrop-saturate-150 transition-[background-color,border-color,left] duration-[240ms] ease-out motion-reduce:transition-none;
+		@apply fixed top-3 left-[calc(var(--sidebar-width)+1.25rem)] right-4 z-30 flex min-h-10 items-center justify-between gap-3 rounded-lg border border-gray-300/70 bg-white/60 px-3 py-1.5 text-xs shadow-lg shadow-slate-900/5 backdrop-blur-xl backdrop-saturate-150 transition-[background-color,border-color,left] duration-[240ms] ease-out motion-reduce:transition-none;
 	}
 
 	.app-breadcrumbs {
@@ -87,7 +87,7 @@
 	}
 
 	.app-topbar a:focus-visible {
-		@apply outline-none ring-2 ring-brand/40;
+		@apply outline-none;
 	}
 
 	.app-main {
@@ -95,7 +95,7 @@
 	}
 
 	.sidebar {
-		@apply fixed inset-y-0 left-0 z-40 flex w-[var(--sidebar-width)] min-w-[var(--sidebar-width)] flex-col border-r border-gray-300/70 bg-white/50 px-3 py-3 shadow-xl shadow-slate-900/5 ring-1 ring-white/40 backdrop-blur-2xl backdrop-saturate-150 transition-[box-shadow,min-width,width] duration-[240ms] ease-out motion-reduce:transition-none;
+		@apply fixed inset-y-0 left-0 z-40 flex w-[var(--sidebar-width)] min-w-[var(--sidebar-width)] flex-col border-r border-gray-300/70 bg-white/50 px-3 py-3 shadow-xl shadow-slate-900/5 backdrop-blur-2xl backdrop-saturate-150 transition-[box-shadow,min-width,width] duration-[240ms] ease-out motion-reduce:transition-none;
 	}
 
 	.sidebar__toggle {
@@ -103,7 +103,7 @@
 	}
 
 	.sidebar__toggle:focus-visible {
-		@apply outline-none ring-2 ring-brand/45 ring-offset-2;
+		@apply outline-none;
 	}
 
 	.sidebar__toggle-icon {
@@ -115,7 +115,7 @@
 	}
 
 	.sidebar__profile-card {
-		@apply mb-5 flex min-h-16 items-center gap-3 rounded-lg border border-gray-300/70 bg-white/60 p-2.5 shadow-sm ring-1 ring-white/40 transition-[background-color,border-color,padding,width] duration-[240ms] ease-out motion-reduce:transition-none;
+		@apply mb-5 flex min-h-16 items-center gap-3 rounded-lg border border-gray-300/70 bg-white/60 p-2.5 shadow-sm transition-[background-color,border-color,padding,width] duration-[240ms] ease-out motion-reduce:transition-none;
 	}
 
 	.sidebar__avatar {
@@ -155,7 +155,7 @@
 	}
 
 	.sidebar__link:focus-visible {
-		@apply outline-none ring-2 ring-brand/45 ring-offset-2;
+		@apply outline-none;
 	}
 
 	.sidebar__link--active {
@@ -179,7 +179,7 @@
 	}
 
 	:root[data-sidebar="collapsed"] .sidebar__profile-card {
-		@apply mx-auto w-[3.25rem] justify-center gap-0 border-transparent bg-transparent p-0 shadow-none ring-0;
+		@apply mx-auto w-[3.25rem] justify-center gap-0 border-transparent bg-transparent p-0 shadow-none;
 	}
 
 	:root[data-sidebar="collapsed"] .sidebar__avatar {
@@ -206,7 +206,7 @@
 			}
 
 			&:focus-visible {
-				@apply outline-none ring-2 ring-brand/45 ring-offset-2;
+				@apply outline-none;
 			}
 
 			&:disabled {
@@ -220,7 +220,7 @@
 	}
 
 	.card {
-		@apply w-full overflow-hidden rounded-lg border border-gray-300/70 bg-white/75 shadow-lg shadow-slate-900/5 ring-1 ring-white/40 backdrop-blur-xl backdrop-saturate-150 transition-[background-color,border-color,box-shadow,transform] duration-200 ease-out motion-reduce:transition-none;
+		@apply w-full overflow-hidden rounded-lg border border-gray-300/70 bg-white/75 shadow-lg shadow-slate-900/5 backdrop-blur-xl backdrop-saturate-150 transition-[background-color,border-color,box-shadow,transform] duration-200 ease-out motion-reduce:transition-none;
 
 		.card__content {
 			@apply px-5 py-4;
@@ -241,11 +241,11 @@
 
 	.side-tray input,
 	.side-tray select {
-		@apply max-w-full rounded-md border border-gray-300 bg-white/80 px-2 py-1 text-sm shadow-sm transition-[background-color,border-color,box-shadow] duration-150 focus:border-gray-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand/35;
+		@apply max-w-full rounded-md border border-gray-300 bg-white/80 px-2 py-1 text-sm shadow-sm transition-[background-color,border-color,box-shadow] duration-150 focus:border-gray-500 focus:bg-white focus:outline-none;
 	}
 
 	.side-tray dl button {
-		@apply rounded-md px-2 py-1 text-left transition-colors duration-150 hover:bg-white/80 hover:no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/35;
+		@apply rounded-md px-2 py-1 text-left transition-colors duration-150 hover:bg-white/80 hover:no-underline focus-visible:outline-none;
 	}
 
 	.calendar-page {
@@ -253,11 +253,11 @@
 	}
 
 	.calendar-tabs {
-		@apply inline-flex w-fit rounded-lg border border-gray-300/70 bg-white/60 p-1 shadow-sm ring-1 ring-white/40 backdrop-blur-xl;
+		@apply inline-flex w-fit rounded-lg border border-gray-300/70 bg-white/60 p-1 shadow-sm backdrop-blur-xl;
 	}
 
 	.calendar-tabs__link {
-		@apply rounded-md px-3 py-1.5 text-sm font-semibold text-gray-600 transition-colors duration-150 hover:bg-white/70 hover:text-gray-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/35;
+		@apply rounded-md px-3 py-1.5 text-sm font-semibold text-gray-600 transition-colors duration-150 hover:bg-white/70 hover:text-gray-950 focus-visible:outline-none;
 	}
 
 	.calendar-tabs__link--active {
@@ -265,7 +265,7 @@
 	}
 
 	.calendar-shell {
-		@apply overflow-hidden rounded-lg border border-gray-300/70 bg-white/65 p-3 shadow-xl shadow-slate-900/5 ring-1 ring-white/45 backdrop-blur-2xl backdrop-saturate-150;
+		@apply overflow-hidden rounded-lg border border-gray-300/70 bg-white/65 p-3 shadow-xl shadow-slate-900/5 backdrop-blur-2xl backdrop-saturate-150;
 	}
 
 	.calendar-shell--home {
@@ -285,7 +285,7 @@
 	}
 
 	.calendar-shell .fc-button-primary {
-		@apply !rounded-lg !border-gray-300/80 !bg-white/70 !px-3 !py-1.5 !text-sm !font-semibold !text-gray-700 !shadow-sm !transition-colors !duration-150 hover:!border-gray-400/80 hover:!bg-white hover:!text-gray-950 focus:!shadow-none focus:!ring-2 focus:!ring-brand/35;
+		@apply !rounded-lg !border-gray-300/80 !bg-white/70 !px-3 !py-1.5 !text-sm !font-semibold !text-gray-700 !shadow-sm !transition-colors !duration-150 hover:!border-gray-400/80 hover:!bg-white hover:!text-gray-950 focus:!shadow-none;
 	}
 
 	.calendar-shell .fc-button-primary:disabled {
@@ -364,7 +364,7 @@
 	}
 
 	.calendar-highlight-input {
-		@apply w-full min-h-10 resize-none rounded-md border border-gray-300/70 bg-white/65 px-2 py-1 text-xs leading-snug text-gray-800 shadow-sm transition-[background-color,border-color,box-shadow] duration-150 placeholder:text-gray-400 focus:border-gray-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand/30;
+		@apply w-full min-h-10 resize-none rounded-md border border-gray-300/70 bg-white/65 px-2 py-1 text-xs leading-snug text-gray-800 shadow-sm transition-[background-color,border-color,box-shadow] duration-150 placeholder:text-gray-400 focus:border-gray-500 focus:bg-white focus:outline-none;
 	}
 
 	.calendar-highlight-input--filled {
@@ -467,7 +467,7 @@
 	}
 
 	.tasks-calendar-button {
-		@apply rounded-lg border border-gray-300/80 bg-white/70 px-3 py-1.5 text-sm font-semibold text-gray-700 shadow-sm transition-colors duration-150 hover:border-gray-400/80 hover:bg-white hover:text-gray-950 focus:outline-none focus:ring-2 focus:ring-brand/35;
+		@apply rounded-lg border border-gray-300/80 bg-white/70 px-3 py-1.5 text-sm font-semibold text-gray-700 shadow-sm transition-colors duration-150 hover:border-gray-400/80 hover:bg-white hover:text-gray-950 focus:outline-none;
 	}
 
 	.tasks-calendar-button--active {

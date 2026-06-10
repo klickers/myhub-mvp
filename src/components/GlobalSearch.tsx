@@ -176,7 +176,7 @@ export default function GlobalSearch() {
 				>
 					Search guilds, contracts, experiments, categories, and tasks
 				</label>
-				<div className="flex h-8 items-center gap-2 rounded-lg border border-gray-300/80 bg-white/70 px-2.5 text-gray-700 shadow-sm ring-1 ring-white/50 transition-[background-color,border-color,box-shadow] duration-150 focus-within:border-gray-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-brand/30">
+				<div className="flex h-8 items-center gap-2 rounded-lg border border-gray-300/80 bg-white/70 px-2.5 text-gray-700 shadow-sm transition-[background-color,border-color,box-shadow] duration-150 focus-within:border-gray-500 focus-within:bg-white">
 					<Search
 						className="size-3.5 flex-none text-gray-400"
 						aria-hidden="true"
@@ -210,7 +210,7 @@ export default function GlobalSearch() {
 						<button
 							type="button"
 							onClick={clearSearch}
-							className="inline-flex size-5 flex-none items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/35"
+							className="inline-flex size-5 flex-none items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700 focus-visible:outline-none"
 							aria-label="Clear search"
 						>
 							<X
@@ -225,7 +225,7 @@ export default function GlobalSearch() {
 					<div
 						id="global-search-results"
 						role="listbox"
-						className="absolute right-0 top-[calc(100%+0.5rem)] z-50 w-[min(28rem,calc(100vw-2rem))] overflow-hidden rounded-lg border border-gray-300/75 bg-white/95 shadow-2xl shadow-slate-900/15 ring-1 ring-white/50 backdrop-blur-xl"
+						className="absolute right-0 top-[calc(100%+0.5rem)] z-50 w-[min(28rem,calc(100vw-2rem))] overflow-hidden rounded-lg border border-gray-300/75 bg-white/95 shadow-2xl shadow-slate-900/15 backdrop-blur-xl"
 					>
 						{error ? (
 							<p className="px-3 py-4 text-sm text-rose-700">
@@ -286,7 +286,7 @@ export default function GlobalSearch() {
 														setActiveIndex(index)
 													}
 													className={cn(
-														"flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/35",
+														"flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left transition-colors focus-visible:outline-none",
 														isSelected
 															? "bg-gray-100"
 															: "hover:bg-gray-50",
@@ -304,7 +304,7 @@ export default function GlobalSearch() {
 														setActiveIndex(index)
 													}
 													className={cn(
-														"flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/35",
+														"flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left transition-colors focus-visible:outline-none",
 														isSelected
 															? "bg-gray-100"
 															: "hover:bg-gray-50",
