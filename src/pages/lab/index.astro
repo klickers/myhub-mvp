@@ -33,7 +33,10 @@ const experiments = await Astro.callAction(
 		</div>
 		{
 			categories.data?.map((category) => (
-				<div>
+				<div
+					id={`category-${category.slug}`}
+					class="scroll-mt-24"
+				>
 					<div class="flex justify-between">
 						<h2 class="text-3xl mb-6">{category.name}</h2>
 						<div>

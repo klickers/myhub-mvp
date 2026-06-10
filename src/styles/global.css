@@ -71,7 +71,11 @@
 	}
 
 	.app-topbar {
-		@apply fixed top-3 left-[calc(var(--sidebar-width)+1.25rem)] right-4 z-30 flex min-h-10 items-center rounded-lg border border-gray-300/70 bg-white/60 px-3 py-1.5 text-xs shadow-lg shadow-slate-900/5 ring-1 ring-white/45 backdrop-blur-xl backdrop-saturate-150 transition-[background-color,border-color,left] duration-[240ms] ease-out motion-reduce:transition-none;
+		@apply fixed top-3 left-[calc(var(--sidebar-width)+1.25rem)] right-4 z-30 flex min-h-10 items-center justify-between gap-3 rounded-lg border border-gray-300/70 bg-white/60 px-3 py-1.5 text-xs shadow-lg shadow-slate-900/5 ring-1 ring-white/45 backdrop-blur-xl backdrop-saturate-150 transition-[background-color,border-color,left] duration-[240ms] ease-out motion-reduce:transition-none;
+	}
+
+	.app-breadcrumbs {
+		@apply flex min-w-0 flex-1 items-center overflow-x-auto pr-[min(24rem,42vw)] scrollbar-hide;
 	}
 
 	.app-topbar a {
@@ -564,7 +568,15 @@
 
 	@media (max-width: 768px) {
 		.app-topbar {
-			@apply left-[calc(var(--sidebar-width)+1rem)] right-3 top-3 overflow-x-auto px-2.5 scrollbar-hide;
+			@apply left-[calc(var(--sidebar-width)+1rem)] right-3 top-3 gap-2 px-2.5;
+		}
+
+		.global-search {
+			@apply right-5 top-[1.125rem] w-[min(13rem,45vw)] min-w-[9rem];
+		}
+
+		.app-breadcrumbs {
+			@apply pr-[min(14rem,48vw)];
 		}
 
 		.app-main {
