@@ -7,7 +7,11 @@ import EditableMakeTimeType from "./form/EditableMakeTimeType"
 import EditableStatus from "./form/EditableStatus"
 import EditableDate from "./form/EditableDate"
 import Subtasks from "./models/task/Subtasks"
-import { dispatchTaskUpdated } from "@/helpers/taskEvents"
+import {
+	TASK_REMOVED_EVENT,
+	dispatchTaskUpdated,
+	type TaskRemovedEvent,
+} from "@/helpers/taskEvents"
 import { ChevronRight, X } from "lucide-react"
 import {
 	useEffect,
@@ -16,6 +20,7 @@ import {
 	type Dispatch,
 	type SetStateAction,
 } from "react"
+import TaskDeleteButton from "@/components/models/task/TaskDeleteButton"
 
 type Props = {
 	type: "task"
@@ -66,6 +71,17 @@ export default function SideTray({
 		document.addEventListener("keydown", handleKeyDown)
 		return () => document.removeEventListener("keydown", handleKeyDown)
 	}, [setSelected])
+
+	useEffect(() => {
+		const handleTaskRemoved = (event: Event) => {
+			const { taskIds } = (event as TaskRemovedEvent).detail
+			if (taskIds.includes(selected.id)) setSelected(null)
+		}
+
+		window.addEventListener(TASK_REMOVED_EVENT, handleTaskRemoved)
+		return () =>
+			window.removeEventListener(TASK_REMOVED_EVENT, handleTaskRemoved)
+	}, [selected.id, setSelected])
 
 	useEffect(() => {
 		let cancelled = false
@@ -169,6 +185,11 @@ export default function SideTray({
 									itemId={selected.id}
 								/>
 							</div>
+							<TaskDeleteButton
+								taskId={selected.id}
+								taskName={selected.name}
+								className="size-9 rounded-lg"
+							/>
 						</div>
 					</div>
 					<button

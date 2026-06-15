@@ -1,7 +1,10 @@
 import { useCallback, useEffect, useState } from "react"
 import { actions } from "astro:actions"
 import type { MakeTimeType, Status } from "@/generated/prisma/enums"
-import { dispatchTaskUpdated } from "@/helpers/taskEvents"
+import {
+	TASK_REMOVED_EVENT,
+	dispatchTaskUpdated,
+} from "@/helpers/taskEvents"
 import EditableDate from "@/components/form/EditableDate"
 import EditableStatus from "@/components/form/EditableStatus"
 import EditableNumber from "@/components/form/EditableNumber"
@@ -9,6 +12,7 @@ import EditableText from "@/components/form/EditableText"
 import SessionPlayButton from "@/components/models/session/SessionPlayButton"
 import AddSubtaskOfTask from "./AddSubtaskOfTask"
 import EditableMakeTimeType from "@/components/form/EditableMakeTimeType"
+import TaskDeleteButton from "@/components/models/task/TaskDeleteButton"
 
 type TaskNode = {
 	id: number
@@ -34,6 +38,16 @@ export default function Subtasks({ taskId }: { taskId: number }) {
 
 	useEffect(() => {
 		void reload()
+	}, [reload])
+
+	useEffect(() => {
+		const handleTaskRemoved = () => {
+			void reload()
+		}
+
+		window.addEventListener(TASK_REMOVED_EVENT, handleTaskRemoved)
+		return () =>
+			window.removeEventListener(TASK_REMOVED_EVENT, handleTaskRemoved)
 	}, [reload])
 
 	return (
@@ -126,6 +140,11 @@ function Node({
 						<SessionPlayButton
 							itemType="task"
 							itemId={node.id}
+						/>
+						<TaskDeleteButton
+							taskId={node.id}
+							taskName={node.name}
+							className="size-7"
 						/>
 						<AddSubtaskOfTask
 							parentTaskId={node.id}

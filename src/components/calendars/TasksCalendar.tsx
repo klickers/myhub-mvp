@@ -29,7 +29,9 @@ import getItemName from "@/helpers/getItemName"
 import type { Task } from "@/generated/prisma/client"
 import SideTray from "@/components/SideTray"
 import {
+	TASK_REMOVED_EVENT,
 	TASK_UPDATED_EVENT,
+	type TaskRemovedEvent,
 	type TaskUpdatedEvent,
 } from "@/helpers/taskEvents"
 
@@ -389,9 +391,29 @@ export default function TasksCalendar() {
 			void loadCalendarData(rangeStart, rangeEnd)
 		}
 
+		const handleTaskRemoved = (event: Event) => {
+			const { taskIds } = (event as TaskRemovedEvent).detail
+			const removedTaskIds = new Set(taskIds)
+
+			setSelectedTask((currentTask) =>
+				currentTask && removedTaskIds.has(currentTask.id)
+					? null
+					: currentTask,
+			)
+			setItems((currentItems) =>
+				currentItems.filter(
+					(item) => !item.taskId || !removedTaskIds.has(item.taskId),
+				),
+			)
+			void loadCalendarData(rangeStart, rangeEnd)
+		}
+
 		window.addEventListener(TASK_UPDATED_EVENT, handleTaskUpdated)
-		return () =>
+		window.addEventListener(TASK_REMOVED_EVENT, handleTaskRemoved)
+		return () => {
 			window.removeEventListener(TASK_UPDATED_EVENT, handleTaskUpdated)
+			window.removeEventListener(TASK_REMOVED_EVENT, handleTaskRemoved)
+		}
 	}, [loadCalendarData, rangeEnd, rangeStart])
 
 	const itemsByDate = useMemo(() => {

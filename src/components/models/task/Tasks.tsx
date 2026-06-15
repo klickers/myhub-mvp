@@ -4,12 +4,15 @@ import SessionPlayButton from "@/components/models/session/SessionPlayButton"
 import type { Task } from "@/generated/prisma/client"
 import { Status } from "@/generated/prisma/enums"
 import {
+	TASK_REMOVED_EVENT,
 	TASK_UPDATED_EVENT,
+	type TaskRemovedEvent,
 	type TaskUpdatedEvent,
 } from "@/helpers/taskEvents"
 import { Icon } from "@iconify/react"
 import minutesToHours from "@/helpers/time/minutesToHours"
 import SideTray from "@/components/SideTray"
+import TaskDeleteButton from "@/components/models/task/TaskDeleteButton"
 
 type TaskListTask = Task & {
 	subtasks?: Task[]
@@ -108,9 +111,33 @@ export default function Tasks({
 			})
 		}
 
+		const handleTaskRemoved = (event: Event) => {
+			const { taskIds } = (event as TaskRemovedEvent).detail
+			const removedTaskIds = new Set(taskIds)
+
+			setTaskList((currentTasks) =>
+				currentTasks
+					.filter((task) => !removedTaskIds.has(task.id))
+					.map((task) => ({
+						...task,
+						subtasks: task.subtasks?.filter(
+							(subtask) => !removedTaskIds.has(subtask.id),
+						),
+					})),
+			)
+			setSelectedTask((currentTask) =>
+				currentTask && removedTaskIds.has(currentTask.id)
+					? null
+					: currentTask,
+			)
+		}
+
 		window.addEventListener(TASK_UPDATED_EVENT, handleTaskUpdated)
-		return () =>
+		window.addEventListener(TASK_REMOVED_EVENT, handleTaskRemoved)
+		return () => {
 			window.removeEventListener(TASK_UPDATED_EVENT, handleTaskUpdated)
+			window.removeEventListener(TASK_REMOVED_EVENT, handleTaskRemoved)
+		}
 	}, [parentId, parentType, statuses])
 
 	return (
@@ -182,6 +209,10 @@ export default function Tasks({
 										<SessionPlayButton
 											itemType="task"
 											itemId={task.id}
+										/>
+										<TaskDeleteButton
+											taskId={task.id}
+											taskName={task.name}
 										/>
 									</div>
 								</div>

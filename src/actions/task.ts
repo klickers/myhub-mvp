@@ -134,6 +134,56 @@ type BreadcrumbTask = {
 	experiment: { id: number; name: string; slug: string } | null
 }
 
+type TaskSubtreeNode = {
+	id: number
+	depth: number
+}
+
+async function getTaskSubtree(taskId: number): Promise<TaskSubtreeNode[]> {
+	const root = await prisma.task.findUnique({
+		where: { id: taskId },
+		select: { id: true },
+	})
+
+	if (!root) return []
+
+	const subtree: TaskSubtreeNode[] = [{ id: root.id, depth: 0 }]
+	const seen = new Set<number>([root.id])
+	let frontier: TaskSubtreeNode[] = [{ id: root.id, depth: 0 }]
+
+	while (frontier.length > 0) {
+		const children = await prisma.task.findMany({
+			where: {
+				parentType: "task",
+				parentTaskId: { in: frontier.map((node) => node.id) },
+			},
+			select: {
+				id: true,
+				parentTaskId: true,
+			},
+		})
+
+		const depthByParentId = new Map(
+			frontier.map((node) => [node.id, node.depth]),
+		)
+		const next: TaskSubtreeNode[] = []
+
+		for (const child of children) {
+			if (seen.has(child.id)) continue
+
+			const depth = (depthByParentId.get(child.parentTaskId ?? 0) ?? 0) + 1
+			const node = { id: child.id, depth }
+			seen.add(child.id)
+			subtree.push(node)
+			next.push(node)
+		}
+
+		frontier = next
+	}
+
+	return subtree
+}
+
 async function getTaskAncestors(
 	tasks: Array<{ id: number; parentTaskId: number | null }>,
 ) {
@@ -510,6 +560,81 @@ export const task = {
 			return prisma.task.delete({
 				where: { id },
 			})
+		},
+	}),
+	deletionImpact: defineAction({
+		input: z.object({
+			id: z.coerce.number().int().positive(),
+		}),
+		handler: async ({ id }) => {
+			const subtree = await getTaskSubtree(id)
+			const taskIds = subtree.map((node) => node.id)
+			const sessionCount =
+				taskIds.length > 0
+					? await prisma.session.count({
+							where: { taskId: { in: taskIds } },
+						})
+					: 0
+
+			return {
+				taskIds,
+				descendantTaskCount: Math.max(taskIds.length - 1, 0),
+				sessionCount,
+			}
+		},
+	}),
+	archiveTree: defineAction({
+		input: z.object({
+			id: z.coerce.number().int().positive(),
+		}),
+		handler: async ({ id }) => {
+			const subtree = await getTaskSubtree(id)
+			const taskIds = subtree.map((node) => node.id)
+
+			if (taskIds.length > 0) {
+				await prisma.task.updateMany({
+					where: { id: { in: taskIds } },
+					data: { status: Status.archived },
+				})
+			}
+
+			return { taskIds }
+		},
+	}),
+	deleteTree: defineAction({
+		input: z.object({
+			id: z.coerce.number().int().positive(),
+		}),
+		handler: async ({ id }) => {
+			const subtree = await getTaskSubtree(id)
+			const taskIds = subtree.map((node) => node.id)
+
+			if (taskIds.length === 0) return { taskIds }
+
+			const maxDepth = Math.max(...subtree.map((node) => node.depth))
+			const operations = [
+				prisma.session.deleteMany({
+					where: { taskId: { in: taskIds } },
+				}),
+			]
+
+			for (let depth = maxDepth; depth >= 0; depth--) {
+				const idsAtDepth = subtree
+					.filter((node) => node.depth === depth)
+					.map((node) => node.id)
+
+				if (idsAtDepth.length === 0) continue
+
+				operations.push(
+					prisma.task.deleteMany({
+						where: { id: { in: idsAtDepth } },
+					}),
+				)
+			}
+
+			await prisma.$transaction(operations)
+
+			return { taskIds }
 		},
 	}),
 	getById: defineAction({
