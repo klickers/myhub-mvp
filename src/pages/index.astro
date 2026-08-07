@@ -1,51 +1,42 @@
 ---
+import Errands from "@/components/models/task/Errands"
+import DayCalendar from "@/components/DayCalendar"
 import Layout from "@/layouts/Layout.astro"
-import Buckets from "@/components/Buckets"
-import Calendar from "@/components/Calendar"
-import Dailies from "@/components/Dailies"
-import WeeklyTitle from "@/components/WeeklyTitle"
-import WeeklyHeader from "@/components/WeeklyHeader"
-import WeeklyCalendarControls from "@/components/WeeklyCalendarControls"
-import SessionPlayer from "@/components/models/session/SessionPlayer"
-import prisma from "@/helpers/prisma"
-
-const objectives = await prisma.objective.findMany({
-	orderBy: [
-		{
-			bucket: {
-				order: "asc",
-			},
-		},
-		{
-			id: "asc",
-		},
-	],
-})
-
-const tasks = await prisma.task.findMany({})
+import TimeGreeting from "@/components/TimeGreeting.astro"
+import { HomeBreadcrumb } from "@/helpers/data/breadcrumbs"
+import InspiringQuote from "@/components/InspiringQuote"
 ---
 
-<Layout>
-	<div class="flex items-center justify-between mb-10">
-		<WeeklyTitle client:load />
-		<WeeklyCalendarControls client:load />
-	</div>
-	<div class="flex gap-20 items-center">
-		<WeeklyHeader client:load />
-		<SessionPlayer
-			objectives={objectives}
-			tasks={tasks}
-			client:load
-		/>
-	</div>
-	<!-- TODO: add small daily calendar -->
-	<div class="flex gap-20">
-		<div class="w-2/3 pt-10">
-			<Dailies client:load />
+<!-- TODO: add focused experiments, e.g. January ones -->
+<Layout breadcrumbs={[HomeBreadcrumb]}>
+	<div class="flex gap-8">
+		<div class="w-full">
+			<TimeGreeting name="Catherine" />
+			<div class="flex gap-4 mt-8">
+				<section class="calendar-shell calendar-shell--home w-1/2">
+					<div class="mb-3 flex items-center justify-between px-1">
+						<h2 class="mb-0 text-lg font-semibold text-gray-950">
+							Calendar
+						</h2>
+					</div>
+					<DayCalendar client:load />
+				</section>
+				<div class="card card--static w-1/2">
+					<div class="card__content">
+						<h2>Agenda</h2>
+					</div>
+				</div>
+			</div>
 		</div>
-		<div class="w-1/3">
-			<Calendar client:load />
-			<Buckets client:load />
+		<div class="w-[220px] flex-none">
+			<div class="sticky top-14 space-y-4">
+				<InspiringQuote client:load />
+				<div class="card card--static mt-6">
+					<div class="card__content">
+						<Errands client:load />
+					</div>
+				</div>
+			</div>
 		</div>
 	</div>
 </Layout>

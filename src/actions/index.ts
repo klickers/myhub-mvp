@@ -2,14 +2,42 @@ import { defineAction } from "astro:actions"
 import { z } from "zod"
 import { differenceInMinutes } from "date-fns"
 import prisma from "@/helpers/prisma"
+import { guild } from "./guild"
+import { contract } from "./contract"
+import { task } from "./task"
+import { SessionItemType } from "@/generated/prisma/enums"
+import { session } from "./session"
+import { experiment } from "./experiment"
+import { category } from "./category"
+import { dailyHighlight } from "./dailyHighlight"
 
 export const server = {
+	guild,
+	contract,
+	task,
+	session,
+	experiment,
+	category,
+	dailyHighlight,
+	// ===============================
+	// Objective
+	// ===============================
+	getObjectiveById: defineAction({
+		input: z.object({
+			id: z.number(),
+		}),
+		handler: async ({ id }) => {
+			return prisma.objective.findUnique({
+				where: { id },
+			})
+		},
+	}),
 	// ===============================
 	// Session
 	// ===============================
 	startSession: defineAction({
 		input: z.object({
-			itemType: z.enum(["objective", "task"]),
+			itemType: z.nativeEnum(SessionItemType),
 			itemId: z.number(),
 		}),
 		handler: async ({ itemType, itemId }) => {
@@ -18,6 +46,10 @@ export const server = {
 				startTime: new Date(),
 			}
 			if (itemType === "objective") data.objectiveId = itemId
+			else if (itemType == "guild") data.guildId = itemId
+			else if (itemType == "contract") data.contractId = itemId
+			else if (itemType == "experiment") data.experimentId = itemId
+			else if (itemType == "task") data.taskId = itemId
 			return await prisma.session.create({ data })
 		},
 	}),

@@ -1,0 +1,153 @@
+---
+import Layout from "@/layouts/Layout.astro"
+import PersonaCard from "@/components/guild-hall/PersonaCard.astro"
+import { Icon } from "astro-icon/components"
+import { actions } from "astro:actions"
+import Button from "@/components/Button.astro"
+import SessionPlayButton from "@/components/models/session/SessionPlayButton"
+import Tasks from "@/components/models/task/Tasks"
+import PreviousSessions from "@/components/models/session/PreviousSessions.astro"
+import { GuildHallBreadcrumb } from "@/helpers/data/breadcrumbs"
+import { Status } from "@/generated/prisma/enums"
+
+const contract = await Astro.callAction(actions.contract.getBySlug, {
+	slug: Astro.params.slug as string,
+	includeSessions: true,
+	sessionsLimit: 5,
+})
+if (!contract.data) return Astro.redirect("/hall")
+
+const tasks = await Astro.callAction(actions.task.listByContract, {
+	contractId: contract.data.id,
+	includeSubtasks: true,
+	status: ["notstarted", "inprogress", "onhold"],
+})
+const completedTasks = await Astro.callAction(actions.task.listByContract, {
+	contractId: contract.data.id,
+	includeSubtasks: true,
+	status: ["completed"],
+})
+---
+
+<Layout
+	breadcrumbs={[
+		GuildHallBreadcrumb,
+		{
+			name: contract.data.guild ? contract.data.guild.name : "No Guild",
+			href: contract.data.guild
+				? `/hall/guilds/${contract.data.guild.slug}`
+				: "/hall",
+		},
+		{
+			name: contract.data.name,
+			href: Astro.url.pathname,
+		},
+	]}
+>
+	<div class="flex gap-8 min-h-screen">
+		<div class="w-full">
+			<div class="sticky top-14 float-right flex items-center gap-0.5">
+				<!-- <a
+					href="#!"
+					class="inline-block p-1"
+				>
+					<Icon name="mingcute:play-fill" />
+				</a> -->
+				<SessionPlayButton
+					itemType="contract"
+					itemId={contract.data.id}
+					client:load
+				/>
+				<a
+					href={`/hall/contracts/${contract.data.slug}/edit`}
+					class="inline-block text-white p-1 rounded-sm bg-gray-950"
+				>
+					<Icon name="mingcute:settings-5-fill" />
+				</a>
+			</div>
+			<!-- TODO: double click to edit contract name -->
+			<h1 class="mb-3">{contract.data.name}</h1>
+			<p>
+				{contract.data.description ?? <em>Put a description here.</em>}
+			</p>
+			<div class="mt-10">
+				<!-- TODO: in progress, upcoming, on hold -->
+				<div class="flex justify-between">
+					<h2>Active Assignments</h2>
+					<div>
+						<Button
+							href={`/tasks/create?contractSlug=${contract.data.slug}`}
+							icon="mingcute:plus-fill"
+							label="Add Assignment"
+						/>
+					</div>
+				</div>
+				<Tasks
+					tasks={tasks.data ?? []}
+					statuses={[
+						Status.notstarted,
+						Status.inprogress,
+						Status.onhold,
+					]}
+					parentType="contract"
+					parentId={contract.data.id}
+					client:load
+				/>
+				<div class="h-1"></div>
+				<Tasks
+					tasks={completedTasks.data ?? []}
+					statuses={[Status.completed]}
+					parentType="contract"
+					parentId={contract.data.id}
+					client:load
+				/>
+			</div>
+		</div>
+		<div class="space-y-4 w-[220px] flex-none">
+			<PersonaCard />
+			<div class="mt-8">
+				<h2>Previous Sessions</h2>
+				<PreviousSessions sessions={contract.data.sessions} />
+			</div>
+		</div>
+	</div>
+	<!-- <div class="h-screen fixed right-0 top-0 w-2/5 bg-white shadow-lg p-6">
+		{
+			tasks.data && tasks.data.length > 0 ? (
+				<div>
+					<h2>{tasks.data[0].name}</h2>
+					<table class="text-sm mb-6 leading-relaxed">
+						<tbody>
+							<tr>
+								<td>Estimated Time</td>
+								<td>{tasks.data[0].estimatedTime}</td>
+							</tr>
+							<tr>
+								<td>Status</td>
+								<td>{tasks.data[0].status}</td>
+							</tr>
+							<tr>
+								<td>Deadline</td>
+								<td>
+									{tasks.data[0].deadline
+										? format(
+												tasks.data[0].deadline,
+												"MMM d, yyyy"
+											)
+										: "no deadline"}
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<div>
+						<h3 class="text-lg font-semibold mb-3">Subtasks</h3>
+						<Subtasks
+							client:load
+							taskId={tasks.data[0].id}
+						/>
+					</div>
+				</div>
+			) : null
+		}
+	</div> -->
+</Layout>

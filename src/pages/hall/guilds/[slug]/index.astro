@@ -1,0 +1,139 @@
+---
+import Layout from "@/layouts/Layout.astro"
+import ContractCard from "@/components/guild-hall/ContractCard.astro"
+import PersonaCard from "@/components/guild-hall/PersonaCard.astro"
+import { Icon } from "astro-icon/components"
+import { actions } from "astro:actions"
+import { Status } from "@/generated/prisma/enums"
+import Button from "@/components/Button.astro"
+import SessionPlayButton from "@/components/models/session/SessionPlayButton"
+import Tasks from "@/components/models/task/Tasks"
+import PreviousSessions from "@/components/models/session/PreviousSessions.astro"
+import { GuildHallBreadcrumb } from "@/helpers/data/breadcrumbs"
+
+const guild = await Astro.callAction(actions.guild.getBySlug, {
+	slug: Astro.params.slug as string,
+	includeSessions: true,
+	sessionsLimit: 5,
+})
+if (!guild.data) return Astro.redirect("/hall")
+
+const activeContracts = await Astro.callAction(actions.contract.listByGuild, {
+	guildId: guild.data.id,
+})
+const allContracts = await Astro.callAction(actions.contract.listByGuild, {
+	guildId: guild.data.id,
+	status: [Status.notstarted, Status.onhold],
+})
+
+const tasks = await Astro.callAction(actions.task.listByGuild, {
+	guildId: guild.data.id,
+})
+---
+
+<Layout
+	breadcrumbs={[
+		GuildHallBreadcrumb,
+		{
+			name: guild.data.name,
+			href: Astro.url.pathname,
+		},
+	]}
+>
+	<div class="flex gap-8 min-h-screen">
+		<div class="w-full">
+			<div class="sticky top-14 float-right flex items-center gap-0.5">
+				<SessionPlayButton
+					itemType="guild"
+					itemId={guild.data.id}
+					client:load
+				/>
+				<a
+					href={`/hall/guilds/${guild.data.slug}/edit`}
+					class="inline-block text-white p-1 rounded-sm bg-gray-950"
+				>
+					<Icon name="mingcute:settings-5-fill" />
+				</a>
+			</div>
+			<!-- TODO: double click to edit guild name -->
+			<h1 class="mb-3">{guild.data.name}</h1>
+			<p>{guild.data.description ?? <em>Put a description here.</em>}</p>
+			<div class="mt-10">
+				<!-- TODO: in progress, upcoming, on hold -->
+				<div class="flex justify-between">
+					<h2>Active Assignments</h2>
+					<div>
+						<Button
+							href={`/tasks/create?guildSlug=${guild.data.slug}`}
+							icon="mingcute:plus-fill"
+							label="Add Assignment"
+						/>
+					</div>
+				</div>
+				<Tasks
+					tasks={tasks.data ?? []}
+					statuses={[
+						Status.notstarted,
+						Status.inprogress,
+						Status.onhold,
+						Status.completed,
+					]}
+					parentType="guild"
+					parentId={guild.data.id}
+					client:load
+				/>
+			</div>
+			<div class="mt-10">
+				<!-- TODO: in progress, upcoming, on hold -->
+				<div class="flex justify-between">
+					<h2>Active Contracts</h2>
+					<div>
+						<Button
+							href={`/hall/contracts/create?guildSlug=${guild.data.slug}`}
+							icon="mingcute:plus-fill"
+							label="Add Contract"
+						/>
+					</div>
+				</div>
+				<div class="grid grid-cols-2 gap-2">
+					{
+						activeContracts.data ? (
+							activeContracts.data.map((contract) => (
+								<ContractCard
+									contract={contract}
+									isGuild
+								/>
+							))
+						) : (
+							<p>No contracts found.</p>
+						)
+					}
+				</div>
+			</div>
+			<div class="mt-10">
+				<h2>All Contracts</h2>
+				<div class="grid grid-cols-2 gap-4">
+					{
+						allContracts.data ? (
+							allContracts.data.map((contract) => (
+								<ContractCard
+									contract={contract}
+									isGuild
+								/>
+							))
+						) : (
+							<p>No contracts found.</p>
+						)
+					}
+				</div>
+			</div>
+		</div>
+		<div class="space-y-4 w-[220px] flex-none">
+			<PersonaCard />
+			<div class="mt-8">
+				<h2>Previous Sessions</h2>
+				<PreviousSessions sessions={guild.data.sessions} />
+			</div>
+		</div>
+	</div>
+</Layout>

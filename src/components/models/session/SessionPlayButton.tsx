@@ -1,18 +1,26 @@
-import React from "react"
+import React, { useEffect } from "react"
 import { useStore } from "@nanostores/react"
 import { Icon } from "@iconify/react"
 import { actions } from "astro:actions"
 import { playingSession } from "@/stores/playingSession"
+import type { SessionItemType } from "@/generated/prisma/enums"
+import { initPlayingSession } from "@/helpers/initPlayingSession"
 
 interface Props {
-	itemType: "objective" | "task"
+	itemType: SessionItemType
 	itemId: number
 }
 
 const SessionPlayButton: React.FC<Props> = ({ itemType, itemId }) => {
 	const $playingSession = useStore(playingSession)
 	const isCurrentlyPlaying =
-		$playingSession.isPlaying && $playingSession.objectiveId == itemId
+		$playingSession.isPlaying &&
+		$playingSession.itemType == itemType &&
+		$playingSession.itemId == itemId
+
+	useEffect(() => {
+		initPlayingSession()
+	}, [])
 
 	const endCurrentSession = async () => {
 		const { data, error } = await actions.getKeyValue({
@@ -25,13 +33,14 @@ const SessionPlayButton: React.FC<Props> = ({ itemType, itemId }) => {
 				value: "false",
 			})
 			await actions.setKeyValue({
-				key: "playingSessionObjectiveId",
+				key: "playingSessionItemId",
 				value: "0",
 			})
 			playingSession.set({
 				id: 0,
 				isPlaying: false,
-				objectiveId: 0,
+				itemType: "task",
+				itemId: 0,
 				startTime: null,
 			})
 		} else if (error)
@@ -54,7 +63,11 @@ const SessionPlayButton: React.FC<Props> = ({ itemType, itemId }) => {
 				value: data.id.toString(),
 			})
 			await actions.setKeyValue({
-				key: "playingSessionObjectiveId",
+				key: "playingSessionItemType",
+				value: itemType,
+			})
+			await actions.setKeyValue({
+				key: "playingSessionItemId",
 				value: itemId.toString(),
 			})
 			await actions.setKeyValue({
@@ -64,7 +77,8 @@ const SessionPlayButton: React.FC<Props> = ({ itemType, itemId }) => {
 			playingSession.set({
 				id: data.id,
 				isPlaying: true,
-				objectiveId: itemId,
+				itemType,
+				itemId,
 				startTime: new Date(),
 			})
 		}
@@ -72,23 +86,23 @@ const SessionPlayButton: React.FC<Props> = ({ itemType, itemId }) => {
 
 	const handleClick = async () => {
 		if ($playingSession.isPlaying) {
-			if (isCurrentlyPlaying) await endCurrentSession()
-			else {
-				await endCurrentSession()
-				await startSession()
-			}
+			await endCurrentSession()
+			if (!isCurrentlyPlaying) await startSession()
 			// TODO: update $bucket.objectives.sessions to include new session
 			// TODO: clear editor
 		} else await startSession()
 	}
 
 	return (
-		<button onClick={handleClick}>
+		<button
+			onClick={handleClick}
+			className="p-1"
+		>
 			<Icon
 				icon={
 					isCurrentlyPlaying
-						? "pixelarticons:pause"
-						: "pixelarticons:play"
+						? "mingcute:pause-fill"
+						: "mingcute:play-fill"
 				}
 			/>
 		</button>

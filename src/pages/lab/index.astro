@@ -1,0 +1,84 @@
+---
+import Layout from "@/layouts/Layout.astro"
+import { actions } from "astro:actions"
+import Button from "@/components/Button.astro"
+import { Status } from "@/generated/prisma/enums"
+import ExperimentCard from "@/components/lab/ExperimentCard.astro"
+import { AlchemyLabBreadcrumb } from "@/helpers/data/breadcrumbs"
+
+const categories = await Astro.callAction(actions.category.list, {
+	withExperiments: true,
+})
+const experiments = await Astro.callAction(
+	actions.experiment.listWithoutCategory,
+	{
+		status: [Status.inprogress],
+	},
+)
+---
+
+<Layout breadcrumbs={[AlchemyLabBreadcrumb]}>
+	<div class="space-y-20">
+		<div class="flex gap-2">
+			<Button
+				href="/lab/categories/create"
+				icon="mingcute:plus-fill"
+				label="Add Category"
+			/>
+			<Button
+				href="/lab/experiments/create"
+				icon="mingcute:plus-fill"
+				label="Add Experiment"
+			/>
+		</div>
+		{
+			categories.data?.map((category) => (
+				<div
+					id={`category-${category.slug}`}
+					class="scroll-mt-24"
+				>
+					<div class="flex justify-between">
+						<h2 class="text-3xl mb-6">{category.name}</h2>
+						<div>
+							<Button
+								href={`/lab/experiments/create?categorySlug=${category.slug}`}
+								icon="mingcute:plus-fill"
+								label="Add Experiment"
+							/>
+						</div>
+					</div>
+					<div class="grid grid-cols-1 gap-1">
+						{category.experiments ? (
+							category.experiments.map((experiment) => (
+								<ExperimentCard experiment={experiment} />
+							))
+						) : (
+							<p>No active experiments found.</p>
+						)}
+					</div>
+				</div>
+			))
+		}
+		{
+			experiments.data && experiments.data.length > 0 ? (
+				<div>
+					<div class="flex justify-between">
+						<h2 class="text-3xl mb-6">Other</h2>
+						<div>
+							<Button
+								href="/lab/experiments/create"
+								icon="mingcute:plus-fill"
+								label="Add Experiment"
+							/>
+						</div>
+					</div>
+					<div class="grid grid-cols-3 gap-3">
+						{experiments.data.map((experiment) => (
+							<ExperimentCard experiment={experiment} />
+						))}
+					</div>
+				</div>
+			) : null
+		}
+	</div>
+</Layout>

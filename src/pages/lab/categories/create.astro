@@ -1,0 +1,49 @@
+---
+import { actions } from "astro:actions"
+import Layout from "@/layouts/Layout.astro"
+import { Icon } from "astro-icon/components"
+import { AlchemyLabBreadcrumb } from "@/helpers/data/breadcrumbs"
+import AutoSlugger from "@/components/AutoSlugger.astro"
+
+const result = Astro.getActionResult(actions.category.create)
+if (result && !result.error) return Astro.redirect(`/lab/`)
+// return Astro.redirect(`/lab/categories/${result.data.slug}`)
+---
+
+<Layout
+	breadcrumbs={[
+		AlchemyLabBreadcrumb,
+		{
+			name: "Create Category",
+			href: Astro.url.pathname,
+		},
+	]}
+>
+	<h1>New Category</h1>
+
+	<form
+		method="POST"
+		action={actions.category.create}
+		class="flex flex-col space-y-1 max-w-lg"
+	>
+		<input
+			type="text"
+			name="name"
+			placeholder="Name"
+			required
+		/>
+
+		<input
+			type="text"
+			name="slug"
+			placeholder="Slug"
+			required
+		/>
+
+		<div>
+			<button class="w-auto button py-2 mt-2">Create</button>
+		</div>
+	</form>
+
+	<AutoSlugger />
+</Layout>

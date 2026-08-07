@@ -1,0 +1,208 @@
+---
+import { actions } from "astro:actions"
+import Layout from "@/layouts/Layout.astro"
+import {
+	GuildHallBreadcrumb,
+	AlchemyLabBreadcrumb,
+} from "@/helpers/data/breadcrumbs"
+
+const result = Astro.getActionResult(actions.task.create)
+if (result && !result.error) {
+	if (result.data?.contractSlug)
+		return Astro.redirect(`/hall/contracts/${result.data.contractSlug}`)
+	if (result.data?.guildSlug)
+		return Astro.redirect(`/hall/guilds/${result.data.guildSlug}`)
+	if (result.data?.experimentSlug)
+		return Astro.redirect(`/lab/experiments/${result.data.experimentSlug}`)
+}
+
+// Fetch parents
+const contracts = await Astro.callAction(actions.contract.list, {})
+const guilds = await Astro.callAction(actions.guild.list, {})
+const experiments = await Astro.callAction(actions.experiment.list, {})
+
+// URL params
+const contractSlug = Astro.url.searchParams.get("contractSlug")
+const guildSlug = Astro.url.searchParams.get("guildSlug")
+const experimentSlug = Astro.url.searchParams.get("experimentSlug")
+
+// Resolve parents
+const contract = contracts.data?.find((c) => c.slug === contractSlug)
+const guild = guilds.data?.find((g) => g.slug === guildSlug)
+const experiment = experiments.data?.find((e) => e.slug === experimentSlug)
+---
+
+<Layout
+	breadcrumbs={[
+		...(contract || guild
+			? [
+					GuildHallBreadcrumb,
+					{
+						name: guild?.name ?? contract?.name ?? "Parent",
+						href: contractSlug
+							? `/hall/contracts/${contractSlug}`
+							: `/hall/guilds/${guildSlug}`,
+					},
+				]
+			: experiment
+				? [
+						AlchemyLabBreadcrumb,
+						{
+							name: experiment.name,
+							href: `/lab/experiments/${experimentSlug}`,
+						},
+					]
+				: []),
+		{ name: "Create Task", href: Astro.url.pathname + Astro.url.search },
+	]}
+>
+	<h1>New Task</h1>
+
+	<form
+		method="POST"
+		action={actions.task.create}
+		class="flex flex-col space-y-1 max-w-lg"
+	>
+		{
+			contractSlug && (
+				<input
+					type="hidden"
+					name="contractSlug"
+					value={contractSlug}
+				/>
+			)
+		}
+		{
+			guildSlug && (
+				<input
+					type="hidden"
+					name="guildSlug"
+					value={guildSlug}
+				/>
+			)
+		}
+		{
+			experimentSlug && (
+				<input
+					type="hidden"
+					name="experimentSlug"
+					value={experimentSlug}
+				/>
+			)
+		}
+
+		<input
+			type="text"
+			name="name"
+			placeholder="Task name"
+			required
+		/>
+
+		<input
+			type="number"
+			name="estimatedTime"
+			placeholder="Estimated time (minutes)"
+			min="0"
+		/>
+
+		<input
+			type="date"
+			name="deadline"
+		/>
+
+		<select name="status">
+			<option
+				value="notstarted"
+				selected
+				>Not started</option
+			>
+			<option value="inprogress">In progress</option>
+			<option value="onhold">On hold</option>
+			<option value="completed">Completed</option>
+			<option value="archived">Archived</option>
+		</select>
+
+		<select name="makeTimeType">
+			<option value="">N/A</option>
+			<option value="highlight">Highlight</option>
+			<option value="batch">Batch</option>
+		</select>
+
+		{
+			contract ? (
+				<>
+					<input
+						type="hidden"
+						name="parentType"
+						value="contract"
+					/>
+					<input
+						type="hidden"
+						name="contractId"
+						value={contract.id}
+					/>
+				</>
+			) : guild ? (
+				<>
+					<input
+						type="hidden"
+						name="parentType"
+						value="guild"
+					/>
+					<input
+						type="hidden"
+						name="guildId"
+						value={guild.id}
+					/>
+				</>
+			) : experiment ? (
+				<>
+					<input
+						type="hidden"
+						name="parentType"
+						value="experiment"
+					/>
+					<input
+						type="hidden"
+						name="experimentId"
+						value={experiment.id}
+					/>
+				</>
+			) : (
+				<>
+					<select name="parentType">
+						<option value="none">No parent</option>
+						<option value="contract">Contract</option>
+						<option value="guild">Guild</option>
+						<option value="experiment">Experiment</option>
+					</select>
+
+					<select name="contractId">
+						<option value="">No contract</option>
+						{contracts.data?.map((c) => (
+							<option value={c.id}>{c.name}</option>
+						))}
+					</select>
+
+					<select name="guildId">
+						<option value="">No guild</option>
+						{guilds.data?.map((g) => (
+							<option value={g.id}>{g.name}</option>
+						))}
+					</select>
+
+					<select name="experimentId">
+						<option value="">No experiment</option>
+						{experiments.data?.map((e) => (
+							<option value={e.id}>{e.name}</option>
+						))}
+					</select>
+				</>
+			)
+		}
+
+		<div>
+			<button class="w-auto button py-2 mt-2">Create Task</button>
+		</div>
+	</form>
+</Layout>

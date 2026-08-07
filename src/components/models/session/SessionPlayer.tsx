@@ -6,29 +6,38 @@ import { playingSession } from "@/stores/playingSession"
 import { secondsToDots } from "@/helpers/time/secondsToDots"
 import { differenceInSeconds } from "date-fns"
 
-import { Plate, usePlateEditor, type TPlateEditor } from "platejs/react"
+import { Plate, usePlateEditor } from "platejs/react"
 import { Editor, EditorContainer } from "@/components/editor/ui/editor"
 import { EditorKit } from "@/components/editor/editor-kit"
 import type { Prisma } from "@/generated/prisma/client"
 import { type Value } from "platejs"
+import { initPlayingSession } from "@/helpers/initPlayingSession"
 
-interface Objective {
-	id: number
-	name: string
-}
+// interface Objective {
+// 	id: number
+// 	name: string
+// }
 
-interface Task {
-	id: number
-	name: string
-}
+// interface Task {
+// 	id: number
+// 	name: string
+// }
+
+type SessionItemType =
+	| "objective"
+	| "none"
+	| "guild"
+	| "contract"
+	| "experiment"
+	| "task"
 
 interface Props {
-	objectives: Objective[]
-	tasks: Task[]
+	// objectives: Objective[]
+	// tasks: Task[]
 }
 
-const SessionPlayer: React.FC<Props> = ({ objectives, tasks }) => {
-	const [itemType, setItemType] = useState<"objective" | "task">("objective")
+const SessionPlayer: React.FC<Props> = ({}) => {
+	const [itemType, setItemType] = useState<SessionItemType>("task")
 	const [itemId, setItemId] = useState<number | null>(null)
 	const [notes, setNotes] = useState<Prisma.JsonArray>([])
 	const [lastSaved, setLastSaved] = useState<string | null>(null)
@@ -51,13 +60,17 @@ const SessionPlayer: React.FC<Props> = ({ objectives, tasks }) => {
 			if (!data) return
 
 			// Set correct item type + id
-			if (data.itemType === "objective" && data.objectiveId) {
-				setItemType("objective")
+			if (data.itemType === "objective" && data.objectiveId)
 				setItemId(data.objectiveId)
-			} else if (data.itemType === "task" && data.taskId) {
-				setItemType("task")
+			else if (data.itemType === "guild" && data.guildId)
+				setItemId(data.guildId)
+			else if (data.itemType === "contract" && data.contractId)
+				setItemId(data.contractId)
+			else if (data.itemType === "experiment" && data.experimentId)
+				setItemId(data.experimentId)
+			else if (data.itemType === "task" && data.taskId)
 				setItemId(data.taskId)
-			}
+			setItemType(data.itemType)
 
 			// Set notes
 			if ((data.notesJson as Array<any>).length == 0) {
@@ -71,6 +84,7 @@ const SessionPlayer: React.FC<Props> = ({ objectives, tasks }) => {
 			}
 		}
 
+		initPlayingSession()
 		loadSessionData()
 	}, [$playingSession.id, $playingSession.isPlaying])
 
@@ -103,7 +117,7 @@ const SessionPlayer: React.FC<Props> = ({ objectives, tasks }) => {
 	// Update timer display
 	// ---------------------------------------------------
 	useEffect(() => {
-		if (!$playingSession.startTime || !$playingSession.objectiveId) return
+		if (!$playingSession.startTime || !$playingSession.itemId) return
 		const interval = setInterval(() => {
 			setUsedTime(
 				secondsToDots(
@@ -114,7 +128,7 @@ const SessionPlayer: React.FC<Props> = ({ objectives, tasks }) => {
 		return () => clearInterval(interval)
 	}, [$playingSession])
 
-	const itemList = itemType === "objective" ? objectives : tasks
+	// const itemList = itemType === "objective" ? objectives : tasks
 
 	const isSessionPlaying = $playingSession.isPlaying && $playingSession.id
 
@@ -123,45 +137,32 @@ const SessionPlayer: React.FC<Props> = ({ objectives, tasks }) => {
 		value: notes as Value,
 	})
 
+	let href = "#!"
+	if ($playingSession?.slug) {
+		switch ($playingSession.itemType) {
+			case "guild":
+				href = `/hall/guilds/${$playingSession.slug}`
+				break
+			case "contract":
+				href = `/hall/contracts/${$playingSession.slug}`
+				break
+			case "objective":
+				href = `/objectives/${$playingSession.slug}`
+				break
+			case "experiment":
+				href = `/lab/experiments/${$playingSession.slug}`
+				break
+		}
+	}
+
 	return (
-		<div className="flex flex-col gap-2 border border-black p-4">
+		<div className="flex flex-col gap-2">
 			<div className="flex gap-2 items-center">
-				<select
-					value={itemType}
-					onChange={(e) => {
-						const t = e.target.value as "objective" | "task"
-						setItemType(t)
-						setItemId(null)
-					}}
-					className="p-1"
-				>
-					<option value="objective">Objective</option>
-					<option value="task">Task</option>
-				</select>
-
-				<select
-					value={itemId ?? ""}
-					onChange={(e) => setItemId(parseInt(e.target.value))}
-					className="p-1"
-				>
-					<option
-						value=""
-						disabled
-					>
-						Select {itemType}
-					</option>
-					{itemList.map((i) => (
-						<option
-							key={i.id}
-							value={i.id}
-						>
-							{i.name}
-						</option>
-					))}
-				</select>
-
 				{itemId && (
 					<>
+						<p>
+							<a href={href}>{$playingSession.title}</a>
+						</p>
 						<p className="text-xs font-mono">{usedTime}</p>
 						<SessionPlayButton
 							itemType={itemType}
@@ -170,24 +171,8 @@ const SessionPlayer: React.FC<Props> = ({ objectives, tasks }) => {
 					</>
 				)}
 			</div>
-			{/* {isSessionPlaying && (
-				<div className="flex flex-col gap-1 relative">
-					<textarea
-						value={notes}
-						onChange={(e) => setNotes(e.target.value)}
-						placeholder="Notes..."
-						className="p-2 h-24 border border-black focus:outline-none"
-					/>
-
-					{lastSaved && (
-						<div className="text-xs absolute bottom-2 left-2 text-gray-500">
-							saved at {lastSaved}
-						</div>
-					)}
-				</div>
-			)} */}
 			{isSessionPlaying && (
-				<div className="relative">
+				<div>
 					<Plate
 						onValueChange={({ value }) => {
 							setNotes(value as Prisma.JsonArray)
@@ -198,12 +183,13 @@ const SessionPlayer: React.FC<Props> = ({ objectives, tasks }) => {
 							<Editor placeholder="Notes here..." />
 						</EditorContainer>
 					</Plate>
-
-					{lastSaved && (
-						<div className="text-xs absolute bottom-2 left-2 text-gray-500">
-							saved at {lastSaved}
-						</div>
-					)}
+					<div className="relative">
+						{lastSaved && (
+							<div className="text-xs absolute top-1 left-0 text-gray-500">
+								saved at {lastSaved}
+							</div>
+						)}
+					</div>
 				</div>
 			)}
 		</div>

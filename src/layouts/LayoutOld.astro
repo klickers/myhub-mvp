@@ -1,0 +1,36 @@
+---
+import "@/styles/global.css"
+import TopNavigation from "@/components/TopNavigation"
+
+const path = Astro.url.pathname
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta
+			name="viewport"
+			content="width=device-width"
+		/>
+		<link
+			rel="icon"
+			type="image/svg+xml"
+			href="/favicon.svg"
+		/>
+		<meta
+			name="generator"
+			content={Astro.generator}
+		/>
+		<title>MyHub</title>
+	</head>
+	<body>
+		<TopNavigation
+			currentPath={path}
+			client:load
+		/>
+		<main class="mt-20 p-6 bg-cover">
+			<slot />
+		</main>
+	</body>
+</html>

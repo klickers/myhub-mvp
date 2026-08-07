@@ -5,8 +5,8 @@ import { useStore } from "@nanostores/react"
 import { buckets } from "@/stores/buckets"
 import { playingSession } from "@/stores/playingSession"
 import { differenceInSeconds } from "date-fns"
-import { actions } from "astro:actions"
 import { secondsToDots } from "@/helpers/time/secondsToDots"
+import { initPlayingSession } from "@/helpers/initPlayingSession"
 
 const Buckets: React.FC = () => {
 	const $buckets = useStore(buckets)
@@ -15,27 +15,6 @@ const Buckets: React.FC = () => {
 	const [sessionUsedTime, setSessionUsedTime] = useState<string>("00:00:00")
 
 	useEffect(() => {
-		const initPlayingSession = async () => {
-			const id = await actions.getKeyValue.orThrow({
-					key: "playingSessionId",
-				}),
-				isPlaying = await actions.getKeyValue.orThrow({
-					key: "isSessionPlaying",
-				}),
-				objectiveId = await actions.getKeyValue.orThrow({
-					key: "playingSessionObjectiveId",
-				}),
-				startTime = await actions.getKeyValue.orThrow({
-					key: "playingSessionStartTime",
-				})
-
-			playingSession.set({
-				id: parseInt(id || "0"),
-				isPlaying: isPlaying === "true",
-				objectiveId: parseInt(objectiveId || "0"),
-				startTime: startTime ? new Date(startTime) : null,
-			})
-		}
 		initPlayingSession()
 	}, [])
 
@@ -43,7 +22,7 @@ const Buckets: React.FC = () => {
 	// Update timer display
 	// ---------------------------------------------------
 	useEffect(() => {
-		if (!$playingSession.startTime || !$playingSession.objectiveId) return
+		if (!$playingSession.startTime || !$playingSession.itemId) return
 		const interval = setInterval(() => {
 			setSessionUsedTime(
 				secondsToDots(
@@ -76,7 +55,7 @@ const Buckets: React.FC = () => {
 							// OR no scheduled time
 
 							const usedTime =
-								$playingSession.objectiveId === obj.id &&
+								$playingSession.itemId === obj.id &&
 								$playingSession.startTime
 									? sessionUsedTime ??
 									  secondsToDots(obj.usedTime * 60)

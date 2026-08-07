@@ -1,0 +1,40 @@
+---
+import Layout from "@/layouts/Layout.astro"
+import SessionsCalendar from "@/components/calendars/SessionsCalendar"
+---
+
+<Layout
+	breadcrumbs={[
+		{
+			icon: "mingcute:calendar-2-fill",
+			name: "Calendar",
+			href: "/calendar",
+		},
+		{
+			name: "Sessions Calendar",
+			href: "/calendar/sessions",
+		},
+	]}
+>
+	<div class="calendar-page">
+		<nav
+			class="calendar-tabs"
+			aria-label="Calendar views"
+		>
+			<a
+				href="/calendar"
+				class="calendar-tabs__link"
+			>
+				Tasks
+			</a>
+			<a
+				href="/calendar/sessions"
+				class="calendar-tabs__link calendar-tabs__link--active"
+				aria-current="page"
+			>
+				Sessions
+			</a>
+		</nav>
+		<SessionsCalendar client:load />
+	</div>
+</Layout>

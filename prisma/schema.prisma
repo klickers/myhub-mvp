@@ -10,6 +10,170 @@ datasource db {
     directUrl = env("DIRECT_URL")
 }
 
+// ================================================
+// Adventure Schema
+// ================================================
+
+enum Status {
+    notstarted
+    archived
+    inprogress
+    onhold
+    completed
+}
+
+model Guild {
+    id          Int     @id @default(autoincrement())
+    name        String
+    slug        String  @unique
+    description String?
+    status      Status  @default(inprogress)
+    personaId   Int?
+
+    persona Persona? @relation(fields: [personaId], references: [id])
+
+    contracts Contract[]
+    sessions  Session[]
+    tasks     Task[]
+}
+
+model Persona {
+    id          Int     @id @default(autoincrement())
+    name        String
+    description String
+    image       String?
+
+    guilds Guild[]
+}
+
+model Contract {
+    id          Int      @id @default(autoincrement())
+    name        String
+    slug        String   @unique
+    description String?
+    dueDate     DateTime
+    status      Status   @default(inprogress)
+    guildId     Int?
+
+    guild Guild? @relation(fields: [guildId], references: [id])
+
+    tasks    Task[]
+    sessions Session[]
+}
+
+enum TaskParentType {
+    none
+    contract
+    experiment
+    task
+    guild
+}
+
+enum MakeTimeType {
+    highlight
+    batch
+}
+
+model Task {
+    id            Int            @id @default(autoincrement())
+    name          String
+    parentType    TaskParentType @default(contract)
+    makeTimeType  MakeTimeType?
+    status        Status         @default(notstarted)
+    estimatedTime Int?           @default(0) // in minutes
+    deadline      DateTime?
+
+    contractId   Int?
+    experimentId Int?
+    parentTaskId Int?
+    guildId      Int?
+
+    contract   Contract?   @relation(fields: [contractId], references: [id])
+    experiment Experiment? @relation(fields: [experimentId], references: [id])
+    parentTask Task?       @relation("TaskHierarchy", fields: [parentTaskId], references: [id])
+    subtasks   Task[]      @relation("TaskHierarchy")
+    guild      Guild?      @relation(fields: [guildId], references: [id])
+
+    sessions Session[]
+}
+
+enum SessionItemType {
+    objective
+
+    none
+    guild
+    contract
+    experiment
+    task
+}
+
+model Session {
+    id        Int             @id @default(autoincrement())
+    itemType  SessionItemType @default(task)
+    startTime DateTime
+    endTime   DateTime?
+    notes     String?
+    notesJson Json?
+
+    objectiveId  Int?
+    guildId      Int?
+    contractId   Int?
+    experimentId Int?
+    taskId       Int?
+
+    objective  Objective?  @relation(fields: [objectiveId], references: [id])
+    guild      Guild?      @relation(fields: [guildId], references: [id])
+    contract   Contract?   @relation(fields: [contractId], references: [id])
+    experiment Experiment? @relation(fields: [experimentId], references: [id])
+    task       Task?       @relation(fields: [taskId], references: [id])
+}
+
+model Category {
+    id   Int    @id @default(autoincrement())
+    name String
+    slug String @unique
+
+    experiments Experiment[]
+}
+
+model Experiment {
+    id          Int      @id @default(autoincrement())
+    name        String
+    slug        String   @unique
+    description String?
+    status      Status   @default(inprogress)
+    categoryId  Int?
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+
+    category Category? @relation(fields: [categoryId], references: [id])
+
+    tasks    Task[]
+    sessions Session[]
+}
+
+model Agenda {
+    id Int @id @default(autoincrement())
+    // TODO
+}
+
+enum AgendaItemType {
+    guild
+    contract
+    task
+    category
+    experiment
+}
+
+model DailyHighlight {
+    date      DateTime @id @unique
+    highlight String?
+}
+
+// ================================================
+// Previous Schema
+// ================================================
+
 model Bucket {
     id    Int    @id @default(autoincrement())
     name  String
@@ -29,22 +193,8 @@ model Objective {
     status    Status    @default(notstarted)
 
     bucket       Bucket        @relation(fields: [bucketId], references: [id])
-    tasks        Task[]
     sessions     Session[]
     timePerWeeks TimePerWeek[]
-}
-
-model Task {
-    id            Int       @id @default(autoincrement())
-    name          String
-    objectiveId   Int
-    status        Status    @default(notstarted)
-    estimatedTime Int       @default(0)
-    deadline      DateTime?
-
-    objective    Objective     @relation(fields: [objectiveId], references: [id])
-    timePerWeeks TimePerWeek[]
-    sessions     Session[]
 }
 
 model Week {
@@ -63,29 +213,13 @@ model TimePerWeek {
     weekNumber    Int
     itemType      ItemType @default(objective)
     objectiveId   Int?
-    taskId        Int?
     scheduledTime Int      @default(0)
     completed     Boolean  @default(false)
 
     objective Objective? @relation(fields: [objectiveId], references: [id])
-    task      Task?      @relation(fields: [taskId], references: [id])
     week      Week       @relation(fields: [year, weekNumber], references: [year, weekNumber])
 
-    @@unique([year, weekNumber, itemType, objectiveId, taskId])
-}
-
-model Session {
-    id          Int       @id @default(autoincrement())
-    itemType    ItemType  @default(objective)
-    objectiveId Int?
-    taskId      Int?
-    startTime   DateTime
-    endTime     DateTime?
-    notes       String?
-    notesJson   Json?
-
-    objective Objective? @relation(fields: [objectiveId], references: [id])
-    task      Task?      @relation(fields: [taskId], references: [id])
+    @@unique([year, weekNumber, itemType, objectiveId])
 }
 
 model KeyValue {
@@ -103,14 +237,6 @@ model BusinessHours {
     daysOfWeek Int[]
     startTime  String
     endTime    String
-}
-
-enum Status {
-    notstarted
-    archived
-    inprogress
-    onhold
-    completed
 }
 
 enum ItemType {

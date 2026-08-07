@@ -1,0 +1,109 @@
+---
+import { Icon } from "astro-icon/components"
+import { differenceInMinutes, format } from "date-fns"
+import PlateInstance from "./PlateInstance"
+import type { Prisma } from "@/generated/prisma/client"
+import SessionPlayButton from "./SessionPlayButton"
+
+interface Props {
+	sessions: {
+		id: number
+		startTime: Date
+		endTime: Date | null
+		notesJson: unknown
+	}[]
+	timekeeper?: boolean
+}
+
+const { sessions, timekeeper = false } = Astro.props as Props
+
+const getTitle = (s: any) =>
+	s?.title ||
+	s?.task?.name ||
+	s?.guild?.name ||
+	s?.contract?.name ||
+	s?.experiment?.name ||
+	s?.objective?.name ||
+	"(untitled)"
+
+const getItemHref = (s: any) => {
+	// adjust routes to your app
+	switch (s?.itemType) {
+		case "task":
+			return /*s?.taskId ? `/tasks/${s.taskId}` :*/ null
+		case "guild":
+			return s?.guildId ? `/hall/guilds/${s.guild.slug}` : null
+		case "contract":
+			return s?.contractId ? `/hall/contracts/${s.contract.slug}` : null
+		case "experiment":
+			return s?.experimentId
+				? `/lab/experiments/${s.experiment.slug}`
+				: null
+		case "objective":
+			return s?.objectiveId ? `/objectives/${s.objective.slug}` : null
+		default:
+			return null
+	}
+}
+---
+
+<div>
+	{
+		sessions && sessions.length > 0 ? (
+			<div class="space-y-2">
+				{sessions.map((session) => {
+					return (
+						<div class="p-3 border border-gray-200 rounded-md bg-white">
+							{timekeeper && (
+								<div class="flex gap-1 items-center mb-1">
+									{getItemHref(session) ? (
+										<a href={getItemHref(session)}>
+											{getTitle(session)}
+										</a>
+									) : (
+										getTitle(session)
+									)}
+									<SessionPlayButton
+										itemType={session.itemType}
+										itemId={session[session.itemType].id}
+										client:load
+									/>
+								</div>
+							)}
+							<p
+								class={
+									(timekeeper ? "text-xs" : "text-sm") +
+									" text-gray-600 mb-1 flex justify-between items-center"
+								}
+							>
+								<span>
+									{format(
+										new Date(session.startTime),
+										"MMM dd, hh:mm a",
+									)}
+								</span>
+								<span class="flex items-center gap-0.5 text-xs">
+									<Icon name="mingcute:time-line" />
+									{differenceInMinutes(
+										new Date(session.endTime!),
+										new Date(session.startTime),
+									) + "min"}
+								</span>
+							</p>
+							{session.notesJson && (
+								<PlateInstance
+									value={
+										session.notesJson as Prisma.JsonArray
+									}
+									client:load
+								/>
+							)}
+						</div>
+					)
+				})}
+			</div>
+		) : (
+			<p class="text-gray-600">No previous sessions found.</p>
+		)
+	}
+</div>

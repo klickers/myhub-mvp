@@ -1,8 +1,21 @@
 ---
 import "@/styles/global.css"
-import TopNavigation from "@/components/TopNavigation"
+import Sidebar from "@/components/Sidebar.astro"
+import GlobalSearch from "@/components/GlobalSearch"
+import { Icon } from "astro-icon/components"
+
+type Breadcrumb = {
+	icon?: string
+	name: string
+	href: string
+}
+
+interface Props {
+	breadcrumbs: Breadcrumb[]
+}
 
 const path = Astro.url.pathname
+const breadcrumbs = Astro.props.breadcrumbs || [{ name: "Home", href: "/" }]
 ---
 
 <!doctype html>
@@ -23,14 +36,82 @@ const path = Astro.url.pathname
 			content={Astro.generator}
 		/>
 		<title>MyHub</title>
+		<script is:inline>
+			;(() => {
+				try {
+					const state =
+						localStorage.getItem("myhub:sidebar-state") ===
+						"collapsed"
+							? "collapsed"
+							: "expanded"
+
+					document.documentElement.dataset.sidebar = state
+				} catch {
+					document.documentElement.dataset.sidebar = "expanded"
+				}
+			})()
+		</script>
 	</head>
-	<body>
-		<TopNavigation
-			currentPath={path}
-			client:load
-		/>
-		<main class="mt-20 p-6 bg-cover">
-			<slot />
-		</main>
+	<body class="app-body">
+		<div class="app-shell">
+			<Sidebar
+				path={path}
+				transition:persist
+			/>
+			<div
+				class="app-content"
+				transition:persist
+			>
+				<header class="app-topbar">
+					<nav
+						class="app-breadcrumbs"
+						aria-label="Breadcrumb"
+					>
+						{
+							breadcrumbs.map((breadcrumb, index) => {
+								const isLast = index === breadcrumbs.length - 1
+
+								return (
+									<div class="flex items-center">
+										<a
+											href={
+												isLast
+													? undefined
+													: breadcrumb.href
+											}
+											aria-disabled={isLast}
+											aria-current={
+												isLast ? "page" : undefined
+											}
+											class={
+												"flex gap-1 items-center whitespace-nowrap" +
+												(isLast
+													? " text-gray-400 pointer-events-none"
+													: " text-gray-600 hover:underline")
+											}
+										>
+											{breadcrumb.icon && (
+												<Icon
+													name={breadcrumb.icon}
+													class="-mt-[1px] text-gray-500"
+												/>
+											)}
+											<span>{breadcrumb.name}</span>
+										</a>
+										{index < breadcrumbs.length - 1 && (
+											<span class="mx-2 text-gray-400">
+												/
+											</span>
+										)}
+									</div>
+								)
+							})
+						}
+					</nav>
+				</header>
+				<GlobalSearch client:load />
+				<main class="app-main"><slot /></main>
+			</div>
+		</div>
 	</body>
 </html>

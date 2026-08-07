@@ -1,0 +1,59 @@
+---
+import type { Contract, Prisma } from "@/generated/prisma/client"
+import { Icon } from "astro-icon/components"
+import { format } from "date-fns"
+
+type ContractWithGuild = Prisma.ContractGetPayload<{
+	include: { guild: true }
+}>
+
+type Props =
+	| {
+			isGuild: true
+			contract: Contract
+	  }
+	| {
+			isGuild?: false
+			contract: ContractWithGuild
+	  }
+
+const { isGuild = false, contract } = Astro.props
+---
+
+<!-- TODO: in progress, upcoming, on hold -->
+<div class="card duration-300 hover:shadow-md">
+	<div class="card__content p-2">
+		<div class="flex justify-between items-center">
+			<div class="flex gap-4 items-center">
+				<a
+					href={`/hall/contracts/${contract.slug}`}
+					class="font-semibold leading-tight"
+				>
+					{contract.name}
+				</a>
+				{
+					!isGuild && (contract as ContractWithGuild).guild ? (
+						<div class="flex gap-1 items-center w-32">
+							<div class="h-4 w-4 rounded-full bg-gray-300" />
+							<a
+								href={`/hall/guilds/${(contract as ContractWithGuild).guild!.slug}`}
+								class="text-gray-600 text-xs"
+							>
+								{(contract as ContractWithGuild).guild!.name}
+							</a>
+						</div>
+					) : null
+				}
+			</div>
+			<p class="text-xs text-gray-600 flex items-center gap-1">
+				<Icon name="mingcute:calendar-fill" />
+				{format(new Date(contract.dueDate), "MMM dd, yyyy")}
+			</p>
+		</div>
+		<!-- <div class="mt-4 relative">
+			<div class="h-2 w-full rounded-full bg-gray-200"></div>
+			<div class="h-2 w-3/4 rounded-full bg-emerald-400 absolute top-0">
+			</div>
+		</div> -->
+	</div>
+</div>
