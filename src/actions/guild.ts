@@ -97,7 +97,11 @@ export const guild = {
 			return prisma.guild.findMany({
 				where: {
 					status: {
-						notIn: [Status.onhold, Status.archived],
+						notIn: [
+							Status.onhold,
+							Status.archived,
+							Status.completed,
+						],
 					},
 				},
 				include: { persona: true },
