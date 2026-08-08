@@ -199,8 +199,8 @@ export const server = {
 								(acc, { startTime, endTime }) =>
 									acc +
 									differenceInMinutes(endTime, startTime),
-								0
-						  )
+								0,
+							)
 						: 0,
 				})
 			}
@@ -210,14 +210,14 @@ export const server = {
 				totalScheduledTime: objectivesByBucket[bucket.id]
 					? objectivesByBucket[bucket.id].reduce(
 							(acc, { scheduledTime }) => acc + scheduledTime,
-							0
-					  )
+							0,
+						)
 					: 0,
 				totalUsedTime: objectivesByBucket[bucket.id]
 					? objectivesByBucket[bucket.id].reduce(
 							(acc, { usedTime }) => acc + usedTime,
-							0
-					  )
+							0,
+						)
 					: 0,
 			}))
 		},
@@ -288,7 +288,7 @@ export const server = {
 					message:
 						"You must provide exactly one of objectiveId or taskId",
 					path: ["objectiveId", "taskId"],
-				}
+				},
 			),
 		handler: async (request) => {
 			const {
@@ -312,7 +312,7 @@ export const server = {
 			const hasTask = typeof taskId === "number"
 			if (hasObjective === hasTask)
 				throw new Error(
-					"You must provide exactly one of objectiveId or taskId."
+					"You must provide exactly one of objectiveId or taskId.",
 				)
 
 			// insert data
