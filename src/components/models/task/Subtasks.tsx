@@ -13,6 +13,7 @@ import SessionPlayButton from "@/components/models/session/SessionPlayButton"
 import AddSubtaskOfTask from "./AddSubtaskOfTask"
 import EditableMakeTimeType from "@/components/form/EditableMakeTimeType"
 import TaskDeleteButton from "@/components/models/task/TaskDeleteButton"
+import { dateKeyToUtcDate, getUtcDateKey } from "@/helpers/dateOnly"
 
 type TaskNode = {
 	id: number
@@ -208,7 +209,7 @@ function Node({
 							onSave={(date) =>
 								saveTaskChange({
 									id: node.id,
-									deadline: date ? new Date(date) : null,
+									deadline: date ? dateKeyToUtcDate(date) : null,
 								})
 							}
 						/>
@@ -234,9 +235,7 @@ function Node({
 
 function getDateValue(value: Date | string | null) {
 	if (!value) return null
-	const date = value instanceof Date ? value : new Date(value)
-	if (Number.isNaN(date.getTime())) return null
-	return date.toISOString()
+	return getUtcDateKey(value)
 }
 
 function statusLabel(status: Status) {

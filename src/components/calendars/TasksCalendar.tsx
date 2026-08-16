@@ -6,7 +6,6 @@ import {
 } from "@/generated/prisma/enums"
 import {
 	addDays,
-	addHours,
 	addMonths,
 	endOfMonth,
 	format,
@@ -28,6 +27,7 @@ import getItemUrl from "@/helpers/getItemUrl"
 import getItemName from "@/helpers/getItemName"
 import type { Task } from "@/generated/prisma/client"
 import SideTray from "@/components/SideTray"
+import { dateKeyToUtcDate, getUtcDateKey } from "@/helpers/dateOnly"
 import {
 	TASK_REMOVED_EVENT,
 	TASK_UPDATED_EVENT,
@@ -78,9 +78,11 @@ type LaneMeasurements = Record<
 	Partial<Record<TaskCalendarLane, Record<string, number>>>
 >
 
-function getDateKey(date: Date | string) {
+function getLocalDateKey(date: Date | string) {
 	if (typeof date === "string") return date.slice(0, 10)
-	return format(date, "yyyy-MM-dd")
+
+	const value = date instanceof Date ? date : new Date(date)
+	return format(value, "yyyy-MM-dd")
 }
 
 function makeDays(start: Date, count: number) {
@@ -128,8 +130,8 @@ function getRangeBounds(rows: Date[][]) {
 	const lastDay = lastRow[lastRow.length - 1] ?? firstDay
 
 	return {
-		start: firstDay,
-		end: addDays(lastDay, 1),
+		start: dateKeyToUtcDate(getLocalDateKey(firstDay)),
+		end: dateKeyToUtcDate(getLocalDateKey(addDays(lastDay, 1))),
 	}
 }
 
@@ -363,7 +365,7 @@ export default function TasksCalendar() {
 			setHighlights(
 				Object.fromEntries(
 					(highlightsRes.data ?? []).map((highlight) => [
-						getDateKey(highlight.date),
+						getLocalDateKey(highlight.date),
 						highlight.highlight ?? "",
 					]),
 				),
@@ -420,7 +422,7 @@ export default function TasksCalendar() {
 		const map = new Map<string, Record<TaskCalendarLane, CalendarItem[]>>()
 
 		for (const item of items) {
-			const dateKey = getDateKey(item.start)
+			const dateKey = getUtcDateKey(item.start)
 			const dayItems = map.get(dateKey) ?? { guild: [], lab: [] }
 			dayItems[item.lane].push(item)
 			map.set(dateKey, dayItems)
@@ -507,12 +509,12 @@ export default function TasksCalendar() {
 		if (item.type === "contract" && item.contract?.id) {
 			await actions.contract.updateJson({
 				id: item.contract.id,
-				dueDate: addHours(date, 3).toISOString(),
+				dueDate: dateKeyToUtcDate(getLocalDateKey(date)).toISOString(),
 			})
 		} else if (item.type === "task" && item.taskId) {
 			await actions.task.update({
 				id: item.taskId,
-				deadline: addHours(date, 3),
+				deadline: dateKeyToUtcDate(getLocalDateKey(date)),
 			})
 		}
 
@@ -584,7 +586,7 @@ export default function TasksCalendar() {
 					}}
 				>
 					{rows[0]?.map((day) => (
-						<div key={getDateKey(day)} className="tasks-calendar-weekday">
+						<div key={getLocalDateKey(day)} className="tasks-calendar-weekday">
 							{format(day, "EEE")}
 						</div>
 					))}
@@ -592,7 +594,7 @@ export default function TasksCalendar() {
 
 				<div className="tasks-calendar-grid">
 					{rows.map((row) => {
-						const rowKey = `${getDateKey(row[0])}_${getDateKey(row[row.length - 1])}`
+						const rowKey = `${getLocalDateKey(row[0])}_${getLocalDateKey(row[row.length - 1])}`
 						const rowMeasurements = laneMeasurements[rowKey] ?? {}
 						const guildLaneHeight = getMaxLaneHeight(
 							rowMeasurements,
@@ -609,7 +611,7 @@ export default function TasksCalendar() {
 								}}
 							>
 								{row.map((day) => {
-									const dateKey = getDateKey(day)
+									const dateKey = getLocalDateKey(day)
 									const dayItems = itemsByDate.get(dateKey) ?? {
 										guild: [],
 										lab: [],

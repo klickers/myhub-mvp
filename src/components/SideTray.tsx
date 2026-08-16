@@ -21,6 +21,7 @@ import {
 	type SetStateAction,
 } from "react"
 import TaskDeleteButton from "@/components/models/task/TaskDeleteButton"
+import { dateKeyToUtcDate, getUtcDateKey } from "@/helpers/dateOnly"
 
 type Props = {
 	type: "task"
@@ -132,7 +133,7 @@ export default function SideTray({
 	}
 
 	const deadlineValue = selected.deadline
-		? new Date(selected.deadline).toISOString()
+		? getUtcDateKey(selected.deadline)
 		: null
 
 	return (
@@ -284,7 +285,7 @@ export default function SideTray({
 										value={deadlineValue}
 										onSave={async (date) => {
 											const d = date
-												? new Date(date)
+												? dateKeyToUtcDate(date)
 												: null
 											await actions.task.update({
 												id: selected.id,
