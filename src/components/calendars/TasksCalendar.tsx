@@ -365,7 +365,7 @@ export default function TasksCalendar() {
 			setHighlights(
 				Object.fromEntries(
 					(highlightsRes.data ?? []).map((highlight) => [
-						getLocalDateKey(highlight.date),
+						getUtcDateKey(highlight.date),
 						highlight.highlight ?? "",
 					]),
 				),
@@ -446,7 +446,7 @@ export default function TasksCalendar() {
 			dateKey,
 			window.setTimeout(async () => {
 				await actions.dailyHighlight.upsert({
-					date: new Date(dateKey),
+					date: dateKeyToUtcDate(dateKey),
 					highlight: value,
 				})
 			}, 500),
