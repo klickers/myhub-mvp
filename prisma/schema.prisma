@@ -11,6 +11,15 @@ datasource db {
 }
 
 // ================================================
+// Updated Schema
+// ================================================
+
+model KeyValue {
+    key   String @id
+    value String
+}
+
+// ================================================
 // Adventure Schema
 // ================================================
 
@@ -238,11 +247,6 @@ model TimePerWeek {
     week      Week       @relation(fields: [year, weekNumber], references: [year, weekNumber])
 
     @@unique([year, weekNumber, itemType, objectiveId])
-}
-
-model KeyValue {
-    key   String @id
-    value String
 }
 
 model GoogleCalendarId {
