@@ -453,6 +453,92 @@
 		@apply text-emerald-950;
 	}
 
+	.agenda-task-list {
+		@apply flex flex-col gap-1.5;
+	}
+
+	.agenda-task-empty {
+		@apply rounded-md border border-dashed border-gray-300/80 bg-white/45 px-3 py-2 text-sm text-gray-500;
+	}
+
+	.agenda-task-card {
+		@apply flex items-center justify-between gap-2 overflow-hidden rounded-md border border-gray-300/80 bg-white/90 px-2 py-1.5 shadow-sm shadow-slate-900/5 transition-colors duration-150 hover:border-gray-400/80 hover:bg-white;
+	}
+
+	.agenda-task-card__content {
+		@apply min-w-0 flex-1;
+	}
+
+	.agenda-task-card__meta {
+		@apply block;
+	}
+
+	.agenda-task-card__title {
+		@apply block min-w-0 text-wrap text-xs font-semibold leading-tight text-gray-800 no-underline hover:text-gray-950;
+	}
+
+	.agenda-task-card__action {
+		@apply -mr-1 flex flex-none items-center text-gray-700;
+	}
+
+	.agenda-task-card--highlight {
+		@apply border-amber-300/90 bg-amber-100/95 hover:border-amber-400/90 hover:bg-amber-100;
+	}
+
+	.agenda-task-card--highlight .agenda-task-card__title,
+	.agenda-task-card--highlight .agenda-task-card__action {
+		@apply text-amber-950;
+	}
+
+	.agenda-task-card--batch {
+		@apply border-blue-300/90 bg-blue-100/95 hover:border-blue-400/90 hover:bg-blue-100;
+	}
+
+	.agenda-task-card--batch .agenda-task-card__title,
+	.agenda-task-card--batch .agenda-task-card__action {
+		@apply text-blue-950;
+	}
+
+	.agenda-task-card--inprogress {
+		@apply border-yellow-300/90 bg-yellow-100/95 hover:border-yellow-400/90 hover:bg-yellow-100;
+	}
+
+	.agenda-task-card--inprogress .agenda-task-card__title,
+	.agenda-task-card--inprogress .agenda-task-card__action {
+		@apply text-yellow-950;
+	}
+
+	.agenda-task-card--onhold {
+		@apply border-gray-300/90 bg-gray-200/95 hover:border-gray-400/90 hover:bg-gray-200;
+	}
+
+	.agenda-task-card--onhold .agenda-task-card__title,
+	.agenda-task-card--onhold .agenda-task-card__action {
+		@apply text-gray-700;
+	}
+
+	.agenda-task-card--completed {
+		@apply border-emerald-300/90 bg-emerald-100/95 hover:border-emerald-400/90 hover:bg-emerald-100;
+	}
+
+	.agenda-task-card--completed .agenda-task-card__title,
+	.agenda-task-card--completed .agenda-task-card__action {
+		@apply text-emerald-950;
+	}
+
+	.agenda-task-card--guild {
+		@apply border-l-[3px] border-l-violet-600/60;
+	}
+
+	.agenda-task-card--lab {
+		@apply border-l-[3px] border-l-sky-600/70;
+	}
+
+	.agenda-task-card--highlight.agenda-task-card--guild,
+	.agenda-task-card--highlight.agenda-task-card--lab {
+		@apply border-l-red-600/80;
+	}
+
 	.tasks-calendar-toolbar {
 		@apply mb-3 flex flex-wrap items-center justify-between gap-2;
 	}
@@ -524,6 +610,11 @@
 
 	.calendar-shell--tasks .calendar-lane-lab {
 		@apply !border-l-[3px] !border-l-sky-600/70;
+	}
+
+	.calendar-shell--tasks .calendar-highlight.calendar-lane-guild,
+	.calendar-shell--tasks .calendar-highlight.calendar-lane-lab {
+		@apply !border-l-red-600/80;
 	}
 
 	.calendar-lane-divider-content {

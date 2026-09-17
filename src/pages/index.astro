@@ -5,6 +5,7 @@ import Layout from "@/layouts/Layout.astro"
 import TimeGreeting from "@/components/TimeGreeting.astro"
 import { HomeBreadcrumb } from "@/helpers/data/breadcrumbs"
 import InspiringQuote from "@/components/InspiringQuote"
+import Agenda from "@/components/Agenda"
 ---
 
 <!-- TODO: add focused experiments, e.g. January ones -->
@@ -24,11 +25,12 @@ import InspiringQuote from "@/components/InspiringQuote"
 				<div class="card card--static w-1/2">
 					<div class="card__content">
 						<h2>Agenda</h2>
+						<Agenda client:load />
 					</div>
 				</div>
 			</div>
 		</div>
-		<div class="w-[220px] flex-none">
+		<div class="w-[240px] flex-none">
 			<div class="sticky top-14 space-y-4">
 				<InspiringQuote client:load />
 				<div class="card card--static mt-6">
