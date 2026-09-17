@@ -36,21 +36,6 @@ const breadcrumbs = Astro.props.breadcrumbs || [{ name: "Home", href: "/" }]
 			content={Astro.generator}
 		/>
 		<title>MyHub</title>
-		<script is:inline>
-			;(() => {
-				try {
-					const state =
-						localStorage.getItem("myhub:sidebar-state") ===
-						"collapsed"
-							? "collapsed"
-							: "expanded"
-
-					document.documentElement.dataset.sidebar = state
-				} catch {
-					document.documentElement.dataset.sidebar = "expanded"
-				}
-			})()
-		</script>
 	</head>
 	<body class="app-body">
 		<div class="app-shell">
