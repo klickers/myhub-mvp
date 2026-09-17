@@ -59,7 +59,7 @@
 
 @layer components {
 	.app-body {
-		@apply min-h-screen bg-[#dbeafe] bg-[linear-gradient(135deg,#dbeafe_0%,#ede9fe_49%,#f3e8ff_100%)] bg-fixed bg-center bg-cover;
+		@apply min-h-screen;
 	}
 
 	.app-shell {
@@ -71,7 +71,7 @@
 	}
 
 	.app-topbar {
-		@apply fixed top-3 left-[calc(var(--sidebar-width)+1.25rem)] right-4 z-30 flex min-h-10 items-center justify-between gap-3 rounded-lg border border-gray-300/70 bg-white/60 px-3 py-1.5 text-xs shadow-lg shadow-slate-900/5 backdrop-blur-xl backdrop-saturate-150 transition-[background-color,border-color,left] duration-[240ms] ease-out motion-reduce:transition-none;
+		@apply fixed top-3 left-[calc(var(--sidebar-width)+1.25rem)] right-4 z-30 flex min-h-10 items-center justify-between gap-3 rounded-lg border border-gray-300/70 bg-white/60 px-3 py-1.5 text-xs backdrop-blur-xl backdrop-saturate-150 transition-[background-color,border-color,left] duration-[240ms] ease-out motion-reduce:transition-none;
 	}
 
 	.app-breadcrumbs {
