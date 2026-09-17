@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react"
-import { format } from "date-fns"
 import SessionPlayButton from "@/components/models/session/SessionPlayButton"
 import type { Task } from "@/generated/prisma/client"
 import { Status } from "@/generated/prisma/enums"
@@ -13,6 +12,7 @@ import { Icon } from "@iconify/react"
 import minutesToHours from "@/helpers/time/minutesToHours"
 import SideTray from "@/components/SideTray"
 import TaskDeleteButton from "@/components/models/task/TaskDeleteButton"
+import { formatUtcDateOnly } from "@/helpers/dateOnly"
 
 type TaskListTask = Task & {
 	subtasks?: Task[]
@@ -58,6 +58,21 @@ function sortTasks(tasks: TaskListTask[]) {
 	})
 }
 
+function getTaskCardStatusClass(status: Status) {
+	switch (status) {
+		case Status.completed:
+			return "border-emerald-200/90 bg-emerald-50/80"
+		case Status.inprogress:
+			return "border-yellow-200/90 bg-yellow-50/80"
+		case Status.onhold:
+			return "border-gray-300/90 bg-gray-100/75"
+		case Status.archived:
+			return "border-gray-200 bg-white/45 opacity-70"
+		default:
+			return ""
+	}
+}
+
 export default function Tasks({
 	tasks,
 	statuses,
@@ -94,7 +109,9 @@ export default function Tasks({
 
 				if (!shouldInclude) {
 					return existingTask
-						? currentTasks.filter((candidate) => candidate.id !== task.id)
+						? currentTasks.filter(
+								(candidate) => candidate.id !== task.id,
+							)
 						: currentTasks
 				}
 
@@ -157,13 +174,7 @@ export default function Tasks({
 					return (
 						<div
 							key={task.id}
-							className={`card ${
-								task.status === "completed"
-									? "bg-green-50 border-green-50"
-									: task.status === "inprogress"
-										? "bg-yellow-50"
-										: ""
-							}`}
+							className={`card ${getTaskCardStatusClass(task.status)}`}
 						>
 							<div className="card__content p-2">
 								<div className="flex justify-between items-center">
@@ -200,10 +211,7 @@ export default function Tasks({
 												<span className="-mt-0.5">
 													<Icon icon="mingcute:calendar-fill" />
 												</span>
-												{format(
-													new Date(task.deadline),
-													"MMM dd, yyyy",
-												)}
+												{formatUtcDateOnly(task.deadline)}
 											</p>
 										)}
 										<SessionPlayButton
