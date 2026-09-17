@@ -46,11 +46,18 @@ model Persona {
     guilds Guild[]
 }
 
+// enum SomethingType {
+//     project
+//     anchor
+//     learning
+// }
+
 model Contract {
     id          Int      @id @default(autoincrement())
     name        String
     slug        String   @unique
     description String?
+    // startDate   DateTime
     dueDate     DateTime
     status      Status   @default(inprogress)
     guildId     Int?
@@ -81,6 +88,8 @@ model Task {
     makeTimeType  MakeTimeType?
     status        Status         @default(notstarted)
     estimatedTime Int?           @default(0) // in minutes
+    // scheduled     Boolean        @default(false)
+    // startDate     DateTime?
     deadline      DateTime?
 
     contractId   Int?
@@ -169,6 +178,15 @@ model DailyHighlight {
     date      DateTime @id @unique
     highlight String?
 }
+
+// model HoldNotes {
+//     id        Int      @id @default(autoincrement())
+//     // task id and type
+//     notes     String?
+//     completed Boolean  @default(false)
+//     createdAt DateTime @default(now())
+//     updatedAt DateTime @updatedAt
+// }
 
 // ================================================
 // Previous Schema
