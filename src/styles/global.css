@@ -21,7 +21,7 @@
 	}
 
 	h1 {
-		@apply text-4xl font-semibold mb-10 leading-tight;
+		@apply text-2xl font-semibold mb-6 leading-tight;
 	}
 
 	h2 {
