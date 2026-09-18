@@ -1,0 +1,43 @@
+---
+import Layout from "@/layouts/Layout.astro"
+import { TasksBreadcrumb } from "@/helpers/data/breadcrumbs"
+import TagGroupHeader from "@/components/models/tag/TagGroupHeader"
+import { actions } from "astro:actions"
+import { TagType } from "@/generated/prisma/enums"
+
+const initialTagGroups = await Astro.callAction(actions.tag.getByType, {
+	type: TagType.group,
+})
+console.log("initialTagGroups", initialTagGroups.data)
+---
+
+<Layout breadcrumbs={[TasksBreadcrumb]}>
+	<div class="flex gap-6">
+		<aside>
+			<!-- <div id="tooltipTagGroups">
+					<Icon
+						name="mingcute:information-fill"
+						class="text-gray-400"
+					/>
+				</div>-->
+			<TagGroupHeader
+				client:load
+				initialGroups={initialTagGroups.data}
+			/>
+		</aside>
+	</div>
+</Layout>
+
+<!-- <script
+	is:inline
+	src="https://unpkg.com/@popperjs/core@2"
+></script>
+<script
+	is:inline
+	src="https://unpkg.com/tippy.js@6"
+></script>
+<script is:inline>
+	tippy("#tooltipTagGroups", {
+		content: "My tooltip!  can we fit a lot more text here than we ewant",
+	})
+</script> -->

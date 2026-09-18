@@ -11,6 +11,7 @@ import { experiment } from "./experiment"
 import { category } from "./category"
 import { dailyHighlight } from "./dailyHighlight"
 import { search } from "./search"
+import { tag } from "./tag"
 
 export const server = {
 	guild,
@@ -21,6 +22,7 @@ export const server = {
 	category,
 	dailyHighlight,
 	search,
+	tag,
 	// ===============================
 	// Objective
 	// ===============================

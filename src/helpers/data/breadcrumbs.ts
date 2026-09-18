@@ -3,6 +3,11 @@ export const HomeBreadcrumb = {
 		name: "Home",
 		href: "/",
 	},
+	TasksBreadcrumb = {
+		icon: "mingcute:list-check-2-fill",
+		name: "Tasks",
+		href: "/tasks",
+	},
 	GuildHallBreadcrumb = {
 		icon: "mingcute:building-4-fill",
 		name: "Guild Hall",

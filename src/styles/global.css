@@ -41,18 +41,17 @@
 	}
 
 	form {
-		input,
-		textarea,
-		select {
-			@apply rounded-lg border border-gray-300 bg-white/80 px-3 py-2  transition-[background-color,border-color,box-shadow] duration-200 ease-out;
-
-			&:focus {
-				@apply border-gray-500 bg-white outline-none;
-			}
-		}
-
 		button {
 			@apply rounded-lg border border-gray-300 bg-white/75 px-4 py-2;
+		}
+	}
+	input,
+	textarea,
+	select {
+		@apply text-sm rounded-3xl border border-gray-300 bg-white/80 px-2 py-1 transition-[background-color,border-color,box-shadow] duration-200 ease-out;
+
+		&:focus {
+			@apply border-gray-500 bg-white outline-none;
 		}
 	}
 }

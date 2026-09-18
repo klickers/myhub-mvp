@@ -48,6 +48,8 @@ model Tag {
     sessions Session[]
     tasks    Task[]
     agendas  Agenda[]
+
+    @@index([parentId, order])
 }
 
 enum AgendaItemType {
