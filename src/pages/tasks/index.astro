@@ -8,7 +8,6 @@ import { TagType } from "@/generated/prisma/enums"
 const initialTagGroups = await Astro.callAction(actions.tag.getByType, {
 	type: TagType.group,
 })
-console.log("initialTagGroups", initialTagGroups.data)
 ---
 
 <Layout breadcrumbs={[TasksBreadcrumb]}>
