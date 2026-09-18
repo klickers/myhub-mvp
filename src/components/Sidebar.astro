@@ -1,0 +1,53 @@
+---
+import { Icon } from "astro-icon/components"
+
+interface Props {
+	path: string
+}
+const { path } = Astro.props
+
+const isActive = (href: string) => {
+	return href === "/"
+		? path === "/"
+		: path === href || path.startsWith(href + "/")
+}
+
+const links = [
+	{ name: "Home", href: "/", icon: "mingcute:home-4-fill" },
+	{ name: "Calendar", href: "/calendar", icon: "mingcute:calendar-2-fill" },
+	{ name: "Tasks", href: "/tasks", icon: "mingcute:list-check-2-fill" },
+]
+
+// Home - daily agenda
+// weekly focus view (all tasks added by agenda for the week)
+
+// Calendar - sort/group agenda view by Tag Group (default but can toggle)
+// toggle view sprints
+// toggle view items (tasks) with deadlines
+// have side list of tag groups to view items by said groups?
+
+// DB of tasks
+// on side - Inbox/Misc (random tasks), Tag Groups
+// Tabs: Current, Completed, Calendar?
+---
+
+<div class="w-[220px] pr-6 fixed top-0">
+	<aside class="p-4 border-r border-gray-200 h-screen">
+		<div class="space-y-0.5">
+			{
+				links.map((link) => (
+					<a
+						href={link.href}
+						class={
+							"flex items-center gap-2 uppercase text-sm font-semibold rounded-3xl py-1 px-2 hover:bg-gray-100" +
+							(isActive(link.href) ? " bg-gray-100" : "")
+						}
+					>
+						<Icon name={link.icon} />
+						<span>{link.name}</span>
+					</a>
+				))
+			}
+		</div>
+	</aside>
+</div>
