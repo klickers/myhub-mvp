@@ -41,21 +41,4 @@ export const tag = {
 			})
 		},
 	}),
-
-	getByType: defineAction({
-		input: z.object({
-			type: z.nativeEnum(TagType),
-		}),
-		handler: async ({ type }) => {
-			return prisma.tag.findMany({
-				where: { type },
-				orderBy: { order: "asc" },
-				include: {
-					children: {
-						orderBy: { order: "asc" },
-					},
-				},
-			})
-		},
-	}),
 }

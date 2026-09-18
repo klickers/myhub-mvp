@@ -2,11 +2,17 @@
 import Layout from "@/layouts/Layout.astro"
 import { TasksBreadcrumb } from "@/helpers/data/breadcrumbs"
 import TagGroupHeader from "@/components/models/tag/TagGroupHeader"
-import { actions } from "astro:actions"
 import { TagType } from "@/generated/prisma/enums"
+import prisma from "@/helpers/prisma"
 
-const initialTagGroups = await Astro.callAction(actions.tag.getByType, {
-	type: TagType.group,
+const initialTagGroups = await prisma.tag.findMany({
+	where: { type: TagType.group },
+	orderBy: { order: "asc" },
+	include: {
+		children: {
+			orderBy: { order: "asc" },
+		},
+	},
 })
 ---
 
@@ -21,7 +27,7 @@ const initialTagGroups = await Astro.callAction(actions.tag.getByType, {
 				</div>-->
 			<TagGroupHeader
 				client:load
-				initialGroups={initialTagGroups.data}
+				initialGroups={initialTagGroups}
 			/>
 		</aside>
 	</div>
