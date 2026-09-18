@@ -23,9 +23,13 @@ export default function TagGroup({ group }: { group: Tag | TagWithChildren }) {
 
 			<div className="ml-4 mb-2">
 				{tags.map((tag) => (
-					<div key={tag.id}>
+					<a
+						key={tag.id}
+						href={`/tags/${tag.slug}`}
+						className="block hover:underline"
+					>
 						<span className="text-sm">{tag.name}</span>
-					</div>
+					</a>
 				))}
 
 				{showInput && (

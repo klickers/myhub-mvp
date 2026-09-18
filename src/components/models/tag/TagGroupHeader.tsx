@@ -15,7 +15,7 @@ export default function TagGroupHeader({
 		useState<(Tag | TagWithChildren)[]>(initialGroups)
 
 	return (
-		<div className="w-40">
+		<>
 			<div className="flex items-center justify-between gap-3 w-full mb-2">
 				<p className="uppercase font-semibold flex items-center gap-1 mb-0">
 					Groups
@@ -50,6 +50,6 @@ export default function TagGroupHeader({
 					/>
 				))}
 			</div>
-		</div>
+		</>
 	)
 }

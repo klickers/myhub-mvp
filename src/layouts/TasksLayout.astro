@@ -1,0 +1,52 @@
+---
+import Layout from "@/layouts/Layout.astro"
+import { TasksBreadcrumb } from "@/helpers/data/breadcrumbs"
+import TagGroupHeader from "@/components/models/tag/TagGroupHeader"
+import { TagType } from "@/generated/prisma/enums"
+import prisma from "@/helpers/prisma"
+
+const initialTagGroups = await prisma.tag.findMany({
+	where: { type: TagType.group },
+	orderBy: { order: "asc" },
+	include: {
+		children: {
+			orderBy: { order: "asc" },
+		},
+	},
+})
+---
+
+<Layout breadcrumbs={[TasksBreadcrumb]}>
+	<div class="flex gap-12">
+		<!-- TODO: make transition persist -->
+		<aside>
+			<!-- <div id="tooltipTagGroups">
+					<Icon
+						name="mingcute:information-fill"
+						class="text-gray-400"
+					/>
+				</div>-->
+			<TagGroupHeader
+				client:load
+				initialGroups={initialTagGroups}
+			/>
+		</aside>
+		<div>
+			<slot />
+		</div>
+	</div>
+</Layout>
+
+<!-- <script
+	is:inline
+	src="https://unpkg.com/@popperjs/core@2"
+></script>
+<script
+	is:inline
+	src="https://unpkg.com/tippy.js@6"
+></script>
+<script is:inline>
+	tippy("#tooltipTagGroups", {
+		content: "My tooltip!  can we fit a lot more text here than we ewant",
+	})
+</script> -->
