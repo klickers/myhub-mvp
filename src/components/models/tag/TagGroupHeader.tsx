@@ -18,7 +18,7 @@ export default function TagGroupHeader({
 		<>
 			<div className="flex items-center justify-between gap-3 w-full mb-2">
 				<p className="uppercase font-semibold flex items-center gap-1 mb-0">
-					Groups
+					Tag Groups
 				</p>
 				<button onClick={() => setShowInput(!showInput)}>
 					{showInput ? (
