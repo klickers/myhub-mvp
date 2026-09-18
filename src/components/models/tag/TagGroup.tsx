@@ -14,9 +14,9 @@ export default function TagGroup({ group }: { group: Tag | TagWithChildren }) {
 				<span className="text-sm font-medium">{group.name}</span>
 				<button onClick={() => setShowInput(!showInput)}>
 					{showInput ? (
-						<Icon icon="mingcute:minus-circle-fill" />
+						<Icon icon="mingcute:minimize-fill" />
 					) : (
-						<Icon icon="mingcute:add-circle-fill" />
+						<Icon icon="mingcute:add-fill" />
 					)}
 				</button>
 			</div>
