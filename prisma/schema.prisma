@@ -45,7 +45,7 @@ model Tag {
     parent   Tag?  @relation("TagHierarchy", fields: [parentId], references: [id])
     children Tag[] @relation("TagHierarchy")
 
-    taskTags TaskTag[]
+    tasks    TaskTag[]
     sessions Session[]
     agendas  Agenda[]
 
@@ -98,7 +98,7 @@ model Task {
     subtasks     Task[]  @relation("TaskHierarchy")
     showSubtasks Boolean @default(true) // whether to default show or hide
 
-    taskTags TaskTag[]
+    tags     TaskTag[]
     sessions Session[]
     agendas  Agenda[]
 
