@@ -29,15 +29,6 @@ export default function TagGroupHeader({
 				</button>
 			</div>
 
-			<div>
-				{groups.map((group) => (
-					<TagGroup
-						group={group}
-						key={group.id}
-					/>
-				))}
-			</div>
-
 			{showInput && (
 				<TagCreateForm
 					type="group"
@@ -50,6 +41,15 @@ export default function TagGroupHeader({
 					onClose={() => setShowInput(false)}
 				/>
 			)}
+
+			<div>
+				{groups.map((group) => (
+					<TagGroup
+						group={group}
+						key={group.id}
+					/>
+				))}
+			</div>
 		</div>
 	)
 }
