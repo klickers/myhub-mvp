@@ -50,7 +50,11 @@ export const tag = {
 			return prisma.tag.findMany({
 				where: { type },
 				orderBy: { order: "asc" },
-				include: { children: true },
+				include: {
+					children: {
+						orderBy: { order: "asc" },
+					},
+				},
 			})
 		},
 	}),
