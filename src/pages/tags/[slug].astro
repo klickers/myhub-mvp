@@ -1,0 +1,32 @@
+---
+import TasksLayout from "@/layouts/TasksLayout.astro"
+import prisma from "@/helpers/prisma"
+import buildTaskTree from "@/helpers/buildTaskTree"
+import Task from "@/components/models/task/Task.astro"
+
+const tag = await prisma.tag.findUnique({
+	where: { slug: Astro.params.slug },
+	include: {
+		children: {
+			orderBy: { order: "asc" },
+		},
+	},
+})
+if (!tag) return Astro.redirect("/tasks")
+
+const tasks = await prisma.task.findMany({
+	include: {
+		tags: {
+			select: {
+				tagId: true,
+			},
+		},
+	},
+})
+const taskTree = buildTaskTree(tasks, tag.id)
+---
+
+<TasksLayout>
+	<h1 class="text-2xl font-semibold">{tag.name}</h1>
+	<Task tasks={taskTree} />
+</TasksLayout>

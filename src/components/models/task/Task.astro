@@ -1,0 +1,28 @@
+---
+import type { TaskNode } from "@/helpers/buildTaskTree"
+import Task from "@/components/models/task/Task.astro"
+
+interface Props {
+	tasks: TaskNode[]
+	depth?: number
+}
+
+const { tasks, depth = 0 } = Astro.props
+---
+
+<ul class={depth === 0 ? "mt-4" : "ml-4 mt-2"}>
+	{
+		tasks.map((task) => (
+			<li class="mb-2">
+				<span>{task.name}</span>
+
+				{task.subtasks.length > 0 && (
+					<Task
+						tasks={task.subtasks}
+						depth={depth + 1}
+					/>
+				)}
+			</li>
+		))
+	}
+</ul>
