@@ -45,8 +45,8 @@ model Tag {
     parent   Tag?  @relation("TagHierarchy", fields: [parentId], references: [id])
     children Tag[] @relation("TagHierarchy")
 
+    taskTags TaskTag[]
     sessions Session[]
-    tasks    Task[]
     agendas  Agenda[]
 
     @@index([parentId, order])
@@ -93,13 +93,12 @@ model Task {
     // startDate     DateTime?
     deadline      DateTime?
 
-    tagId        Int?
-    tag          Tag?    @relation(fields: [tagId], references: [id])
     parentTaskId Int?
     parentTask   Task?   @relation("TaskHierarchy", fields: [parentTaskId], references: [id])
     subtasks     Task[]  @relation("TaskHierarchy")
     showSubtasks Boolean @default(true) // whether to default show or hide
 
+    taskTags TaskTag[]
     sessions Session[]
     agendas  Agenda[]
 
@@ -111,6 +110,17 @@ model Task {
     contract     Contract?     @relation(fields: [contractId], references: [id])
     experiment   Experiment?   @relation(fields: [experimentId], references: [id])
     guild        Guild?        @relation(fields: [guildId], references: [id])
+}
+
+model TaskTag {
+    taskId Int
+    tagId  Int
+
+    task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+    tag  Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+    @@id([taskId, tagId])
+    @@index([tagId])
 }
 
 enum SessionItemType {
