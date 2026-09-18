@@ -1,50 +1,22 @@
 import { useState } from "react"
 import { Icon } from "@iconify/react"
-import { toast } from "react-toastify"
-
-import { actions } from "astro:actions"
-import slugify from "@/helpers/slugify"
+import TagGroup from "@/components/models/tag/TagGroup"
+import TagCreateForm from "@/components/models/tag/CreateTagForm"
+import type { TagWithChildren } from "@/types/prisma-custom"
 import type { Tag } from "@/generated/prisma/client"
 
 export default function TagGroupHeader({
 	initialGroups,
 }: {
-	initialGroups: Tag[]
+	initialGroups: (Tag | TagWithChildren)[]
 }) {
 	const [showInput, setShowInput] = useState(false)
-	const [name, setName] = useState("")
-	const [slug, setSlug] = useState("")
-	const [groups, setGroups] = useState<Tag[]>(initialGroups)
-
-	function handleNameChange(e: React.ChangeEvent<HTMLInputElement>) {
-		setName(e.target.value)
-		setSlug(slugify(e.target.value))
-	}
-	function handleSlugChange(e: React.ChangeEvent<HTMLInputElement>) {
-		setSlug(slugify(e.target.value))
-	}
-	async function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-		if (e.key === "Enter" && name && slug) {
-			const { data: newGroup, error } = await actions.tag.create({
-				name,
-				slug,
-				type: "group",
-			})
-			if (error) {
-				toast.error("Failed to create tag group")
-			} else {
-				toast.success("Tag group " + name + " created successfully!")
-				setGroups((groups) => [...groups, newGroup])
-				setName("")
-				setSlug("")
-				setShowInput(false)
-			}
-		}
-	}
+	const [groups, setGroups] =
+		useState<(Tag | TagWithChildren)[]>(initialGroups)
 
 	return (
 		<div className="w-40">
-			<div className="flex items-center justify-between gap-3 w-full mb-1">
+			<div className="flex items-center justify-between gap-3 w-full mb-2">
 				<p className="uppercase font-semibold flex items-center gap-1 mb-0">
 					Groups
 				</p>
@@ -57,35 +29,27 @@ export default function TagGroupHeader({
 				</button>
 			</div>
 
-			{showInput && (
-				<div className="mb-2 w-full">
-					<input
-						type="text"
-						placeholder="Name"
-						autoFocus
-						value={name}
-						onKeyDown={(e) => handleKeyDown(e)}
-						onChange={(e) => handleNameChange(e)}
-					/>
-					<input
-						type="text"
-						placeholder="Slug"
-						value={slug}
-						onKeyDown={(e) => handleKeyDown(e)}
-						onChange={(e) => handleSlugChange(e)}
-					/>
-				</div>
-			)}
-
 			<div>
 				{groups.map((group) => (
-					<div key={group.id}>
-						<span className="text-sm font-medium">
-							{group.name}
-						</span>
-					</div>
+					<TagGroup
+						group={group}
+						key={group.id}
+					/>
 				))}
 			</div>
+
+			{showInput && (
+				<TagCreateForm
+					type="group"
+					successMessage={(name) =>
+						`Tag group ${name} created successfully!`
+					}
+					onCreated={(group) =>
+						setGroups((groups) => [...groups, group])
+					}
+					onClose={() => setShowInput(false)}
+				/>
+			)}
 		</div>
 	)
 }
