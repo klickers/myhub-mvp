@@ -37,8 +37,8 @@ const breadcrumbs = Astro.props.breadcrumbs || [{ name: "Home", href: "/" }]
 		/>
 		<title>My Hub</title>
 	</head>
-	<body class="app-body">
-		<div class="app-shell">
+	<body class="min-h-screen">
+		<div class="min-h-screen w-full">
 			<Sidebar
 				path={path}
 				transition:persist
@@ -95,7 +95,7 @@ const breadcrumbs = Astro.props.breadcrumbs || [{ name: "Home", href: "/" }]
 					</nav>
 				</header>
 				<GlobalSearch client:load />
-				<main class="app-main"><slot /></main>
+				<main class="px-8 pb-8 pl-10 pt-20"><slot /></main>
 			</div>
 		</div>
 	</body>

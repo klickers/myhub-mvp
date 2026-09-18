@@ -58,14 +58,6 @@
 }
 
 @layer components {
-	.app-body {
-		@apply min-h-screen;
-	}
-
-	.app-shell {
-		@apply min-h-screen w-full;
-	}
-
 	.app-content {
 		@apply ml-[var(--sidebar-width)] min-h-screen min-w-0 w-auto pb-8 transition-[margin-left] duration-[240ms] ease-out motion-reduce:transition-none;
 	}
@@ -88,10 +80,6 @@
 
 	.app-topbar a:focus-visible {
 		@apply outline-none;
-	}
-
-	.app-main {
-		@apply px-8 pb-8 pl-10 pt-20;
 	}
 
 	.button {
@@ -569,13 +557,13 @@
 			@apply pr-[min(14rem,48vw)];
 		}
 
-		.app-main {
+		/* .app-main {
 			@apply pb-6 pl-5 pr-4 pt-[5.75rem];
 		}
 
 		.sidebar {
 			@apply px-2;
-		}
+		} */
 	}
 }
 
