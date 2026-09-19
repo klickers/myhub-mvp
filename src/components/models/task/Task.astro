@@ -2,6 +2,7 @@
 import type { TaskNode } from "@/helpers/buildTaskTree"
 import Task from "@/components/models/task/Task.astro"
 import { format } from "date-fns"
+import { Icon } from "astro-icon/components"
 
 interface Props {
 	tasks: TaskNode[]
@@ -52,6 +53,16 @@ const { tasks, depth = 0 } = Astro.props
 									(index < task.tags.length - 1 ? "," : "")}
 							</span>
 						))}
+					</span>
+				</td>
+				<td>
+					<span class="flex gap-2 justify-end">
+						<button class="text-blue-400 hover:text-blue-600">
+							<Icon name="mingcute:pencil-3-fill" />
+						</button>
+						<button class="text-red-300 hover:text-red-500">
+							<Icon name="mingcute:delete-2-fill" />
+						</button>
 					</span>
 				</td>
 			</tr>
