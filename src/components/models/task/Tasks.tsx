@@ -1,235 +1,30 @@
-import { useEffect, useState } from "react"
-import SessionPlayButton from "@/components/models/session/SessionPlayButton"
-import type { Task } from "@/generated/prisma/client"
-import { Status } from "@/generated/prisma/enums"
-import {
-	TASK_REMOVED_EVENT,
-	TASK_UPDATED_EVENT,
-	type TaskRemovedEvent,
-	type TaskUpdatedEvent,
-} from "@/helpers/taskEvents"
-import { Icon } from "@iconify/react"
-import minutesToHours from "@/helpers/time/minutesToHours"
-import SideTray from "@/components/SideTray"
-import TaskDeleteButton from "@/components/models/task/TaskDeleteButton"
-import { formatUtcDateOnly } from "@/helpers/dateOnly"
+import type { TaskNode } from "@/helpers/buildTaskTree"
+import Task from "@/components/models/task/Task"
 
-type TaskListTask = Task & {
-	subtasks?: Task[]
+interface Props {
+	tasks: TaskNode[]
 }
 
-type TaskParentFilter = { parentType?: never; parentId?: never }
-
-type Props = TaskParentFilter & {
-	tasks: TaskListTask[]
-	statuses?: Status[]
-}
-
-function taskBelongsToParent(task: Task, parentFilter: TaskParentFilter) {
-	if (!parentFilter.parentType) return true
-	return false
-}
-
-function taskMatchesStatuses(task: Task, statuses?: Status[]) {
-	return !statuses || statuses.includes(task.status)
-}
-
-function sortTasks(tasks: TaskListTask[]) {
-	return tasks.slice().sort((a, b) => {
-		if (!a.deadline && !b.deadline) return a.name.localeCompare(b.name)
-		if (!a.deadline) return 1
-		if (!b.deadline) return -1
-
-		const deadlineOrder =
-			new Date(a.deadline).getTime() - new Date(b.deadline).getTime()
-		if (deadlineOrder !== 0) return deadlineOrder
-
-		return a.name.localeCompare(b.name)
-	})
-}
-
-function getTaskCardStatusClass(status: Status) {
-	switch (status) {
-		case Status.completed:
-			return "border-emerald-200/90 bg-emerald-50/80"
-		case Status.inprogress:
-			return "border-yellow-200/90 bg-yellow-50/80"
-		case Status.onhold:
-			return "border-gray-300/90 bg-gray-100/75"
-		case Status.archived:
-			return "border-gray-200 bg-white/45 opacity-70"
-		default:
-			return ""
-	}
-}
-
-export default function Tasks({
-	tasks,
-	statuses,
-	parentType,
-	parentId,
-}: Props) {
-	const [taskList, setTaskList] = useState<TaskListTask[]>(() => tasks)
-	const [selectedTask, setSelectedTask] = useState<Task | null>(null)
-	const parentFilter = { parentType, parentId } as TaskParentFilter
-
-	// keep local copy in sync if tasks prop changes
-	useEffect(() => {
-		setTaskList(tasks)
-		setSelectedTask((currentTask) => {
-			if (!currentTask) return currentTask
-			return (
-				tasks.find((candidate) => candidate.id === currentTask.id) ??
-				currentTask
-			)
-		})
-	}, [tasks])
-
-	useEffect(() => {
-		const handleTaskUpdated = (event: Event) => {
-			const { task } = (event as TaskUpdatedEvent).detail
-			const shouldInclude =
-				taskBelongsToParent(task, parentFilter) &&
-				taskMatchesStatuses(task, statuses)
-
-			setTaskList((currentTasks) => {
-				const existingTask = currentTasks.find(
-					(candidate) => candidate.id === task.id,
-				)
-
-				if (!shouldInclude) {
-					return existingTask
-						? currentTasks.filter(
-								(candidate) => candidate.id !== task.id,
-							)
-						: currentTasks
-				}
-
-				const nextTask = existingTask
-					? { ...existingTask, ...task }
-					: task
-				const nextTasks = existingTask
-					? currentTasks.map((candidate) =>
-							candidate.id === task.id ? nextTask : candidate,
-						)
-					: [...currentTasks, nextTask]
-
-				return sortTasks(nextTasks)
-			})
-		}
-
-		const handleTaskRemoved = (event: Event) => {
-			const { taskIds } = (event as TaskRemovedEvent).detail
-			const removedTaskIds = new Set(taskIds)
-
-			setTaskList((currentTasks) =>
-				currentTasks
-					.filter((task) => !removedTaskIds.has(task.id))
-					.map((task) => ({
-						...task,
-						subtasks: task.subtasks?.filter(
-							(subtask) => !removedTaskIds.has(subtask.id),
-						),
-					})),
-			)
-			setSelectedTask((currentTask) =>
-				currentTask && removedTaskIds.has(currentTask.id)
-					? null
-					: currentTask,
-			)
-		}
-
-		window.addEventListener(TASK_UPDATED_EVENT, handleTaskUpdated)
-		window.addEventListener(TASK_REMOVED_EVENT, handleTaskRemoved)
-		return () => {
-			window.removeEventListener(TASK_UPDATED_EVENT, handleTaskUpdated)
-			window.removeEventListener(TASK_REMOVED_EVENT, handleTaskRemoved)
-		}
-	}, [parentId, parentType, statuses])
-
+export default function Tasks({ tasks }: Props) {
 	return (
-		<div>
-			{/* TASK LIST */}
-			<div className="space-y-1">
-				{taskList.map((task) => {
-					let completed = 0,
-						total = 0
-					if (task.subtasks) {
-						for (const subtask of task.subtasks) {
-							if (subtask.status === "archived") continue
-							total++
-							if (subtask.status === "completed") completed++
-						}
-					}
-					return (
-						<div
-							key={task.id}
-							className={`card ${getTaskCardStatusClass(task.status)}`}
-						>
-							<div className="card__content p-2">
-								<div className="flex justify-between items-center">
-									<div
-										className="flex gap-4 items-center cursor-pointer"
-										onClick={() => setSelectedTask(task)}
-									>
-										<p className="font-semibold">
-											{task.name}
-										</p>
-										{task.subtasks &&
-											task.subtasks.length > 0 && (
-												<p className="text-xs text-gray-600 flex items-center gap-1">
-													<Icon icon="mingcute:list-check-2-line" />
-													<span>
-														{completed}/{total}
-													</span>
-												</p>
-											)}
-										{task.estimatedTime &&
-										task.estimatedTime != 0 ? (
-											<p className="text-xs text-gray-600 flex items-center gap-1">
-												<Icon icon="mingcute:time-line" />{" "}
-												{minutesToHours(
-													task.estimatedTime,
-												)}
-												h
-											</p>
-										) : null}
-									</div>
-									<div className="flex items-center gap-2 -mr-1">
-										{task.deadline && (
-											<p className="text-xs text-gray-600 flex items-center gap-1">
-												<span className="-mt-0.5">
-													<Icon icon="mingcute:calendar-fill" />
-												</span>
-												{formatUtcDateOnly(
-													task.deadline,
-												)}
-											</p>
-										)}
-										<SessionPlayButton
-											itemType="task"
-											itemId={task.id}
-										/>
-										<TaskDeleteButton
-											taskId={task.id}
-											taskName={task.name}
-										/>
-									</div>
-								</div>
-							</div>
-						</div>
-					)
-				})}
-			</div>
-
-			{/* SIDE TRAY */}
-			{selectedTask && (
-				<SideTray
-					type="task"
-					selected={selectedTask}
-					setSelected={setSelectedTask}
+		<table>
+			<thead>
+				<tr>
+					<th>Task</th>
+					<th>Status</th>
+					<th>Est. Time</th>
+					<th>Deadline</th>
+					<th>Tags</th>
+					{/* Controls */}
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				<Task
+					tasks={tasks}
+					depth={0}
 				/>
-			)}
-		</div>
+			</tbody>
+		</table>
 	)
 }
