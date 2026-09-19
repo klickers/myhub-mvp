@@ -10,7 +10,7 @@ export default function EditableDate({
 			type="date"
 			value={value ? value.slice(0, 10) : ""}
 			onChange={(e) => onSave(e.target.value || null)}
-			className="bg-tranparent p-0 max-w-28"
+			className="border-0 bg-transparent p-0 max-w-26"
 		/>
 	)
 }
