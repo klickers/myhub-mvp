@@ -2,8 +2,10 @@
 import "@/styles/global.css"
 import Sidebar from "@/components/Sidebar.astro"
 import GlobalSearch from "@/components/GlobalSearch"
+
 import { Icon } from "astro-icon/components"
 import { ToastContainer } from "react-toastify"
+import { ClientRouter } from "astro:transitions"
 
 type Breadcrumb = {
 	icon?: string
@@ -37,6 +39,7 @@ const breadcrumbs = Astro.props.breadcrumbs || [{ name: "Home", href: "/" }]
 			content={Astro.generator}
 		/>
 		<title>My Hub</title>
+		<ClientRouter />
 	</head>
 	<body class="min-h-screen">
 		<div class="min-h-screen w-full">
@@ -45,11 +48,11 @@ const breadcrumbs = Astro.props.breadcrumbs || [{ name: "Home", href: "/" }]
 				path={path}
 				transition:persist
 			/>
-			<div
-				class="app-content"
-				transition:persist
-			>
-				<header class="app-topbar">
+			<div class="app-content">
+				<header
+					class="app-topbar"
+					transition:persist
+				>
 					<nav
 						class="app-breadcrumbs"
 						aria-label="Breadcrumb"
@@ -96,7 +99,10 @@ const breadcrumbs = Astro.props.breadcrumbs || [{ name: "Home", href: "/" }]
 						}
 					</nav>
 				</header>
-				<GlobalSearch client:load />
+				<GlobalSearch
+					client:load
+					transition:persist
+				/>
 				<main class="px-8 pb-8 pl-10 pt-20"><slot /></main>
 			</div>
 		</div>
