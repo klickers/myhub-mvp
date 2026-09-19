@@ -1,5 +1,4 @@
 import React from "react"
-import { format } from "date-fns"
 import { Icon } from "@iconify/react"
 import { toast } from "react-toastify"
 import { actions } from "astro:actions"
@@ -9,6 +8,7 @@ import EditableStatus from "@/components/form/EditableStatus"
 import EditableNumber from "@/components/form/EditableNumber"
 import EditableDate from "@/components/form/EditableDate"
 import { dateKeyToUtcDate, getUtcDateKey } from "@/helpers/dateOnly"
+import SessionPlayButton from "../session/SessionPlayButton"
 
 interface Props {
 	initialTasks: TaskNode[]
@@ -110,6 +110,10 @@ export default function Task({ initialTasks, depth = 0 }: Props) {
 						</td>
 						<td>
 							<span className="flex gap-2 justify-end">
+								<SessionPlayButton
+									itemType="task"
+									itemId={task.id}
+								/>
 								<button className="text-blue-400 hover:text-blue-600">
 									<Icon icon="mingcute:pencil-3-fill" />
 								</button>

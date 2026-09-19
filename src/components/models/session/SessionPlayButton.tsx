@@ -94,10 +94,7 @@ const SessionPlayButton: React.FC<Props> = ({ itemType, itemId }) => {
 	}
 
 	return (
-		<button
-			onClick={handleClick}
-			className="p-1"
-		>
+		<button onClick={handleClick}>
 			<Icon
 				icon={
 					isCurrentlyPlaying
