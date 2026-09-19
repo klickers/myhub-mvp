@@ -92,6 +92,7 @@ model Task {
     // scheduled     Boolean        @default(false)
     // startDate     DateTime?
     deadline      DateTime?
+    isEvergreen   Boolean        @default(false)
 
     parentTaskId Int?
     parentTask   Task?   @relation("TaskHierarchy", fields: [parentTaskId], references: [id])
