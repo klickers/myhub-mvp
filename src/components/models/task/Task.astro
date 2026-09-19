@@ -13,7 +13,14 @@ const { tasks, depth = 0 } = Astro.props
 {
 	tasks.map((task) => (
 		<div>
-			<tr class="border-b border-gray-200 hover:bg-gray-50">
+			<tr
+				class={
+					"border-b border-gray-200" +
+					(task.status === "inprogress"
+						? " bg-yellow-50 hover:bg-yellow-100"
+						: " hover:bg-gray-100")
+				}
+			>
 				<td
 					class={
 						"pl-" +
