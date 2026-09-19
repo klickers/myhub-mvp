@@ -43,7 +43,10 @@ const breadcrumbs = Astro.props.breadcrumbs || [{ name: "Home", href: "/" }]
 	</head>
 	<body class="min-h-screen">
 		<div class="min-h-screen w-full">
-			<ToastContainer client:load />
+			<ToastContainer
+				client:load
+				transition:animate="none"
+			/>
 			<Sidebar
 				path={path}
 				transition:persist
