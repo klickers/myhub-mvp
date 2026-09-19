@@ -1,6 +1,6 @@
 ---
 import type { TaskNode } from "@/helpers/buildTaskTree"
-import Task from "@/components/models/task/Task.astro"
+import Task from "@/components/models/task/Task"
 
 interface Props {
 	tasks: TaskNode[]
@@ -22,6 +22,7 @@ const { tasks } = Astro.props
 	</thead>
 	<tbody>
 		<Task
+			client:load
 			tasks={tasks}
 			depth={0}
 		/>
