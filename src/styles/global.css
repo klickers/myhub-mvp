@@ -34,8 +34,12 @@
 
 	table {
 		tr {
-			td:first-child {
-				@apply pr-1;
+			th,
+			td {
+				@apply text-sm text-left pr-4 py-1;
+			}
+			th {
+				@apply whitespace-nowrap;
 			}
 		}
 	}

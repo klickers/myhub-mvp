@@ -2,7 +2,7 @@
 import TasksLayout from "@/layouts/TasksLayout.astro"
 import prisma from "@/helpers/prisma"
 import buildTaskTree from "@/helpers/buildTaskTree"
-import Task from "@/components/models/task/Task.astro"
+import Tasks from "@/components/models/task/Tasks.astro"
 
 const tag = await prisma.tag.findUnique({
 	where: { slug: Astro.params.slug },
@@ -17,8 +17,8 @@ if (!tag) return Astro.redirect("/tasks")
 const tasks = await prisma.task.findMany({
 	include: {
 		tags: {
-			select: {
-				tagId: true,
+			include: {
+				tag: true,
 			},
 		},
 	},
@@ -28,5 +28,5 @@ const taskTree = buildTaskTree(tasks, tag.id)
 
 <TasksLayout>
 	<h1>{tag.name}</h1>
-	<Task tasks={taskTree} />
+	<Tasks tasks={taskTree} />
 </TasksLayout>

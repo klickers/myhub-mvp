@@ -7,14 +7,14 @@ import type { Status } from "@/generated/prisma/enums"
 type TaskWithTags = Prisma.TaskGetPayload<{
 	include: {
 		tags: {
-			select: {
-				tagId: true
+			include: {
+				tag: true
 			}
 		}
 	}
 }>
 
-export type TaskNode = (TaskWithTags | Task) & {
+export type TaskNode = TaskWithTags & {
 	subtasks: TaskNode[]
 }
 
@@ -25,7 +25,7 @@ function statusQualifies(status: Status) {
 }
 
 export default function buildTaskTree(
-	tasks: TaskWithTags[] | Task[],
+	tasks: TaskWithTags[],
 	tagId: number | null = null,
 ): TaskNode[] {
 	const map = new Map<number, TaskNode>()

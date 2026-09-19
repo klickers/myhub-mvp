@@ -2,13 +2,21 @@
 import TasksLayout from "@/layouts/TasksLayout.astro"
 import prisma from "@/helpers/prisma"
 import buildTaskTree from "@/helpers/buildTaskTree"
-import Task from "@/components/models/task/Task.astro"
+import Tasks from "@/components/models/task/Tasks.astro"
 
-const tasks = await prisma.task.findMany()
+const tasks = await prisma.task.findMany({
+	include: {
+		tags: {
+			include: {
+				tag: true,
+			},
+		},
+	},
+})
 const taskTree = buildTaskTree(tasks)
 ---
 
 <TasksLayout>
 	<h1>All Tasks</h1>
-	<Task tasks={taskTree} />
+	<Tasks tasks={taskTree} />
 </TasksLayout>
