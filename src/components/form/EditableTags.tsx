@@ -19,7 +19,7 @@ export default function EditableTags({
 	const [input, setInput] = useState("")
 
 	return (
-		<div>
+		<div className="text-xs">
 			<div className="flex items-center gap-1">
 				<p className="mb-0">
 					{selectedTags.map((tag, index) => (
@@ -53,7 +53,7 @@ export default function EditableTags({
 						setInput("")
 					}}
 					className={[
-						"p-0 -ml-1",
+						"text-xs p-0 -ml-1",
 						className ?? "bg-transparent border-0",
 					]
 						.filter(Boolean)
