@@ -28,7 +28,6 @@ export const tag = {
 				})
 				order = (last._max.order ?? -1) + 1
 			}
-
 			return prisma.tag.create({
 				data: {
 					name: input.name,
@@ -37,6 +36,21 @@ export const tag = {
 					order,
 					visibility: input.visibility,
 					parentId: input.parentId ?? null,
+				},
+			})
+		},
+	}),
+
+	getAllTagGroups: defineAction({
+		input: z.object({}),
+		handler: async () => {
+			return prisma.tag.findMany({
+				where: { type: "group" },
+				orderBy: { order: "asc" },
+				include: {
+					children: {
+						orderBy: { order: "asc" },
+					},
 				},
 			})
 		},

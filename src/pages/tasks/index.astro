@@ -3,6 +3,7 @@ import TasksLayout from "@/layouts/TasksLayout.astro"
 import prisma from "@/helpers/prisma"
 import buildTaskTree from "@/helpers/buildTaskTree"
 import Tasks from "@/components/models/task/Tasks"
+import { actions } from "astro:actions"
 
 const tasks = await prisma.task.findMany({
 	include: {
@@ -15,15 +16,7 @@ const tasks = await prisma.task.findMany({
 })
 const taskTree = buildTaskTree(tasks)
 
-const tags = await prisma.tag.findMany({
-	where: { type: "group" },
-	orderBy: { order: "asc" },
-	include: {
-		children: {
-			orderBy: { order: "asc" },
-		},
-	},
-})
+const tags = await Astro.callAction(actions.tag.getAllTagGroups, {})
 ---
 
 <TasksLayout>
@@ -31,6 +24,6 @@ const tags = await prisma.tag.findMany({
 	<Tasks
 		client:load
 		tasks={taskTree}
-		tags={tags}
+		tags={tags.data ?? []}
 	/>
 </TasksLayout>
