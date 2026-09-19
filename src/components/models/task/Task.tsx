@@ -5,6 +5,7 @@ import { toast } from "react-toastify"
 import { actions } from "astro:actions"
 import type { TaskNode } from "@/helpers/buildTaskTree"
 import EditableText from "@/components/form/EditableText"
+import EditableStatus from "@/components/form/EditableStatus"
 
 interface Props {
 	initialTasks: TaskNode[]
@@ -55,7 +56,12 @@ export default function Task({ initialTasks, depth = 0 }: Props) {
 							/>
 						</td>
 						<td>
-							<span>{task.status}</span>
+							<EditableStatus
+								value={task.status}
+								onSave={(status) =>
+									saveTaskChange({ id: task.id, status })
+								}
+							/>
 						</td>
 						<td className="font-mono text-right">
 							<span>{task.estimatedTime}</span>
