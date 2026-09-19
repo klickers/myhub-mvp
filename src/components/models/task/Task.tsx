@@ -6,6 +6,9 @@ import { actions } from "astro:actions"
 import type { TaskNode } from "@/helpers/buildTaskTree"
 import EditableText from "@/components/form/EditableText"
 import EditableStatus from "@/components/form/EditableStatus"
+import EditableNumber from "@/components/form/EditableNumber"
+import EditableDate from "@/components/form/EditableDate"
+import { dateKeyToUtcDate, getUtcDateKey } from "@/helpers/dateOnly"
 
 interface Props {
 	initialTasks: TaskNode[]
@@ -64,13 +67,31 @@ export default function Task({ initialTasks, depth = 0 }: Props) {
 							/>
 						</td>
 						<td className="font-mono text-right">
-							<span>{task.estimatedTime}</span>
+							{/* TODO: hide if evergreen */}
+							<EditableNumber
+								value={task.estimatedTime}
+								onSave={(estimatedTime) =>
+									saveTaskChange({
+										id: task.id,
+										estimatedTime,
+									})
+								}
+							/>
 						</td>
 						<td className="font-mono text-right">
-							<span>
-								{task.deadline &&
-									format(task.deadline, "MM/dd/yy")}
-							</span>
+							{task.deadline && (
+								<EditableDate
+									value={getUtcDateKey(task.deadline)}
+									onSave={(deadline) =>
+										saveTaskChange({
+											id: task.id,
+											deadline: deadline
+												? dateKeyToUtcDate(deadline)
+												: null,
+										})
+									}
+								/>
+							)}
 						</td>
 						<td>
 							<span>

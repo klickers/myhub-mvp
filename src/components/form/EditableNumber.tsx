@@ -19,9 +19,9 @@ export default function EditableNumber({
 		return (
 			<button
 				onClick={() => setEditing(true)}
-				className="hover:underline"
+				className="border border-transparent hover:underline"
 			>
-				{value ?? "—"} min
+				{value ?? "—"}min
 			</button>
 		)
 	}
@@ -29,7 +29,7 @@ export default function EditableNumber({
 	return (
 		<input
 			type="number"
-			className="border px-1 w-10"
+			className="border-black px-1 py-0 w-12"
 			value={draft}
 			onChange={(e) => setDraft(e.target.value)}
 			onBlur={save}
