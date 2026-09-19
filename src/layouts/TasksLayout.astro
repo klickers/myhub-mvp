@@ -7,9 +7,7 @@ import prisma from "@/helpers/prisma"
 
 const path = Astro.url.pathname
 const isActive = (href: string) => {
-	return href === "/"
-		? path === "/"
-		: path === href || path.startsWith(href + "/")
+	return href === "/" ? path === "/" : path === href // || path.startsWith(href + "/")
 }
 
 const links = [
