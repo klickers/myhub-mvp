@@ -107,6 +107,11 @@
 
 	.editor {
 		@apply border border-black rounded-md;
+
+		p,
+		li {
+			@apply text-sm;
+		}
 	}
 
 	.card {

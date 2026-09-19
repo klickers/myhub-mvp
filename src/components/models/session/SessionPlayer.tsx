@@ -23,7 +23,7 @@ import { initPlayingSession } from "@/helpers/initPlayingSession"
 // 	name: string
 // }
 
-type SessionItemType = "objective" | "none" | "task"
+type SessionItemType = "objective" | "none" | "task" | "tag"
 
 interface Props {
 	// objectives: Objective[]
@@ -136,21 +136,23 @@ const SessionPlayer: React.FC<Props> = ({}) => {
 
 	return (
 		<div className="flex flex-col gap-2">
-			<div className="flex gap-2 items-center">
+			<div>
 				{itemId && (
-					<>
-						<p>
+					<div>
+						<p className="text-sm">
 							<a href={href}>{$playingSession.title}</a>
 						</p>
-						<p className="text-xs font-mono">{usedTime}</p>
-						<SessionPlayButton
-							itemType={itemType}
-							itemId={itemId}
-						/>
-					</>
+						<div className="flex items-center gap-2">
+							<p className="text-xs font-mono">{usedTime}</p>
+							<SessionPlayButton
+								itemType={itemType}
+								itemId={itemId}
+							/>
+						</div>
+					</div>
 				)}
 			</div>
-			{isSessionPlaying && (
+			{isSessionPlaying ? (
 				<div>
 					<Plate
 						onValueChange={({ value }) => {
@@ -170,6 +172,8 @@ const SessionPlayer: React.FC<Props> = ({}) => {
 						)}
 					</div>
 				</div>
+			) : (
+				<p className="text-sm text-gray-500">No session playing.</p>
 			)}
 		</div>
 	)
