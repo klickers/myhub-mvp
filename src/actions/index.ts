@@ -5,8 +5,6 @@ import prisma from "@/helpers/prisma"
 import { task } from "./task"
 import { SessionItemType } from "@/generated/prisma/enums"
 import { session } from "./session"
-import { experiment } from "./experiment"
-import { category } from "./category"
 import { dailyHighlight } from "./dailyHighlight"
 import { search } from "./search"
 import { tag } from "./tag"
@@ -14,8 +12,6 @@ import { tag } from "./tag"
 export const server = {
 	task,
 	session,
-	experiment,
-	category,
 	dailyHighlight,
 	search,
 	tag,
@@ -46,7 +42,6 @@ export const server = {
 				startTime: new Date(),
 			}
 			if (itemType === "objective") data.objectiveId = itemId
-			else if (itemType == "experiment") data.experimentId = itemId
 			else if (itemType == "task") data.taskId = itemId
 			return await prisma.session.create({ data })
 		},

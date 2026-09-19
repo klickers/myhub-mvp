@@ -32,9 +32,6 @@ export const session = {
 					objective: {
 						select: { id: true, name: true, slug: true },
 					},
-					experiment: {
-						select: { id: true, name: true, slug: true },
-					},
 					task: withFullTask ?? {
 						select: { id: true, name: true },
 					},

@@ -3,7 +3,7 @@ import { z } from "zod"
 import prisma from "@/helpers/prisma"
 import type { Status, Task } from "@/generated/prisma/client"
 
-type SearchResultType = "experiment" | "category" | "task"
+type SearchResultType = "task"
 
 type SearchResultStatus = Status | "active"
 
@@ -37,8 +37,6 @@ const STATUS_RANK: Record<SearchResultStatus, number> = {
 }
 
 const TYPE_RANK: Record<SearchResultType, number> = {
-	experiment: 2,
-	category: 3,
 	task: 4,
 }
 
@@ -65,26 +63,7 @@ export const search = {
 				},
 			}
 
-			const [experiments, categories, tasks] = await Promise.all([
-				prisma.experiment.findMany({
-					where,
-					select: {
-						id: true,
-						name: true,
-						slug: true,
-						status: true,
-					},
-					take: RESULT_LIMIT,
-				}),
-				prisma.category.findMany({
-					where,
-					select: {
-						id: true,
-						name: true,
-						slug: true,
-					},
-					take: RESULT_LIMIT,
-				}),
+			const [tasks] = await Promise.all([
 				prisma.task.findMany({
 					where,
 					take: RESULT_LIMIT,
@@ -92,20 +71,6 @@ export const search = {
 			])
 
 			const results: GlobalSearchResult[] = [
-				...experiments.map((experiment) => ({
-					id: experiment.id,
-					type: "experiment" as const,
-					title: experiment.name,
-					status: experiment.status,
-					href: `/lab/experiments/${experiment.slug}`,
-				})),
-				...categories.map((category) => ({
-					id: category.id,
-					type: "category" as const,
-					title: category.name,
-					status: "active" as const,
-					href: `/lab#category-${category.slug}`,
-				})),
 				...tasks.map((task) => ({
 					id: task.id,
 					type: "task" as const,

@@ -7,32 +7,10 @@ import {
 } from "@/helpers/data/breadcrumbs"
 
 const result = Astro.getActionResult(actions.task.create)
-if (result && !result.error) {
-	if (result.data?.experimentSlug)
-		return Astro.redirect(`/lab/experiments/${result.data.experimentSlug}`)
-}
-
-// Fetch parents
-const experiments = await Astro.callAction(actions.experiment.list, {})
-
-// URL params
-const experimentSlug = Astro.url.searchParams.get("experimentSlug")
-
-// Resolve parents
-const experiment = experiments.data?.find((e) => e.slug === experimentSlug)
 ---
 
 <Layout
 	breadcrumbs={[
-		...(experiment
-			? [
-					AlchemyLabBreadcrumb,
-					{
-						name: experiment.name,
-						href: `/lab/experiments/${experimentSlug}`,
-					},
-				]
-			: []),
 		{ name: "Create Task", href: Astro.url.pathname + Astro.url.search },
 	]}
 >
@@ -43,16 +21,6 @@ const experiment = experiments.data?.find((e) => e.slug === experimentSlug)
 		action={actions.task.create}
 		class="flex flex-col space-y-1 max-w-lg"
 	>
-		{
-			experimentSlug && (
-				<input
-					type="hidden"
-					name="experimentSlug"
-					value={experimentSlug}
-				/>
-			)
-		}
-
 		<input
 			type="text"
 			name="name"
@@ -90,36 +58,13 @@ const experiment = experiments.data?.find((e) => e.slug === experimentSlug)
 			<option value="batch">Batch</option>
 		</select>
 
-		{
-			experiment ? (
-				<>
-					<input
-						type="hidden"
-						name="parentType"
-						value="experiment"
-					/>
-					<input
-						type="hidden"
-						name="experimentId"
-						value={experiment.id}
-					/>
-				</>
-			) : (
-				<>
-					<select name="parentType">
-						<option value="none">No parent</option>
-						<option value="experiment">Experiment</option>
-					</select>
+		<select name="parentType">
+			<option value="none">No parent</option>
+		</select>
 
-					<select name="experimentId">
-						<option value="">No experiment</option>
-						{experiments.data?.map((e) => (
-							<option value={e.id}>{e.name}</option>
-						))}
-					</select>
-				</>
-			)
-		}
+		<select name="experimentId">
+			<option value="">No experiment</option>
+		</select>
 
 		<div>
 			<button class="w-auto button py-2 mt-2">Create Task</button>

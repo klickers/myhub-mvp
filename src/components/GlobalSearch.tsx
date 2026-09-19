@@ -174,7 +174,7 @@ export default function GlobalSearch() {
 					htmlFor="global-search"
 					className="sr-only"
 				>
-					Search experiments, categories, and tasks
+					Search tasks
 				</label>
 				<div className="flex h-8 items-center gap-2 rounded-lg border border-gray-300/80 bg-white/70 px-2.5 text-gray-700 shadow-sm transition-[background-color,border-color,box-shadow] duration-150 focus-within:border-gray-500 focus-within:bg-white">
 					<Search

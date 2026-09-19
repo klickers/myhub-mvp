@@ -16,16 +16,10 @@ const taskInput = z
 		estimatedTime: z.number().int().nonnegative().optional(),
 		deadline: z.coerce.date().optional(),
 
-		experimentId: z.number().int().positive().optional(),
 		parentTaskId: z.number().int().positive().optional(),
-
-		// for form handling
-		experimentSlug: z.string().optional(),
 	})
 	.superRefine((data, ctx) => {
-		const parentIds = [data.experimentId, data.parentTaskId].filter(
-			(v) => v != null,
-		)
+		const parentIds = [data.parentTaskId].filter((v) => v != null)
 
 		// Rule: only one parent (or none)
 		if (parentIds.length > 1) {
@@ -40,14 +34,6 @@ const taskInput = z
 			ctx.addIssue({
 				code: z.ZodIssueCode.custom,
 				message: "parentType is 'none' but a parent id was provided",
-			})
-		}
-
-		if (data.parentType === "experiment" && !data.experimentId) {
-			ctx.addIssue({
-				code: z.ZodIssueCode.custom,
-				message:
-					"parentType is 'experiment' but experimentId is missing",
 			})
 		}
 
@@ -83,7 +69,6 @@ type TaskAncestor = {
 	name: string
 	parentType: TaskParentType
 	parentTaskId: number | null
-	experimentId: number | null
 	makeTimeType: MakeTimeType | null
 	status: Status
 	estimatedTime: number | null
@@ -91,7 +76,7 @@ type TaskAncestor = {
 }
 
 type TaskBreadcrumbItem = {
-	type: "area" | "experiment" | "task" | "task-root"
+	type: "area" | "task" | "task-root"
 	id: number | null
 	name: string
 	href: string | null
@@ -101,7 +86,6 @@ type BreadcrumbTask = {
 	id: number
 	name: string
 	parentTaskId: number | null
-	experiment: { id: number; name: string; slug: string } | null
 }
 
 type TaskSubtreeNode = {
@@ -178,7 +162,6 @@ async function getTaskAncestors(
 				name: true,
 				parentType: true,
 				parentTaskId: true,
-				experimentId: true,
 				makeTimeType: true,
 				status: true,
 				estimatedTime: true,
@@ -235,13 +218,6 @@ async function getTaskBreadcrumbs(
 				id: true,
 				name: true,
 				parentTaskId: true,
-				experiment: {
-					select: {
-						id: true,
-						name: true,
-						slug: true,
-					},
-				},
 			},
 		})
 
@@ -254,20 +230,7 @@ async function getTaskBreadcrumbs(
 	const rootTask = chain[chain.length - 1]
 	const breadcrumbs: TaskBreadcrumbItem[] = []
 
-	if (rootTask?.experiment) {
-		breadcrumbs.push({
-			type: "area",
-			id: null,
-			name: "Alchemy Lab",
-			href: "/lab",
-		})
-		breadcrumbs.push({
-			type: "experiment",
-			id: rootTask.experiment.id,
-			name: rootTask.experiment.name,
-			href: `/lab/experiments/${rootTask.experiment.slug}`,
-		})
-	} else if (rootTask) {
+	if (rootTask) {
 		breadcrumbs.push({
 			type: "task-root",
 			id: null,
@@ -382,13 +345,11 @@ export const task = {
 					status: input.status,
 					estimatedTime: input.estimatedTime,
 					deadline: input.deadline && new Date(input.deadline),
-					experimentId: input.experimentId ?? null,
 					parentTaskId: input.parentTaskId ?? null,
 				},
 			})
 			return {
 				task,
-				experimentSlug: input.experimentSlug,
 			}
 		},
 	}),
@@ -600,7 +561,6 @@ export const task = {
 						: {}),
 				},
 				include: {
-					experiment: includeExperiment,
 					parentTask: includeParentTask,
 				},
 				orderBy: { deadline: "asc" },
@@ -614,31 +574,6 @@ export const task = {
 				...task,
 				ancestorTasks: ancestorsByTaskId.get(task.id) ?? [],
 			}))
-		},
-	}),
-	listByExperiment: defineAction({
-		input: z.object({
-			experimentId: z.coerce.number().int(),
-			status: z.array(z.nativeEnum(Status)).optional(),
-			includeSubtasks: z.boolean().default(false),
-		}),
-		handler: async ({ experimentId, status, includeSubtasks }) => {
-			return prisma.task.findMany({
-				where: {
-					experimentId,
-					...(status
-						? {
-								status: { in: status },
-							}
-						: {
-								status: { not: Status.archived },
-							}),
-				},
-				include: {
-					...(includeSubtasks && { subtasks: true }),
-				},
-				orderBy: { deadline: "asc" },
-			})
 		},
 	}),
 	listErrands: defineAction({

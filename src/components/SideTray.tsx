@@ -38,7 +38,7 @@ type Props = {
 //   }
 
 type TaskBreadcrumbItem = {
-	type: "area" | "experiment" | "task" | "task-root"
+	type: "area" | "task" | "task-root"
 	id: number | null
 	name: string
 	href: string | null

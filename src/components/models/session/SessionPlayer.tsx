@@ -23,7 +23,7 @@ import { initPlayingSession } from "@/helpers/initPlayingSession"
 // 	name: string
 // }
 
-type SessionItemType = "objective" | "none" | "experiment" | "task"
+type SessionItemType = "objective" | "none" | "task"
 
 interface Props {
 	// objectives: Objective[]
@@ -56,8 +56,6 @@ const SessionPlayer: React.FC<Props> = ({}) => {
 			// Set correct item type + id
 			if (data.itemType === "objective" && data.objectiveId)
 				setItemId(data.objectiveId)
-			else if (data.itemType === "experiment" && data.experimentId)
-				setItemId(data.experimentId)
 			else if (data.itemType === "task" && data.taskId)
 				setItemId(data.taskId)
 			setItemType(data.itemType)
@@ -132,9 +130,6 @@ const SessionPlayer: React.FC<Props> = ({}) => {
 		switch ($playingSession.itemType) {
 			case "objective":
 				href = `/objectives/${$playingSession.slug}`
-				break
-			case "experiment":
-				href = `/lab/experiments/${$playingSession.slug}`
 				break
 		}
 	}

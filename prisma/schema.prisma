@@ -76,9 +76,6 @@ enum TaskParentType {
     none
     tag
     task
-
-    // ARCHIVED
-    experiment
 }
 
 model Task {
@@ -103,8 +100,6 @@ model Task {
 
     // ARCHIVED
     makeTimeType MakeTimeType?
-    experimentId Int?
-    experiment   Experiment?   @relation(fields: [experimentId], references: [id])
 }
 
 model TaskTag {
@@ -124,7 +119,6 @@ enum SessionItemType {
     task
 
     // ARCHIVED
-    experiment
     objective
 }
 
@@ -145,10 +139,8 @@ model Session {
     agenda   Agenda? @relation(fields: [agendaId], references: [id])
 
     // ARCHIVED
-    objectiveId  Int?
-    experimentId Int?
-    objective    Objective?  @relation(fields: [objectiveId], references: [id])
-    experiment   Experiment? @relation(fields: [experimentId], references: [id])
+    objectiveId Int?
+    objective   Objective? @relation(fields: [objectiveId], references: [id])
 }
 
 // ================================================
@@ -158,30 +150,6 @@ model Session {
 enum MakeTimeType {
     highlight
     batch
-}
-
-model Category {
-    id   Int    @id @default(autoincrement())
-    name String
-    slug String @unique
-
-    experiments Experiment[]
-}
-
-model Experiment {
-    id          Int      @id @default(autoincrement())
-    name        String
-    slug        String   @unique
-    description String?
-    status      Status   @default(inprogress)
-    categoryId  Int?
-    createdAt   DateTime @default(now())
-    updatedAt   DateTime @updatedAt
-
-    category Category? @relation(fields: [categoryId], references: [id])
-
-    tasks    Task[]
-    sessions Session[]
 }
 
 model DailyHighlight {

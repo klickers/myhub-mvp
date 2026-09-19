@@ -22,9 +22,6 @@ function getAgendaTaskClasses(task: Task) {
 	else if (task.makeTimeType === MakeTimeType.batch)
 		classes.push("agenda-task-card--batch")
 
-	if (task.experimentId || task.experiment)
-		classes.push("agenda-task-card--lab")
-
 	return classes.join(" ")
 }
 
@@ -64,8 +61,8 @@ export default function Agenda() {
 					<p className="agenda-task-empty">Loading...</p>
 				)}
 				{todayTasks.map((task) => {
-					const parentName = getItemName(task.experiment, null)
-					const itemUrl = getItemUrl(task.experiment)
+					const parentName = getItemName(null)
+					const itemUrl = getItemUrl()
 
 					return (
 						<div
@@ -106,7 +103,7 @@ export default function Agenda() {
 						key={task.id}
 					>
 						<a
-							href={getItemUrl(task.experiment)}
+							href={getItemUrl()}
 							className="text-sm"
 						>
 							{task.name}

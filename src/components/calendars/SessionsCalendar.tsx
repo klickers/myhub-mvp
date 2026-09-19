@@ -12,7 +12,7 @@ type CalendarEvent = {
 	start: Date | string
 	end?: Date | string
 	extendedProps: {
-		type: "experiment" | "task" | "session"
+		type: "task" | "session"
 		name: string
 		slug?: string
 		task?: Task
@@ -34,10 +34,7 @@ export default function TasksCalendar() {
 			})
 
 			const events: CalendarEvent[] = (res.data ?? []).map((session) => {
-				const sources = [
-					{ key: "experiment", type: "experiment" },
-					{ key: "task", type: "task" },
-				] as const
+				const sources = [{ key: "task", type: "task" }] as const
 
 				const found = sources.find(({ key }) => session[key])
 				const item = found ? session[found.key] : null
@@ -92,8 +89,6 @@ export default function TasksCalendar() {
 						const { type, slug } = event.extendedProps
 
 						let url = "#!"
-						if (type == "experiment")
-							url = `/lab/experiments/${slug}`
 
 						return (
 							<div className="calendar-event-card flex gap-1 px-2 py-1.5">

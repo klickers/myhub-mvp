@@ -1,5 +1,4 @@
-export default function getItemUrl(experiment: { slug: string } | null) {
+export default function getItemUrl() {
 	let url = "#!"
-	if (experiment) url = `/lab/experiments/${experiment.slug}`
 	return url
 }

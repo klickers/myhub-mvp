@@ -18,9 +18,7 @@ type TaskListTask = Task & {
 	subtasks?: Task[]
 }
 
-type TaskParentFilter =
-	| { parentType: "experiment"; parentId: number }
-	| { parentType?: never; parentId?: never }
+type TaskParentFilter = { parentType?: never; parentId?: never }
 
 type Props = TaskParentFilter & {
 	tasks: TaskListTask[]
@@ -29,7 +27,7 @@ type Props = TaskParentFilter & {
 
 function taskBelongsToParent(task: Task, parentFilter: TaskParentFilter) {
 	if (!parentFilter.parentType) return true
-	return task.experimentId === parentFilter.parentId
+	return false
 }
 
 function taskMatchesStatuses(task: Task, statuses?: Status[]) {

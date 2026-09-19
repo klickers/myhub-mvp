@@ -42,11 +42,8 @@ type RelatedItem = {
 }
 
 type TaskCalendarTask = Task & {
-	experiment?: RelatedItem | null
 	parentTask?: Task | null
 	ancestorTasks?: Array<{
-		experimentId?: number | null
-		experiment?: unknown
 		parentType?: TaskParentType | null
 	}>
 }
@@ -60,7 +57,6 @@ type CalendarItem = {
 	status: Status
 	makeTimeType?: MakeTimeType | null
 	taskId?: number
-	experiment?: RelatedItem
 	task?: TaskCalendarTask
 	parentTask?: Task | null
 }
@@ -125,14 +121,6 @@ function getRangeBounds(rows: Date[][]) {
 		start: dateKeyToUtcDate(getLocalDateKey(firstDay)),
 		end: dateKeyToUtcDate(getLocalDateKey(addDays(lastDay, 1))),
 	}
-}
-
-function isLabTask(task?: TaskCalendarTask | null) {
-	return Boolean(
-		task?.experimentId ||
-		task?.experiment ||
-		task?.parentType === TaskParentType.experiment,
-	)
 }
 
 function getTaskCalendarLane(task: TaskCalendarTask): TaskCalendarLane {
@@ -314,13 +302,6 @@ export default function TasksCalendar() {
 					taskId: task.id,
 					task,
 					parentTask: task.parentTask,
-					...(task.experiment && {
-						experiment: {
-							id: task.experimentId,
-							slug: task.experiment.slug,
-							name: task.experiment.name,
-						},
-					}),
 				}))
 
 			setItems([...taskItems])
@@ -682,11 +663,8 @@ function CalendarCard({
 	setDraggedItemId: (id: string | null) => void
 	setSelectedTask: (task: Task | null) => void
 }) {
-	const url = getItemUrl(item.experiment ?? null)
-	const parentName = getItemName(
-		item.experiment ?? null,
-		item.parentTask ?? null,
-	)
+	const url = getItemUrl()
+	const parentName = getItemName(item.parentTask ?? null)
 
 	return (
 		<div
