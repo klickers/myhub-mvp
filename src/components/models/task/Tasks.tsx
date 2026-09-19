@@ -21,7 +21,7 @@ export default function Tasks({ tasks }: Props) {
 			</thead>
 			<tbody>
 				<Task
-					tasks={tasks}
+					initialTasks={tasks}
 					depth={0}
 				/>
 			</tbody>

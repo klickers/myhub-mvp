@@ -1,16 +1,32 @@
 import React from "react"
 import { format } from "date-fns"
 import { Icon } from "@iconify/react"
+import { toast } from "react-toastify"
 import { actions } from "astro:actions"
 import type { TaskNode } from "@/helpers/buildTaskTree"
 import EditableText from "@/components/form/EditableText"
 
 interface Props {
-	tasks: TaskNode[]
+	initialTasks: TaskNode[]
 	depth?: number
 }
 
-export default function Task({ tasks, depth = 0 }: Props) {
+export default function Task({ initialTasks, depth = 0 }: Props) {
+	const [tasks, setTasks] = React.useState(initialTasks)
+
+	const saveTaskChange = async (
+		patch: Parameters<typeof actions.task.update>[0],
+	) => {
+		const res = await actions.task.update(patch)
+		if (res.error) toast.error("Failed to update task")
+		else {
+			toast.success("Task updated successfully")
+			setTasks((prev) =>
+				prev.map((t) => (t.id === patch.id ? { ...t, ...patch } : t)),
+			)
+		}
+	}
+
 	return (
 		<>
 			{tasks.map((task) => (
@@ -31,6 +47,12 @@ export default function Task({ tasks, depth = 0 }: Props) {
 								(depth == 0 && " font-medium")
 							}
 						>
+							<EditableText
+								value={task.name}
+								onSave={(name) =>
+									saveTaskChange({ id: task.id, name })
+								}
+							/>
 						</td>
 						<td>
 							<span>{task.status}</span>
@@ -72,7 +94,7 @@ export default function Task({ tasks, depth = 0 }: Props) {
 					</tr>
 					{task.subtasks.length > 0 && (
 						<Task
-							tasks={task.subtasks}
+							initialTasks={task.subtasks}
 							depth={depth + 1}
 						/>
 					)}
