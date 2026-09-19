@@ -79,19 +79,20 @@ export default function Task({ initialTasks, depth = 0 }: Props) {
 							/>
 						</td>
 						<td className="font-mono text-right">
-							{task.deadline && (
-								<EditableDate
-									value={getUtcDateKey(task.deadline)}
-									onSave={(deadline) =>
-										saveTaskChange({
-											id: task.id,
-											deadline: deadline
-												? dateKeyToUtcDate(deadline)
-												: null,
-										})
-									}
-								/>
-							)}
+							<EditableDate
+								value={
+									task.deadline &&
+									getUtcDateKey(task.deadline)
+								}
+								onSave={(deadline) =>
+									saveTaskChange({
+										id: task.id,
+										deadline: deadline
+											? dateKeyToUtcDate(deadline)
+											: null,
+									})
+								}
+							/>
 						</td>
 						<td>
 							<span>
