@@ -10,10 +10,12 @@ import getItemName from "@/helpers/getItemName"
 function getAgendaTaskClasses(task: Task) {
 	const classes = ["agenda-task-card"]
 
-	if (task.status === Status.completed) classes.push("agenda-task-card--completed")
+	if (task.status === Status.completed)
+		classes.push("agenda-task-card--completed")
 	else if (task.status === Status.inprogress)
 		classes.push("agenda-task-card--inprogress")
-	else if (task.status === Status.onhold) classes.push("agenda-task-card--onhold")
+	else if (task.status === Status.onhold)
+		classes.push("agenda-task-card--onhold")
 
 	if (task.makeTimeType === MakeTimeType.highlight)
 		classes.push("agenda-task-card--highlight")
@@ -22,7 +24,6 @@ function getAgendaTaskClasses(task: Task) {
 
 	if (task.experimentId || task.experiment)
 		classes.push("agenda-task-card--lab")
-	else classes.push("agenda-task-card--guild")
 
 	return classes.join(" ")
 }
@@ -63,17 +64,8 @@ export default function Agenda() {
 					<p className="agenda-task-empty">Loading...</p>
 				)}
 				{todayTasks.map((task) => {
-					const parentName = getItemName(
-						task.contract,
-						task.guild,
-						task.experiment,
-						null,
-					)
-					const itemUrl = getItemUrl(
-						task.contract,
-						task.guild,
-						task.experiment,
-					)
+					const parentName = getItemName(task.experiment, null)
+					const itemUrl = getItemUrl(task.experiment)
 
 					return (
 						<div
@@ -114,11 +106,7 @@ export default function Agenda() {
 						key={task.id}
 					>
 						<a
-							href={getItemUrl(
-								task.contract,
-								task.guild,
-								task.experiment,
-							)}
+							href={getItemUrl(task.experiment)}
 							className="text-sm"
 						>
 							{task.name}

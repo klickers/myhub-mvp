@@ -78,15 +78,13 @@ enum TaskParentType {
     task
 
     // ARCHIVED
-    contract
     experiment
-    guild
 }
 
 model Task {
     id            Int            @id @default(autoincrement())
     name          String
-    parentType    TaskParentType @default(contract)
+    parentType    TaskParentType @default(task)
     status        Status         @default(notstarted)
     estimatedTime Int?           @default(0) // in minutes
     // scheduled     Boolean        @default(false)
@@ -105,12 +103,8 @@ model Task {
 
     // ARCHIVED
     makeTimeType MakeTimeType?
-    contractId   Int?
     experimentId Int?
-    guildId      Int?
-    contract     Contract?     @relation(fields: [contractId], references: [id])
     experiment   Experiment?   @relation(fields: [experimentId], references: [id])
-    guild        Guild?        @relation(fields: [guildId], references: [id])
 }
 
 model TaskTag {
@@ -130,8 +124,6 @@ enum SessionItemType {
     task
 
     // ARCHIVED
-    guild
-    contract
     experiment
     objective
 }
@@ -154,46 +146,14 @@ model Session {
 
     // ARCHIVED
     objectiveId  Int?
-    guildId      Int?
-    contractId   Int?
     experimentId Int?
     objective    Objective?  @relation(fields: [objectiveId], references: [id])
-    guild        Guild?      @relation(fields: [guildId], references: [id])
-    contract     Contract?   @relation(fields: [contractId], references: [id])
     experiment   Experiment? @relation(fields: [experimentId], references: [id])
 }
 
 // ================================================
 // Adventure Schema
 // ================================================
-
-model Guild {
-    id          Int     @id @default(autoincrement())
-    name        String
-    slug        String  @unique
-    description String?
-    status      Status  @default(inprogress)
-
-    contracts Contract[]
-    sessions  Session[]
-    tasks     Task[]
-}
-
-model Contract {
-    id          Int      @id @default(autoincrement())
-    name        String
-    slug        String   @unique
-    description String?
-    // startDate   DateTime
-    dueDate     DateTime
-    status      Status   @default(inprogress)
-    guildId     Int?
-
-    guild Guild? @relation(fields: [guildId], references: [id])
-
-    tasks    Task[]
-    sessions Session[]
-}
 
 enum MakeTimeType {
     highlight

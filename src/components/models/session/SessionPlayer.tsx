@@ -23,13 +23,7 @@ import { initPlayingSession } from "@/helpers/initPlayingSession"
 // 	name: string
 // }
 
-type SessionItemType =
-	| "objective"
-	| "none"
-	| "guild"
-	| "contract"
-	| "experiment"
-	| "task"
+type SessionItemType = "objective" | "none" | "experiment" | "task"
 
 interface Props {
 	// objectives: Objective[]
@@ -62,10 +56,6 @@ const SessionPlayer: React.FC<Props> = ({}) => {
 			// Set correct item type + id
 			if (data.itemType === "objective" && data.objectiveId)
 				setItemId(data.objectiveId)
-			else if (data.itemType === "guild" && data.guildId)
-				setItemId(data.guildId)
-			else if (data.itemType === "contract" && data.contractId)
-				setItemId(data.contractId)
 			else if (data.itemType === "experiment" && data.experimentId)
 				setItemId(data.experimentId)
 			else if (data.itemType === "task" && data.taskId)
@@ -121,8 +111,8 @@ const SessionPlayer: React.FC<Props> = ({}) => {
 		const interval = setInterval(() => {
 			setUsedTime(
 				secondsToDots(
-					differenceInSeconds(new Date(), $playingSession.startTime!)
-				)
+					differenceInSeconds(new Date(), $playingSession.startTime!),
+				),
 			)
 		}, 1000)
 		return () => clearInterval(interval)
@@ -140,12 +130,6 @@ const SessionPlayer: React.FC<Props> = ({}) => {
 	let href = "#!"
 	if ($playingSession?.slug) {
 		switch ($playingSession.itemType) {
-			case "guild":
-				href = `/hall/guilds/${$playingSession.slug}`
-				break
-			case "contract":
-				href = `/hall/contracts/${$playingSession.slug}`
-				break
 			case "objective":
 				href = `/objectives/${$playingSession.slug}`
 				break

@@ -3,7 +3,7 @@ import { actions } from "astro:actions"
 
 async function getTitleAndSlug(
 	itemType: string,
-	itemId: number
+	itemId: number,
 ): Promise<{ title: string | null; slug: string | null }> {
 	if (!itemId) return { title: null, slug: null }
 
@@ -13,22 +13,6 @@ async function getTitleAndSlug(
 			return {
 				title: objective.data?.name ?? null,
 				slug: objective.data?.slug ?? null,
-			}
-		}
-
-		case "guild": {
-			const guild = await actions.guild.getById({ id: itemId })
-			return {
-				title: guild.data?.name ?? null,
-				slug: guild.data?.slug ?? null,
-			}
-		}
-
-		case "contract": {
-			const contract = await actions.contract.getById({ id: itemId })
-			return {
-				title: contract.data?.name ?? null,
-				slug: contract.data?.slug ?? null,
 			}
 		}
 

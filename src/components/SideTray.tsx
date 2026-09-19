@@ -38,7 +38,7 @@ type Props = {
 //   }
 
 type TaskBreadcrumbItem = {
-	type: "area" | "guild" | "contract" | "experiment" | "task" | "task-root"
+	type: "area" | "experiment" | "task" | "task-root"
 	id: number | null
 	name: string
 	href: string | null
@@ -220,16 +220,14 @@ export default function SideTray({
 									<EditableNumber
 										value={selected.estimatedTime}
 										onSave={async (v) => {
-											await actions.task.update(
-												{
-													id: selected.id,
-													estimatedTime: v,
-												} as Parameters<
-													typeof actions.task.update
-												>[0] & {
-													estimatedTime: number | null
-												},
-											)
+											await actions.task.update({
+												id: selected.id,
+												estimatedTime: v,
+											} as Parameters<
+												typeof actions.task.update
+											>[0] & {
+												estimatedTime: number | null
+											})
 											applySavedTaskChange({
 												estimatedTime: v,
 											})
@@ -344,7 +342,8 @@ function TaskBreadcrumbs({
 				const key = `${breadcrumb.type}-${breadcrumb.id ?? breadcrumb.name}-${index}`
 				const isLast = index === items.length - 1
 				const isSelectedTask =
-					breadcrumb.type === "task" && breadcrumb.id === selectedTaskId
+					breadcrumb.type === "task" &&
+					breadcrumb.id === selectedTaskId
 				const content = (
 					<span className="min-w-0 break-words">
 						{breadcrumb.name}
@@ -368,7 +367,9 @@ function TaskBreadcrumbs({
 						  !isSelectedTask ? (
 							<button
 								type="button"
-								onClick={() => void onTaskSelect(breadcrumb.id!)}
+								onClick={() =>
+									void onTaskSelect(breadcrumb.id!)
+								}
 								className="min-w-0 max-w-full rounded-sm text-left text-gray-600 transition-colors hover:text-gray-950 hover:underline focus-visible:outline-none"
 							>
 								{content}

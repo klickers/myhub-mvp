@@ -2,8 +2,6 @@ import { defineAction } from "astro:actions"
 import { z } from "zod"
 import { differenceInMinutes } from "date-fns"
 import prisma from "@/helpers/prisma"
-import { guild } from "./guild"
-import { contract } from "./contract"
 import { task } from "./task"
 import { SessionItemType } from "@/generated/prisma/enums"
 import { session } from "./session"
@@ -14,8 +12,6 @@ import { search } from "./search"
 import { tag } from "./tag"
 
 export const server = {
-	guild,
-	contract,
 	task,
 	session,
 	experiment,
@@ -50,8 +46,6 @@ export const server = {
 				startTime: new Date(),
 			}
 			if (itemType === "objective") data.objectiveId = itemId
-			else if (itemType == "guild") data.guildId = itemId
-			else if (itemType == "contract") data.contractId = itemId
 			else if (itemType == "experiment") data.experimentId = itemId
 			else if (itemType == "task") data.taskId = itemId
 			return await prisma.session.create({ data })

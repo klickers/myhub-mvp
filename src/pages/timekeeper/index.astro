@@ -20,7 +20,6 @@ const sessions = await Astro.callAction(actions.session.list, { take: 5 })
 		<div class="w-full">
 			<div class="sticky top-14">
 				<h2>Current Session</h2>
-				<!-- TODO: allow easy play by guild, contract, task -->
 				<div class="card">
 					<div class="card__content">
 						<SessionPlayer client:load />

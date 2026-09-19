@@ -291,14 +291,6 @@
 		@apply text-gray-800;
 	}
 
-	.calendar-shell .calendar-contract {
-		@apply !border-violet-300/80 !bg-violet-100/95;
-	}
-
-	.calendar-shell .calendar-contract div {
-		@apply text-violet-950;
-	}
-
 	.calendar-shell .calendar-highlight {
 		@apply !border-amber-300/90 !bg-amber-100/95;
 	}
@@ -412,15 +404,10 @@
 		@apply text-emerald-950;
 	}
 
-	.agenda-task-card--guild {
-		@apply border-l-[3px] border-l-violet-600/60;
-	}
-
 	.agenda-task-card--lab {
 		@apply border-l-[3px] border-l-sky-600/70;
 	}
 
-	.agenda-task-card--highlight.agenda-task-card--guild,
 	.agenda-task-card--highlight.agenda-task-card--lab {
 		@apply border-l-red-600/80;
 	}
@@ -490,15 +477,10 @@
 		@apply my-1 cursor-grab overflow-hidden rounded-md border   active:cursor-grabbing;
 	}
 
-	.calendar-shell--tasks .calendar-lane-guild {
-		@apply !border-l-[3px] !border-l-violet-600/60;
-	}
-
 	.calendar-shell--tasks .calendar-lane-lab {
 		@apply !border-l-[3px] !border-l-sky-600/70;
 	}
 
-	.calendar-shell--tasks .calendar-highlight.calendar-lane-guild,
 	.calendar-shell--tasks .calendar-highlight.calendar-lane-lab {
 		@apply !border-l-red-600/80;
 	}
@@ -515,19 +497,6 @@
 
 	.calendar-lane-divider-content span {
 		@apply whitespace-nowrap rounded-md px-1.5 py-0.5;
-	}
-
-	.calendar-lane-divider-content--guild {
-		@apply text-violet-700;
-	}
-
-	.calendar-lane-divider-content--guild::before,
-	.calendar-lane-divider-content--guild::after {
-		@apply bg-violet-600/25;
-	}
-
-	.calendar-lane-divider-content--guild span {
-		@apply bg-violet-50/90;
 	}
 
 	.calendar-lane-divider-content--lab {

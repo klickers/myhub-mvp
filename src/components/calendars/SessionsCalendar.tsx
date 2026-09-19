@@ -12,7 +12,7 @@ type CalendarEvent = {
 	start: Date | string
 	end?: Date | string
 	extendedProps: {
-		type: "guild" | "contract" | "experiment" | "task" | "session"
+		type: "experiment" | "task" | "session"
 		name: string
 		slug?: string
 		task?: Task
@@ -35,8 +35,6 @@ export default function TasksCalendar() {
 
 			const events: CalendarEvent[] = (res.data ?? []).map((session) => {
 				const sources = [
-					{ key: "guild", type: "guild" },
-					{ key: "contract", type: "contract" },
 					{ key: "experiment", type: "experiment" },
 					{ key: "task", type: "task" },
 				] as const
@@ -52,7 +50,7 @@ export default function TasksCalendar() {
 					id: `session-${session.id}`,
 					title: item?.name ?? "",
 					start: session.startTime,
-				end: session.endTime ?? undefined,
+					end: session.endTime ?? undefined,
 					extendedProps: {
 						type: found?.type ?? "session",
 						name: item?.name ?? "",
@@ -71,56 +69,54 @@ export default function TasksCalendar() {
 	return (
 		<>
 			<div className="calendar-shell calendar-shell--sessions">
-			<FullCalendar
-				plugins={[interactionPlugin, timeGridPlugin]}
-				initialView="timeGridWeek"
-				allDaySlot={false}
-				height="auto"
-				initialEvents={[]}
-				headerToolbar={{
-					left: "timeGridDay,timeGridWeek",
-					center: "title",
-					right: "today prev,next",
-				}}
-				nowIndicator
-				slotMinTime="06:00:00"
-				events={loadEvents}
-				eventClassNames={["calendar-session"]}
-				/* ===============================
+				<FullCalendar
+					plugins={[interactionPlugin, timeGridPlugin]}
+					initialView="timeGridWeek"
+					allDaySlot={false}
+					height="auto"
+					initialEvents={[]}
+					headerToolbar={{
+						left: "timeGridDay,timeGridWeek",
+						center: "title",
+						right: "today prev,next",
+					}}
+					nowIndicator
+					slotMinTime="06:00:00"
+					events={loadEvents}
+					eventClassNames={["calendar-session"]}
+					/* ===============================
                Custom event rendering
                =============================== */
-				eventContent={(arg) => {
-					const { event } = arg
-					const { type, slug } = event.extendedProps
+					eventContent={(arg) => {
+						const { event } = arg
+						const { type, slug } = event.extendedProps
 
-					let url = "#!"
-					if (type == "contract") url = `/hall/contracts/${slug}`
-					else if (type == "guild") url = `/hall/guilds/${slug}`
-					else if (type == "experiment")
-						url = `/lab/experiments/${slug}`
+						let url = "#!"
+						if (type == "experiment")
+							url = `/lab/experiments/${slug}`
 
-					return (
-						<div className="calendar-event-card flex gap-1 px-2 py-1.5">
-							<div className={`leading-tight`}>
-								{event.extendedProps.task ? (
-									<span
-										className="cursor-pointer"
-										onClick={() =>
-											setSelectedTask(
-												event.extendedProps.task,
-											)
-										}
-									>
-										{event.title}
-									</span>
-								) : (
-									<a href={url}>{event.title}</a>
-								)}
+						return (
+							<div className="calendar-event-card flex gap-1 px-2 py-1.5">
+								<div className={`leading-tight`}>
+									{event.extendedProps.task ? (
+										<span
+											className="cursor-pointer"
+											onClick={() =>
+												setSelectedTask(
+													event.extendedProps.task,
+												)
+											}
+										>
+											{event.title}
+										</span>
+									) : (
+										<a href={url}>{event.title}</a>
+									)}
+								</div>
 							</div>
-						</div>
-					)
-				}}
-			/>
+						)
+					}}
+				/>
 			</div>
 			{selectedTask && (
 				<SideTray

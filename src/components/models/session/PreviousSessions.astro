@@ -20,8 +20,6 @@ const { sessions, timekeeper = false } = Astro.props as Props
 const getTitle = (s: any) =>
 	s?.title ||
 	s?.task?.name ||
-	s?.guild?.name ||
-	s?.contract?.name ||
 	s?.experiment?.name ||
 	s?.objective?.name ||
 	"(untitled)"
@@ -31,10 +29,6 @@ const getItemHref = (s: any) => {
 	switch (s?.itemType) {
 		case "task":
 			return /*s?.taskId ? `/tasks/${s.taskId}` :*/ null
-		case "guild":
-			return s?.guildId ? `/hall/guilds/${s.guild.slug}` : null
-		case "contract":
-			return s?.contractId ? `/hall/contracts/${s.contract.slug}` : null
 		case "experiment":
 			return s?.experimentId
 				? `/lab/experiments/${s.experiment.slug}`

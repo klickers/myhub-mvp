@@ -3,12 +3,7 @@ import { z } from "zod"
 import prisma from "@/helpers/prisma"
 import type { Status, Task } from "@/generated/prisma/client"
 
-type SearchResultType =
-	| "guild"
-	| "contract"
-	| "experiment"
-	| "category"
-	| "task"
+type SearchResultType = "experiment" | "category" | "task"
 
 type SearchResultStatus = Status | "active"
 
@@ -42,8 +37,6 @@ const STATUS_RANK: Record<SearchResultStatus, number> = {
 }
 
 const TYPE_RANK: Record<SearchResultType, number> = {
-	guild: 0,
-	contract: 1,
 	experiment: 2,
 	category: 3,
 	task: 4,
@@ -72,68 +65,33 @@ export const search = {
 				},
 			}
 
-			const [guilds, contracts, experiments, categories, tasks] =
-				await Promise.all([
-					prisma.guild.findMany({
-						where,
-						select: {
-							id: true,
-							name: true,
-							slug: true,
-							status: true,
-						},
-						take: RESULT_LIMIT,
-					}),
-					prisma.contract.findMany({
-						where,
-						select: {
-							id: true,
-							name: true,
-							slug: true,
-							status: true,
-						},
-						take: RESULT_LIMIT,
-					}),
-					prisma.experiment.findMany({
-						where,
-						select: {
-							id: true,
-							name: true,
-							slug: true,
-							status: true,
-						},
-						take: RESULT_LIMIT,
-					}),
-					prisma.category.findMany({
-						where,
-						select: {
-							id: true,
-							name: true,
-							slug: true,
-						},
-						take: RESULT_LIMIT,
-					}),
-					prisma.task.findMany({
-						where,
-						take: RESULT_LIMIT,
-					}),
-				])
+			const [experiments, categories, tasks] = await Promise.all([
+				prisma.experiment.findMany({
+					where,
+					select: {
+						id: true,
+						name: true,
+						slug: true,
+						status: true,
+					},
+					take: RESULT_LIMIT,
+				}),
+				prisma.category.findMany({
+					where,
+					select: {
+						id: true,
+						name: true,
+						slug: true,
+					},
+					take: RESULT_LIMIT,
+				}),
+				prisma.task.findMany({
+					where,
+					take: RESULT_LIMIT,
+				}),
+			])
 
 			const results: GlobalSearchResult[] = [
-				...guilds.map((guild) => ({
-					id: guild.id,
-					type: "guild" as const,
-					title: guild.name,
-					status: guild.status,
-					href: `/hall/guilds/${guild.slug}`,
-				})),
-				...contracts.map((contract) => ({
-					id: contract.id,
-					type: "contract" as const,
-					title: contract.name,
-					status: contract.status,
-					href: `/hall/contracts/${contract.slug}`,
-				})),
 				...experiments.map((experiment) => ({
 					id: experiment.id,
 					type: "experiment" as const,

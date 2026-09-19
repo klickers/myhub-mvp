@@ -1,9 +1,5 @@
 import { actions } from "astro:actions"
-import {
-	MakeTimeType,
-	Status,
-	TaskParentType,
-} from "@/generated/prisma/enums"
+import { MakeTimeType, Status, TaskParentType } from "@/generated/prisma/enums"
 import {
 	addDays,
 	addMonths,
@@ -36,8 +32,8 @@ import {
 } from "@/helpers/taskEvents"
 
 type CalendarView = "fourDay" | "week" | "month"
-type TaskCalendarLane = "guild" | "lab"
-type CalendarEventType = "contract" | "task"
+type TaskCalendarLane = "lab"
+type CalendarEventType = "task"
 
 type RelatedItem = {
 	id: number | null
@@ -46,8 +42,6 @@ type RelatedItem = {
 }
 
 type TaskCalendarTask = Task & {
-	contract?: RelatedItem | null
-	guild?: RelatedItem | null
 	experiment?: RelatedItem | null
 	parentTask?: Task | null
 	ancestorTasks?: Array<{
@@ -66,8 +60,6 @@ type CalendarItem = {
 	status: Status
 	makeTimeType?: MakeTimeType | null
 	taskId?: number
-	contract?: RelatedItem
-	guild?: RelatedItem
 	experiment?: RelatedItem
 	task?: TaskCalendarTask
 	parentTask?: Task | null
@@ -138,21 +130,13 @@ function getRangeBounds(rows: Date[][]) {
 function isLabTask(task?: TaskCalendarTask | null) {
 	return Boolean(
 		task?.experimentId ||
-			task?.experiment ||
-			task?.parentType === TaskParentType.experiment,
+		task?.experiment ||
+		task?.parentType === TaskParentType.experiment,
 	)
 }
 
 function getTaskCalendarLane(task: TaskCalendarTask): TaskCalendarLane {
-	if (
-		isLabTask(task) ||
-		isLabTask(task.parentTask as TaskCalendarTask | null) ||
-		task.ancestorTasks?.some((ancestor) => isLabTask(ancestor as TaskCalendarTask))
-	) {
-		return "lab"
-	}
-
-	return "guild"
+	return "lab"
 }
 
 function getEventRank(item: CalendarItem) {
@@ -178,16 +162,19 @@ function getMaxLaneHeight(
 function getItemClasses(item: CalendarItem) {
 	const classes = [
 		"tasks-calendar-card",
-		item.type === "contract" ? "calendar-contract" : "calendar-task",
-		item.lane === "lab" ? "calendar-lane-lab" : "calendar-lane-guild",
+		"calendar-task",
+		"calendar-lane-lab",
 	]
 
 	if (item.status === Status.completed) classes.push("calendar-completed")
-	else if (item.status === Status.inprogress) classes.push("calendar-inprogress")
+	else if (item.status === Status.inprogress)
+		classes.push("calendar-inprogress")
 	else if (item.status === Status.onhold) classes.push("calendar-onhold")
 
-	if (item.makeTimeType === MakeTimeType.highlight) classes.push("calendar-highlight")
-	else if (item.makeTimeType === MakeTimeType.batch) classes.push("calendar-batch")
+	if (item.makeTimeType === MakeTimeType.highlight)
+		classes.push("calendar-highlight")
+	else if (item.makeTimeType === MakeTimeType.batch)
+		classes.push("calendar-batch")
 
 	return classes.join(" ")
 }
@@ -235,7 +222,12 @@ function MeasuredLane({
 		if (!content) return
 
 		const measure = () =>
-			onMeasure(rowKey, lane, measurementKey, Math.ceil(content.scrollHeight))
+			onMeasure(
+				rowKey,
+				lane,
+				measurementKey,
+				Math.ceil(content.scrollHeight),
+			)
 		measure()
 
 		const observer = new ResizeObserver(measure)
@@ -249,7 +241,10 @@ function MeasuredLane({
 			className={`tasks-calendar-lane tasks-calendar-lane--${lane}`}
 			style={{ minHeight: `${Math.max(height, 16)}px` }}
 		>
-			<div ref={contentRef} className="tasks-calendar-lane__content">
+			<div
+				ref={contentRef}
+				className="tasks-calendar-lane__content"
+			>
 				{children}
 			</div>
 		</div>
@@ -261,7 +256,9 @@ export default function TasksCalendar() {
 	const [currentDate, setCurrentDate] = useState(() => new Date())
 	const [items, setItems] = useState<CalendarItem[]>([])
 	const [highlights, setHighlights] = useState<Record<string, string>>({})
-	const [laneMeasurements, setLaneMeasurements] = useState<LaneMeasurements>({})
+	const [laneMeasurements, setLaneMeasurements] = useState<LaneMeasurements>(
+		{},
+	)
 	const [selectedTask, setSelectedTask] = useState<Task | null>(null)
 	const [draggedItemId, setDraggedItemId] = useState<string | null>(null)
 	const saveTimeouts = useRef(new Map<string, number>())
@@ -285,12 +282,7 @@ export default function TasksCalendar() {
 			const statuses = Object.values(Status).filter(
 				(status) => status !== Status.archived,
 			)
-			const [contractsRes, tasksRes, highlightsRes] = await Promise.all([
-				actions.contract.list({
-					status: statuses,
-					from: start,
-					to: end,
-				}),
+			const [tasksRes, highlightsRes] = await Promise.all([
 				actions.task.listAll({
 					status: statuses,
 					from: start,
@@ -307,22 +299,6 @@ export default function TasksCalendar() {
 				}),
 			])
 
-			const contractItems: CalendarItem[] = (contractsRes.data ?? []).map(
-				(contract) => ({
-					id: `contract-${contract.id}`,
-					title: contract.name,
-					start: contract.dueDate,
-					type: "contract",
-					lane: "guild",
-					status: contract.status,
-					contract: {
-						id: contract.id,
-						slug: contract.slug,
-						name: contract.name,
-					},
-				}),
-			)
-
 			const taskItems: CalendarItem[] = (
 				(tasksRes.data ?? []) as TaskCalendarTask[]
 			)
@@ -338,20 +314,6 @@ export default function TasksCalendar() {
 					taskId: task.id,
 					task,
 					parentTask: task.parentTask,
-					...(task.contract && {
-						contract: {
-							id: task.contractId,
-							slug: task.contract.slug,
-							name: task.contract.name,
-						},
-					}),
-					...(task.guild && {
-						guild: {
-							id: task.guildId,
-							slug: task.guild.slug,
-							name: task.guild.name,
-						},
-					}),
 					...(task.experiment && {
 						experiment: {
 							id: task.experimentId,
@@ -361,7 +323,7 @@ export default function TasksCalendar() {
 					}),
 				}))
 
-			setItems([...contractItems, ...taskItems])
+			setItems([...taskItems])
 			setHighlights(
 				Object.fromEntries(
 					(highlightsRes.data ?? []).map((highlight) => [
@@ -423,13 +385,12 @@ export default function TasksCalendar() {
 
 		for (const item of items) {
 			const dateKey = getUtcDateKey(item.start)
-			const dayItems = map.get(dateKey) ?? { guild: [], lab: [] }
+			const dayItems = map.get(dateKey) ?? { lab: [] }
 			dayItems[item.lane].push(item)
 			map.set(dateKey, dayItems)
 		}
 
 		for (const dayItems of map.values()) {
-			dayItems.guild.sort(sortCalendarItems)
 			dayItems.lab.sort(sortCalendarItems)
 		}
 
@@ -461,7 +422,8 @@ export default function TasksCalendar() {
 			height: number,
 		) => {
 			setLaneMeasurements((prev) => {
-				if (prev[rowKey]?.[lane]?.[measurementKey] === height) return prev
+				if (prev[rowKey]?.[lane]?.[measurementKey] === height)
+					return prev
 				return {
 					...prev,
 					[rowKey]: {
@@ -506,12 +468,7 @@ export default function TasksCalendar() {
 		const item = items.find((candidate) => candidate.id === itemId)
 		if (!item) return
 
-		if (item.type === "contract" && item.contract?.id) {
-			await actions.contract.updateJson({
-				id: item.contract.id,
-				dueDate: dateKeyToUtcDate(getLocalDateKey(date)).toISOString(),
-			})
-		} else if (item.type === "task" && item.taskId) {
+		if (item.type === "task" && item.taskId) {
 			await actions.task.update({
 				id: item.taskId,
 				deadline: dateKeyToUtcDate(getLocalDateKey(date)),
@@ -586,7 +543,10 @@ export default function TasksCalendar() {
 					}}
 				>
 					{rows[0]?.map((day) => (
-						<div key={getLocalDateKey(day)} className="tasks-calendar-weekday">
+						<div
+							key={getLocalDateKey(day)}
+							className="tasks-calendar-weekday"
+						>
 							{format(day, "EEE")}
 						</div>
 					))}
@@ -596,11 +556,10 @@ export default function TasksCalendar() {
 					{rows.map((row) => {
 						const rowKey = `${getLocalDateKey(row[0])}_${getLocalDateKey(row[row.length - 1])}`
 						const rowMeasurements = laneMeasurements[rowKey] ?? {}
-						const guildLaneHeight = getMaxLaneHeight(
+						const labLaneHeight = getMaxLaneHeight(
 							rowMeasurements,
-							"guild",
+							"lab",
 						)
-						const labLaneHeight = getMaxLaneHeight(rowMeasurements, "lab")
 
 						return (
 							<div
@@ -612,24 +571,29 @@ export default function TasksCalendar() {
 							>
 								{row.map((day) => {
 									const dateKey = getLocalDateKey(day)
-									const dayItems = itemsByDate.get(dateKey) ?? {
-										guild: [],
+									const dayItems = itemsByDate.get(
+										dateKey,
+									) ?? {
 										lab: [],
 									}
 									const isOutsideMonth =
-										view === "month" && !isSameMonth(day, currentDate)
+										view === "month" &&
+										!isSameMonth(day, currentDate)
 
 									return (
 										<div
 											key={dateKey}
 											className={`tasks-calendar-day ${isOutsideMonth ? "tasks-calendar-day--outside" : ""} ${isToday(day) ? "tasks-calendar-day--today" : ""}`}
-											onDragOver={(event) => event.preventDefault()}
+											onDragOver={(event) =>
+												event.preventDefault()
+											}
 											onDrop={(event) => {
 												event.preventDefault()
 												void handleDrop(
 													day,
-													event.dataTransfer.getData("text/plain") ||
-														draggedItemId,
+													event.dataTransfer.getData(
+														"text/plain",
+													) || draggedItemId,
 												)
 											}}
 										>
@@ -639,39 +603,31 @@ export default function TasksCalendar() {
 
 											<textarea
 												rows={2}
-												value={highlights[dateKey] ?? ""}
+												value={
+													highlights[dateKey] ?? ""
+												}
 												placeholder="Highlight"
 												onChange={(event) =>
-													saveHighlight(dateKey, event.target.value)
+													saveHighlight(
+														dateKey,
+														event.target.value,
+													)
 												}
-												onPointerDown={(event) => event.stopPropagation()}
-												onMouseDown={(event) => event.stopPropagation()}
-												onTouchStart={(event) => event.stopPropagation()}
-												onClick={(event) => event.stopPropagation()}
+												onPointerDown={(event) =>
+													event.stopPropagation()
+												}
+												onMouseDown={(event) =>
+													event.stopPropagation()
+												}
+												onTouchStart={(event) =>
+													event.stopPropagation()
+												}
+												onClick={(event) =>
+													event.stopPropagation()
+												}
 												className={`calendar-highlight-input ${highlights[dateKey] ? "calendar-highlight-input--filled" : ""}`}
 												style={{ minHeight: "2.5em" }}
 											/>
-
-											<CalendarLaneDivider lane="guild">
-												Guild Hall
-											</CalendarLaneDivider>
-
-											<MeasuredLane
-												rowKey={rowKey}
-												lane="guild"
-												measurementKey={dateKey}
-												height={guildLaneHeight}
-												onMeasure={handleLaneMeasure}
-											>
-												{dayItems.guild.map((item) => (
-													<CalendarCard
-														key={item.id}
-														item={item}
-														setDraggedItemId={setDraggedItemId}
-														setSelectedTask={setSelectedTask}
-													/>
-												))}
-											</MeasuredLane>
 
 											<CalendarLaneDivider lane="lab">
 												Alchemy Lab
@@ -688,8 +644,12 @@ export default function TasksCalendar() {
 													<CalendarCard
 														key={item.id}
 														item={item}
-														setDraggedItemId={setDraggedItemId}
-														setSelectedTask={setSelectedTask}
+														setDraggedItemId={
+															setDraggedItemId
+														}
+														setSelectedTask={
+															setSelectedTask
+														}
 													/>
 												))}
 											</MeasuredLane>
@@ -722,14 +682,8 @@ function CalendarCard({
 	setDraggedItemId: (id: string | null) => void
 	setSelectedTask: (task: Task | null) => void
 }) {
-	const url = getItemUrl(
-		item.contract ?? null,
-		item.guild ?? null,
-		item.experiment ?? null,
-	)
+	const url = getItemUrl(item.experiment ?? null)
 	const parentName = getItemName(
-		item.contract ?? null,
-		item.guild ?? null,
 		item.experiment ?? null,
 		item.parentTask ?? null,
 	)
@@ -752,7 +706,9 @@ function CalendarCard({
 						(item.parentTask ? (
 							<span
 								className="calendar-event-card__meta block cursor-pointer text-xs"
-								onClick={() => setSelectedTask(item.parentTask ?? null)}
+								onClick={() =>
+									setSelectedTask(item.parentTask ?? null)
+								}
 							>
 								{parentName}
 							</span>

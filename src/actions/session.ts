@@ -32,12 +32,6 @@ export const session = {
 					objective: {
 						select: { id: true, name: true, slug: true },
 					},
-					guild: {
-						select: { id: true, name: true, slug: true },
-					},
-					contract: {
-						select: { id: true, name: true, slug: true },
-					},
 					experiment: {
 						select: { id: true, name: true, slug: true },
 					},

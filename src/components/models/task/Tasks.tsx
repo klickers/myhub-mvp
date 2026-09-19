@@ -19,9 +19,7 @@ type TaskListTask = Task & {
 }
 
 type TaskParentFilter =
-	| { parentType: "contract"; parentId: number }
 	| { parentType: "experiment"; parentId: number }
-	| { parentType: "guild"; parentId: number }
 	| { parentType?: never; parentId?: never }
 
 type Props = TaskParentFilter & {
@@ -31,13 +29,7 @@ type Props = TaskParentFilter & {
 
 function taskBelongsToParent(task: Task, parentFilter: TaskParentFilter) {
 	if (!parentFilter.parentType) return true
-	if (parentFilter.parentType === "contract") {
-		return task.contractId === parentFilter.parentId
-	}
-	if (parentFilter.parentType === "experiment") {
-		return task.experimentId === parentFilter.parentId
-	}
-	return task.guildId === parentFilter.parentId
+	return task.experimentId === parentFilter.parentId
 }
 
 function taskMatchesStatuses(task: Task, statuses?: Status[]) {
@@ -211,7 +203,9 @@ export default function Tasks({
 												<span className="-mt-0.5">
 													<Icon icon="mingcute:calendar-fill" />
 												</span>
-												{formatUtcDateOnly(task.deadline)}
+												{formatUtcDateOnly(
+													task.deadline,
+												)}
 											</p>
 										)}
 										<SessionPlayButton

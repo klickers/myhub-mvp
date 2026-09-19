@@ -7,7 +7,7 @@ const taskInput = z
 	.object({
 		name: z.string().min(1),
 
-		parentType: z.nativeEnum(TaskParentType).default("contract"),
+		parentType: z.nativeEnum(TaskParentType).default("task"),
 		makeTimeType: z
 			.union([z.nativeEnum(MakeTimeType), z.literal("none")])
 			.optional(),
@@ -16,23 +16,16 @@ const taskInput = z
 		estimatedTime: z.number().int().nonnegative().optional(),
 		deadline: z.coerce.date().optional(),
 
-		contractId: z.number().int().positive().optional(),
 		experimentId: z.number().int().positive().optional(),
 		parentTaskId: z.number().int().positive().optional(),
-		guildId: z.number().int().positive().optional(),
 
 		// for form handling
-		contractSlug: z.string().optional(),
-		guildSlug: z.string().optional(),
 		experimentSlug: z.string().optional(),
 	})
 	.superRefine((data, ctx) => {
-		const parentIds = [
-			data.contractId,
-			data.experimentId,
-			data.parentTaskId,
-			data.guildId,
-		].filter((v) => v != null)
+		const parentIds = [data.experimentId, data.parentTaskId].filter(
+			(v) => v != null,
+		)
 
 		// Rule: only one parent (or none)
 		if (parentIds.length > 1) {
@@ -50,13 +43,6 @@ const taskInput = z
 			})
 		}
 
-		if (data.parentType === "contract" && !data.contractId) {
-			ctx.addIssue({
-				code: z.ZodIssueCode.custom,
-				message: "parentType is 'contract' but contractId is missing",
-			})
-		}
-
 		if (data.parentType === "experiment" && !data.experimentId) {
 			ctx.addIssue({
 				code: z.ZodIssueCode.custom,
@@ -69,13 +55,6 @@ const taskInput = z
 			ctx.addIssue({
 				code: z.ZodIssueCode.custom,
 				message: "parentType is 'task' but parentTaskId is missing",
-			})
-		}
-
-		if (data.parentType === "guild" && !data.guildId) {
-			ctx.addIssue({
-				code: z.ZodIssueCode.custom,
-				message: "parentType is 'guild' but guildId is missing",
 			})
 		}
 	})
@@ -104,9 +83,7 @@ type TaskAncestor = {
 	name: string
 	parentType: TaskParentType
 	parentTaskId: number | null
-	contractId: number | null
 	experimentId: number | null
-	guildId: number | null
 	makeTimeType: MakeTimeType | null
 	status: Status
 	estimatedTime: number | null
@@ -114,7 +91,7 @@ type TaskAncestor = {
 }
 
 type TaskBreadcrumbItem = {
-	type: "area" | "guild" | "contract" | "experiment" | "task" | "task-root"
+	type: "area" | "experiment" | "task" | "task-root"
 	id: number | null
 	name: string
 	href: string | null
@@ -124,13 +101,6 @@ type BreadcrumbTask = {
 	id: number
 	name: string
 	parentTaskId: number | null
-	contract: {
-		id: number
-		name: string
-		slug: string
-		guild: { id: number; name: string; slug: string } | null
-	} | null
-	guild: { id: number; name: string; slug: string } | null
 	experiment: { id: number; name: string; slug: string } | null
 }
 
@@ -171,7 +141,8 @@ async function getTaskSubtree(taskId: number): Promise<TaskSubtreeNode[]> {
 		for (const child of children) {
 			if (seen.has(child.id)) continue
 
-			const depth = (depthByParentId.get(child.parentTaskId ?? 0) ?? 0) + 1
+			const depth =
+				(depthByParentId.get(child.parentTaskId ?? 0) ?? 0) + 1
 			const node = { id: child.id, depth }
 			seen.add(child.id)
 			subtree.push(node)
@@ -207,9 +178,7 @@ async function getTaskAncestors(
 				name: true,
 				parentType: true,
 				parentTaskId: true,
-				contractId: true,
 				experimentId: true,
-				guildId: true,
 				makeTimeType: true,
 				status: true,
 				estimatedTime: true,
@@ -266,27 +235,6 @@ async function getTaskBreadcrumbs(
 				id: true,
 				name: true,
 				parentTaskId: true,
-				contract: {
-					select: {
-						id: true,
-						name: true,
-						slug: true,
-						guild: {
-							select: {
-								id: true,
-								name: true,
-								slug: true,
-							},
-						},
-					},
-				},
-				guild: {
-					select: {
-						id: true,
-						name: true,
-						slug: true,
-					},
-				},
 				experiment: {
 					select: {
 						id: true,
@@ -306,41 +254,7 @@ async function getTaskBreadcrumbs(
 	const rootTask = chain[chain.length - 1]
 	const breadcrumbs: TaskBreadcrumbItem[] = []
 
-	if (rootTask?.contract) {
-		breadcrumbs.push({
-			type: "area",
-			id: null,
-			name: "Guild Hall",
-			href: "/hall",
-		})
-		if (rootTask.contract.guild) {
-			breadcrumbs.push({
-				type: "guild",
-				id: rootTask.contract.guild.id,
-				name: rootTask.contract.guild.name,
-				href: `/hall/guilds/${rootTask.contract.guild.slug}`,
-			})
-		}
-		breadcrumbs.push({
-			type: "contract",
-			id: rootTask.contract.id,
-			name: rootTask.contract.name,
-			href: `/hall/contracts/${rootTask.contract.slug}`,
-		})
-	} else if (rootTask?.guild) {
-		breadcrumbs.push({
-			type: "area",
-			id: null,
-			name: "Guild Hall",
-			href: "/hall",
-		})
-		breadcrumbs.push({
-			type: "guild",
-			id: rootTask.guild.id,
-			name: rootTask.guild.name,
-			href: `/hall/guilds/${rootTask.guild.slug}`,
-		})
-	} else if (rootTask?.experiment) {
+	if (rootTask?.experiment) {
 		breadcrumbs.push({
 			type: "area",
 			id: null,
@@ -468,16 +382,12 @@ export const task = {
 					status: input.status,
 					estimatedTime: input.estimatedTime,
 					deadline: input.deadline && new Date(input.deadline),
-					contractId: input.contractId ?? null,
 					experimentId: input.experimentId ?? null,
 					parentTaskId: input.parentTaskId ?? null,
-					guildId: input.guildId ?? null,
 				},
 			})
 			return {
 				task,
-				contractSlug: input.contractSlug,
-				guildSlug: input.guildSlug,
 				experimentSlug: input.experimentSlug,
 			}
 		},
@@ -690,8 +600,6 @@ export const task = {
 						: {}),
 				},
 				include: {
-					contract: includeContract,
-					guild: includeGuild,
 					experiment: includeExperiment,
 					parentTask: includeParentTask,
 				},
@@ -706,56 +614,6 @@ export const task = {
 				...task,
 				ancestorTasks: ancestorsByTaskId.get(task.id) ?? [],
 			}))
-		},
-	}),
-	listByContract: defineAction({
-		input: z.object({
-			contractId: z.coerce.number().int(),
-			status: z.array(z.nativeEnum(Status)).optional(),
-			includeSubtasks: z.boolean().default(false),
-		}),
-		handler: async ({ contractId, status, includeSubtasks }) => {
-			return prisma.task.findMany({
-				where: {
-					contractId,
-					...(status
-						? {
-								status: { in: status },
-							}
-						: {
-								status: { not: Status.archived },
-							}),
-				},
-				include: {
-					...(includeSubtasks && { subtasks: true }),
-				},
-				orderBy: [{ deadline: "asc" }, { name: "asc" }],
-			})
-		},
-	}),
-	listByGuild: defineAction({
-		input: z.object({
-			guildId: z.coerce.number().int(),
-			status: z.array(z.nativeEnum(Status)).optional(),
-			includeSubtasks: z.boolean().default(false),
-		}),
-		handler: async ({ guildId, status, includeSubtasks }) => {
-			return prisma.task.findMany({
-				where: {
-					guildId,
-					...(status
-						? {
-								status: { in: status },
-							}
-						: {
-								status: { not: Status.archived },
-							}),
-				},
-				include: {
-					...(includeSubtasks && { subtasks: true }),
-				},
-				orderBy: { deadline: "asc" },
-			})
 		},
 	}),
 	listByExperiment: defineAction({
