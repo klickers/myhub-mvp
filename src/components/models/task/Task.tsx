@@ -9,13 +9,16 @@ import EditableNumber from "@/components/form/EditableNumber"
 import EditableDate from "@/components/form/EditableDate"
 import { dateKeyToUtcDate, getUtcDateKey } from "@/helpers/dateOnly"
 import SessionPlayButton from "../session/SessionPlayButton"
+import EditableTags from "@/components/form/EditableTags"
+import type { TagWithChildren } from "@/types/prisma-custom"
 
 interface Props {
 	initialTasks: TaskNode[]
 	depth?: number
+	tags: TagWithChildren[]
 }
 
-export default function Task({ initialTasks, depth = 0 }: Props) {
+export default function Task({ initialTasks, depth = 0, tags }: Props) {
 	const [tasks, setTasks] = React.useState(initialTasks)
 
 	const saveTaskChange = async (
@@ -96,17 +99,16 @@ export default function Task({ initialTasks, depth = 0 }: Props) {
 						</td>
 						<td>
 							<span>
-								{task.tags.map((tag, index) => (
-									<span
-										className="mr-1"
-										key={tag.tag.id}
-									>
-										{tag.tag.name +
-											(index < task.tags.length - 1
-												? ","
-												: "")}
-									</span>
-								))}
+								<EditableTags
+									value={task.tags.map((tag) => tag.tag)}
+									tags={tags}
+									onSave={(tags) =>
+										saveTaskChange({
+											id: task.id,
+											tags: tags.map((tag) => tag.id),
+										})
+									}
+								/>
 							</span>
 						</td>
 						<td>
@@ -128,6 +130,7 @@ export default function Task({ initialTasks, depth = 0 }: Props) {
 						<Task
 							initialTasks={task.subtasks}
 							depth={depth + 1}
+							tags={tags}
 						/>
 					)}
 				</React.Fragment>

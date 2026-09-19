@@ -1,11 +1,13 @@
 import type { TaskNode } from "@/helpers/buildTaskTree"
 import Task from "@/components/models/task/Task"
+import type { TagWithChildren } from "@/types/prisma-custom"
 
 interface Props {
 	tasks: TaskNode[]
+	tags: TagWithChildren[]
 }
 
-export default function Tasks({ tasks }: Props) {
+export default function Tasks({ tasks, tags }: Props) {
 	return (
 		<table>
 			<thead>
@@ -23,6 +25,7 @@ export default function Tasks({ tasks }: Props) {
 				<Task
 					initialTasks={tasks}
 					depth={0}
+					tags={tags}
 				/>
 			</tbody>
 		</table>

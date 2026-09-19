@@ -14,6 +14,16 @@ const tasks = await prisma.task.findMany({
 	},
 })
 const taskTree = buildTaskTree(tasks)
+
+const tags = await prisma.tag.findMany({
+	where: { type: "group" },
+	orderBy: { order: "asc" },
+	include: {
+		children: {
+			orderBy: { order: "asc" },
+		},
+	},
+})
 ---
 
 <TasksLayout>
@@ -21,5 +31,6 @@ const taskTree = buildTaskTree(tasks)
 	<Tasks
 		client:load
 		tasks={taskTree}
+		tags={tags}
 	/>
 </TasksLayout>

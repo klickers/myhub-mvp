@@ -415,11 +415,34 @@ export const task = {
 				.optional(),
 			estimatedTime: z.number().int().nonnegative().nullable().optional(),
 			deadline: z.coerce.date().optional().nullable(),
+			tags: z.array(z.number().int().positive()).optional(),
 		}),
-		handler: async ({ id, ...data }) => {
+		handler: async ({ id, tags, ...data }) => {
 			return prisma.task.update({
 				where: { id },
-				data,
+				data: {
+					...data,
+					...(tags !== undefined && {
+						tags: {
+							deleteMany: {
+								tagId: {
+									notIn: tags.map((tagId) => tagId),
+								},
+							},
+							createMany: {
+								data: tags.map((tagId) => ({ tagId })),
+								skipDuplicates: true,
+							},
+						},
+					}),
+				},
+				include: {
+					tags: {
+						include: {
+							tag: true,
+						},
+					},
+				},
 			})
 		},
 	}),
