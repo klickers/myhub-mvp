@@ -1,3 +1,4 @@
+import React from "react"
 import { format } from "date-fns"
 import { Icon } from "@iconify/react"
 import { actions } from "astro:actions"
@@ -13,7 +14,7 @@ export default function Task({ tasks, depth = 0 }: Props) {
 	return (
 		<>
 			{tasks.map((task) => (
-				<div>
+				<React.Fragment key={task.id}>
 					<tr
 						className={
 							"border-b border-gray-200" +
@@ -46,7 +47,10 @@ export default function Task({ tasks, depth = 0 }: Props) {
 						<td>
 							<span>
 								{task.tags.map((tag, index) => (
-									<span className="mr-1">
+									<span
+										className="mr-1"
+										key={tag.tag.id}
+									>
 										{tag.tag.name +
 											(index < task.tags.length - 1
 												? ","
@@ -72,7 +76,7 @@ export default function Task({ tasks, depth = 0 }: Props) {
 							depth={depth + 1}
 						/>
 					)}
-				</div>
+				</React.Fragment>
 			))}
 		</>
 	)
