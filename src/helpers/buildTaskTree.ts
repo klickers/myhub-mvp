@@ -1,18 +1,9 @@
-import type { Prisma, Task } from "@/generated/prisma/client"
 import type { Status } from "@/generated/prisma/enums"
+import type { TaskWithTags } from "@/types/prisma-custom"
 
 // TODO: cache tree at some point
 // TODO: full load no tags option
 
-type TaskWithTags = Prisma.TaskGetPayload<{
-	include: {
-		tags: {
-			include: {
-				tag: true
-			}
-		}
-	}
-}>
 
 export type TaskNode = TaskWithTags & {
 	subtasks: TaskNode[]

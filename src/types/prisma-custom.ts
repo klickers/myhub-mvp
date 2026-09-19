@@ -5,3 +5,13 @@ export type TagWithChildren = Prisma.TagGetPayload<{
 		children: true
 	}
 }>
+
+export type TaskWithTags = Prisma.TaskGetPayload<{
+	include: {
+		tags: {
+			include: {
+				tag: true
+			}
+		}
+	}
+}>
