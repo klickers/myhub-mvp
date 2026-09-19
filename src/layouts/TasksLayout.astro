@@ -5,6 +5,18 @@ import TagGroupHeader from "@/components/models/tag/TagGroupHeader"
 import { TagType } from "@/generated/prisma/enums"
 import prisma from "@/helpers/prisma"
 
+const path = Astro.url.pathname
+const isActive = (href: string) => {
+	return href === "/"
+		? path === "/"
+		: path === href || path.startsWith(href + "/")
+}
+
+const links = [
+	{ name: "All Tasks", href: "/tasks" },
+	{ name: "Untagged", href: "/tasks/untagged" },
+]
+
 const initialTagGroups = await prisma.tag.findMany({
 	where: { type: TagType.group },
 	orderBy: { order: "asc" },
@@ -26,16 +38,22 @@ const initialTagGroups = await prisma.tag.findMany({
 						class="text-gray-400"
 					/>
 				</div>-->
-			<a
-				href="/tasks"
-				class="block mb-1 text-sm hover:underline"
-				>All Tasks</a
-			>
-			<a
-				href="/tasks/untagged"
-				class="block mb-3 text-sm hover:underline"
-				>Untagged</a
-			>
+			<div class="mb-2">
+				{
+					links.map((link) => (
+						<a
+							href={link.href}
+							class={
+								"block mb-1 text-sm hover:underline" +
+								(isActive(link.href) ? " underline" : "")
+							}
+							data-active={isActive(link.href)}
+						>
+							{link.name}
+						</a>
+					))
+				}
+			</div>
 			<TagGroupHeader
 				client:load
 				initialGroups={initialTagGroups}
