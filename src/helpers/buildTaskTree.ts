@@ -1,4 +1,5 @@
 import type { Prisma } from "@/generated/prisma/client"
+import type { Status } from "@/generated/prisma/enums"
 
 type TaskWithTags = Prisma.TaskGetPayload<{
 	include: {
@@ -14,7 +15,7 @@ export type TaskNode = TaskWithTags & {
 	subtasks: TaskNode[]
 }
 
-function statusQualifies(status: TaskWithTags["status"]) {
+function statusQualifies(status: Status) {
 	return (
 		status !== "archived" && status !== "completed" && status !== "onhold"
 	)
