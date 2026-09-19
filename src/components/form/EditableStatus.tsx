@@ -13,7 +13,7 @@ export default function EditableStatus({
 		<select
 			value={value}
 			onChange={(e) => onSave(e.target.value as Status)}
-			className={["p-0", className ?? "bg-transparent"]
+			className={["p-0 -ml-1", className ?? "bg-transparent border-0"]
 				.filter(Boolean)
 				.join(" ")}
 		>
