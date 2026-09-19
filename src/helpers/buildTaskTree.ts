@@ -1,5 +1,8 @@
-import type { Prisma } from "@/generated/prisma/client"
+import type { Prisma, Task } from "@/generated/prisma/client"
 import type { Status } from "@/generated/prisma/enums"
+
+// TODO: cache tree at some point
+// TODO: full load no tags option
 
 type TaskWithTags = Prisma.TaskGetPayload<{
 	include: {
@@ -11,7 +14,7 @@ type TaskWithTags = Prisma.TaskGetPayload<{
 	}
 }>
 
-export type TaskNode = TaskWithTags & {
+export type TaskNode = (TaskWithTags | Task) & {
 	subtasks: TaskNode[]
 }
 
@@ -22,8 +25,8 @@ function statusQualifies(status: Status) {
 }
 
 export default function buildTaskTree(
-	tasks: TaskWithTags[],
-	tagId: number,
+	tasks: TaskWithTags[] | Task[],
+	tagId: number | null = null,
 ): TaskNode[] {
 	const map = new Map<number, TaskNode>()
 
@@ -42,23 +45,29 @@ export default function buildTaskTree(
 		if (parent && statusQualifies(task.status)) parent.subtasks.push(task)
 	}
 
-	// Find tasks directly containing this tag
-	const taggedIds = new Set(
-		tasks
-			.filter((task) => task.tags.some((tag) => tag.tagId === tagId))
-			.map((task) => task.id),
-	)
+	if (tagId !== null) {
+		// Find tasks directly containing this tag
+		const taggedIds = new Set(
+			tasks
+				.filter((task) => task.tags.some((tag) => tag.tagId === tagId))
+				.map((task) => task.id),
+		)
 
-	// Keep only tagged tasks that don't have a tagged ancestor
-	return [...taggedIds]
-		.filter((id) => {
-			let parentId = map.get(id)?.parentTaskId
-			while (parentId) {
-				if (taggedIds.has(parentId)) return false
-				parentId = map.get(parentId)?.parentTaskId
-			}
-			return true
-		})
-		.map((id) => map.get(id)!)
-		.filter((task) => statusQualifies(task.status))
+		// Keep only tagged tasks that don't have a tagged ancestor
+		return [...taggedIds]
+			.filter((id) => {
+				let parentId = map.get(id)?.parentTaskId
+				while (parentId) {
+					if (taggedIds.has(parentId)) return false
+					parentId = map.get(parentId)?.parentTaskId
+				}
+				return true
+			})
+			.map((id) => map.get(id)!)
+			.filter((task) => statusQualifies(task.status))
+	} else {
+		return [...map.values()].filter(
+			(task) => !task.parentTaskId && statusQualifies(task.status),
+		)
+	}
 }

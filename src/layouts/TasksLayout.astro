@@ -26,6 +26,16 @@ const initialTagGroups = await prisma.tag.findMany({
 						class="text-gray-400"
 					/>
 				</div>-->
+			<a
+				href="/tasks"
+				class="block mb-1 text-sm hover:underline"
+				>All Tasks</a
+			>
+			<a
+				href="/tasks/untagged"
+				class="block mb-3 text-sm hover:underline"
+				>Untagged</a
+			>
 			<TagGroupHeader
 				client:load
 				initialGroups={initialTagGroups}
