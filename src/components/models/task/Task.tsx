@@ -24,6 +24,7 @@ export default function Task({ initialTasks, depth = 0, tags }: Props) {
 	const [addTaskParentId, setAddTaskParentId] = React.useState<number | null>(
 		null,
 	)
+	const [isAddingTask, setIsAddingTask] = React.useState(false)
 
 	const saveTaskChange = async (
 		patch: Parameters<typeof actions.task.update>[0],
@@ -40,6 +41,27 @@ export default function Task({ initialTasks, depth = 0, tags }: Props) {
 
 	return (
 		<>
+			{/* Add task button */}
+			{depth === 0 && (
+				<button
+					className="text-xs px-1 rounded-3xl border border-gray-400"
+					onClick={() => setIsAddingTask(!isAddingTask)}
+				>
+					{isAddingTask ? (
+						<span className="flex items-center gap-1">
+							<Icon icon="mingcute:minimize-fill" />
+							Cancel
+						</span>
+					) : (
+						<span className="flex items-center gap-1">
+							<Icon icon="mingcute:add-fill" />
+							Add Task
+						</span>
+					)}
+				</button>
+			)}
+
+			{/* Task rows */}
 			{tasks.map((task) => (
 				<React.Fragment key={task.id}>
 					<tr
@@ -145,6 +167,7 @@ export default function Task({ initialTasks, depth = 0, tags }: Props) {
 						</button>
 					</tr>
 
+					{/* Subtask rows */}
 					{task.subtasks.length > 0 && (
 						<Task
 							initialTasks={task.subtasks}
@@ -154,6 +177,7 @@ export default function Task({ initialTasks, depth = 0, tags }: Props) {
 						/>
 					)}
 
+					{/* Add subtask button */}
 					{addTaskParentId === task.id && (
 						<tr>
 							<td
@@ -193,6 +217,24 @@ export default function Task({ initialTasks, depth = 0, tags }: Props) {
 					)}
 				</React.Fragment>
 			))}
+
+			{/* Add task section */}
+			{isAddingTask && (
+				<tr>
+					<td className="max-w-[400px]">
+						<CreateTaskForm
+							// parentTags={task.tags.map((tag) => tag.tag.id)}
+							onCreated={(newTask) => {
+								setTasks((prev) => [
+									...prev,
+									{ ...newTask, subtasks: [] },
+								])
+								setIsAddingTask(false)
+							}}
+						/>
+					</td>
+				</tr>
+			)}
 		</>
 	)
 }
