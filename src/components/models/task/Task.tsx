@@ -17,9 +17,15 @@ interface Props {
 	initialTasks: TaskNode[]
 	depth?: number
 	tags: TagWithChildren[]
+	currentTag?: TagWithChildren | null
 }
 
-export default function Task({ initialTasks, depth = 0, tags }: Props) {
+export default function Task({
+	initialTasks,
+	depth = 0,
+	tags,
+	currentTag,
+}: Props) {
 	const [tasks, setTasks] = React.useState(initialTasks)
 	const [addTaskParentId, setAddTaskParentId] = React.useState<number | null>(
 		null,
@@ -221,7 +227,7 @@ export default function Task({ initialTasks, depth = 0, tags }: Props) {
 				<tr>
 					<td className="max-w-[400px]">
 						<CreateTaskForm
-							// tags={task.tags.map((tag) => tag.tag.id)}
+							tags={currentTag ? [currentTag.id] : undefined}
 							onCreated={(newTask) => {
 								setTasks((prev) => [
 									...prev,

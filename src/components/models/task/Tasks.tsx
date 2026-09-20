@@ -5,9 +5,10 @@ import type { TagWithChildren } from "@/types/prisma-custom"
 interface Props {
 	tasks: TaskNode[]
 	tags: TagWithChildren[]
+	currentTag?: TagWithChildren | null
 }
 
-export default function Tasks({ tasks, tags }: Props) {
+export default function Tasks({ tasks, tags, currentTag }: Props) {
 	return (
 		<table>
 			<thead>
@@ -26,6 +27,7 @@ export default function Tasks({ tasks, tags }: Props) {
 					initialTasks={tasks}
 					depth={0}
 					tags={tags}
+					currentTag={currentTag}
 				/>
 			</tbody>
 		</table>
