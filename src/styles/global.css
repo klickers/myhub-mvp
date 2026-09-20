@@ -39,7 +39,7 @@
 				@apply text-sm text-left pr-4 py-1;
 			}
 			th {
-				@apply whitespace-nowrap;
+				@apply whitespace-nowrap text-xs;
 			}
 		}
 	}
