@@ -20,15 +20,24 @@ export default function EditableTags({
 
 	return (
 		<div className="text-xs">
-			<div className="flex items-center gap-1">
-				<p className="mb-0">
-					{selectedTags.map((tag, index) => (
-						<span key={tag.id}>
-							{tag.name +
-								(index < selectedTags.length - 1 ? ", " : "")}
-						</span>
-					))}
-				</p>
+			<div className="flex items-center gap-0.5">
+				{selectedTags.map((tag) => (
+					<button
+						key={tag.id}
+						className="bg-gray-100 text-gray-700 rounded-3xl px-1 inline-block hover:bg-red-100 hover:text-red-700"
+						onClick={async (e) => {
+							e.preventDefault()
+							setSelectedTags((prevState) =>
+								prevState.filter((t) => t.id !== tag.id),
+							)
+							await onSave(
+								selectedTags.filter((t) => t.id !== tag.id),
+							)
+						}}
+					>
+						{tag.name}
+					</button>
+				))}
 				<button onClick={() => setIsEditing(!isEditing)}>
 					{isEditing ? (
 						<Icon icon="mingcute:minimize-fill" />
