@@ -14,23 +14,16 @@ import type { TagWithChildren } from "@/types/prisma-custom"
 import CreateTaskForm from "./CreateTaskForm"
 
 interface Props {
-	initialTasks: TaskNode[]
+	tasks: TaskNode[]
 	depth?: number
 	tags: TagWithChildren[]
-	currentTag?: TagWithChildren | null
+	updateTasks: (tasks: TaskNode[]) => void
 }
 
-export default function Task({
-	initialTasks,
-	depth = 0,
-	tags,
-	currentTag,
-}: Props) {
-	const [tasks, setTasks] = React.useState(initialTasks)
+export default function Task({ tasks, depth = 0, tags, updateTasks }: Props) {
 	const [addTaskParentId, setAddTaskParentId] = React.useState<number | null>(
 		null,
 	)
-	const [isAddingTask, setIsAddingTask] = React.useState(false)
 
 	const saveTaskChange = async (
 		patch: Parameters<typeof actions.task.update>[0],
@@ -39,7 +32,7 @@ export default function Task({
 		if (res.error) toast.error("Failed to update task")
 		else {
 			toast.success("Task updated successfully")
-			setTasks((prev) =>
+			updateTasks((prev) =>
 				prev.map((t) => (t.id === patch.id ? { ...t, ...patch } : t)),
 			)
 		}
@@ -47,26 +40,6 @@ export default function Task({
 
 	return (
 		<>
-			{/* Add task button */}
-			{depth === 0 && (
-				<button
-					className="text-xs px-1 rounded-3xl border border-gray-400"
-					onClick={() => setIsAddingTask(!isAddingTask)}
-				>
-					{isAddingTask ? (
-						<span className="flex items-center gap-1">
-							<Icon icon="mingcute:minimize-fill" />
-							Cancel
-						</span>
-					) : (
-						<span className="flex items-center gap-1">
-							<Icon icon="mingcute:add-fill" />
-							Add Task
-						</span>
-					)}
-				</button>
-			)}
-
 			{/* Task rows */}
 			{tasks.map((task) => (
 				<React.Fragment key={task.id}>
@@ -176,10 +149,11 @@ export default function Task({
 					{/* Subtask rows */}
 					{task.subtasks.length > 0 && (
 						<Task
-							initialTasks={task.subtasks}
+							tasks={task.subtasks}
 							depth={depth + 1}
 							tags={tags}
 							key={task.id + "-subtasks"}
+							updateTasks={updateTasks}
 						/>
 					)}
 
@@ -196,7 +170,7 @@ export default function Task({
 									parentId={task.id}
 									tags={task.tags.map((tag) => tag.tag.id)}
 									onCreated={(newTask) => {
-										setTasks((prev) =>
+										updateTasks((prev) =>
 											prev.map((t) =>
 												t.id === task.id
 													? {
@@ -221,24 +195,6 @@ export default function Task({
 					)}
 				</React.Fragment>
 			))}
-
-			{/* Add task section */}
-			{isAddingTask && (
-				<tr>
-					<td className="max-w-[400px]">
-						<CreateTaskForm
-							tags={currentTag ? [currentTag.id] : undefined}
-							onCreated={(newTask) => {
-								setTasks((prev) => [
-									...prev,
-									{ ...newTask, subtasks: [] },
-								])
-								setIsAddingTask(false)
-							}}
-						/>
-					</td>
-				</tr>
-			)}
 		</>
 	)
 }
