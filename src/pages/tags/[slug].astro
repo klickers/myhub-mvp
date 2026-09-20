@@ -4,6 +4,7 @@ import prisma from "@/helpers/prisma"
 import buildTaskTree from "@/helpers/buildTaskTree"
 import Tasks from "@/components/models/task/Tasks"
 import { actions } from "astro:actions"
+import { format } from "date-fns"
 
 const tag = await prisma.tag.findUnique({
 	where: { slug: Astro.params.slug },
@@ -27,10 +28,60 @@ const tasks = await prisma.task.findMany({
 const taskTree = buildTaskTree(tasks, tag.id)
 
 const tags = await Astro.callAction(actions.tag.getAllTagGroups, {})
+
+const days = [
+	{
+		day: "Sunday",
+		date: new Date(),
+	},
+	{
+		day: "Monday",
+		date: new Date(),
+	},
+	{
+		day: "Tuesday",
+		date: new Date(),
+	},
+	{
+		day: "Wednesday",
+		date: new Date(),
+	},
+	{
+		day: "Thursday",
+		date: new Date(),
+	},
+	{
+		day: "Friday",
+		date: new Date(),
+	},
+	{
+		day: "Saturday",
+		date: new Date(),
+	},
+]
 ---
 
 <TasksLayout>
 	<h1>{tag.name}</h1>
+
+	<div class="grid grid-cols-7 gap-2 mb-6 text-xs">
+		{
+			days.map((day) => (
+				<div>
+					<p class="flex gap-1 uppercase">
+						<span class="font-semibold">
+							{format(day.date, "EEE")}
+						</span>
+						<span>{format(day.date, "MM/dd")}</span>
+					</p>
+					<div class="rounded-sm border border-gray-200 bg-gray-50 py-0.5 px-1">
+						Sample task name goes here
+					</div>
+				</div>
+			))
+		}
+	</div>
+
 	<Tasks
 		client:load
 		tasks={taskTree}
