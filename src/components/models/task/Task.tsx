@@ -10,17 +10,24 @@ import EditableDate from "@/components/form/EditableDate"
 import { dateKeyToUtcDate, getUtcDateKey } from "@/helpers/dateOnly"
 import SessionPlayButton from "../session/SessionPlayButton"
 import EditableTags from "@/components/form/EditableTags"
-import type { TagWithChildren } from "@/types/prisma-custom"
+import type { TagWithChildren, TaskWithTags } from "@/types/prisma-custom"
 import CreateTaskForm from "./CreateTaskForm"
 
 interface Props {
 	tasks: TaskNode[]
 	depth?: number
 	tags: TagWithChildren[]
-	updateTasks: (tasks: TaskNode[]) => void
+	onTaskUpdated: (task: TaskWithTags) => void
+	onSubtaskCreated: (parentTaskId: number, task: TaskWithTags) => void
 }
 
-export default function Task({ tasks, depth = 0, tags, updateTasks }: Props) {
+export default function Task({
+	tasks,
+	depth = 0,
+	tags,
+	onTaskUpdated,
+	onSubtaskCreated,
+}: Props) {
 	const [addTaskParentId, setAddTaskParentId] = React.useState<number | null>(
 		null,
 	)
@@ -32,9 +39,7 @@ export default function Task({ tasks, depth = 0, tags, updateTasks }: Props) {
 		if (res.error) toast.error("Failed to update task")
 		else {
 			toast.success("Task updated successfully")
-			updateTasks((prev) =>
-				prev.map((t) => (t.id === patch.id ? { ...t, ...patch } : t)),
-			)
+			onTaskUpdated(res.data)
 		}
 	}
 
@@ -58,7 +63,7 @@ export default function Task({ tasks, depth = 0, tags, updateTasks }: Props) {
 								"pl-" +
 								depth * 4 +
 								" max-w-[400px]" +
-								(depth == 0 && " font-medium")
+								(depth == 0 ? " font-medium" : "")
 							}
 						>
 							<EditableText
@@ -155,7 +160,8 @@ export default function Task({ tasks, depth = 0, tags, updateTasks }: Props) {
 							depth={depth + 1}
 							tags={tags}
 							key={task.id + "-subtasks"}
-							updateTasks={updateTasks}
+							onTaskUpdated={onTaskUpdated}
+							onSubtaskCreated={onSubtaskCreated}
 						/>
 					)}
 
@@ -172,23 +178,7 @@ export default function Task({ tasks, depth = 0, tags, updateTasks }: Props) {
 									parentId={task.id}
 									tags={task.tags.map((tag) => tag.tag.id)}
 									onCreated={(newTask) => {
-										updateTasks((prev) =>
-											prev.map((t) =>
-												t.id === task.id
-													? {
-															...t,
-															subtasks: [
-																...t.subtasks,
-																{
-																	...newTask,
-																	subtasks:
-																		[],
-																},
-															],
-														}
-													: t,
-											),
-										)
+										onSubtaskCreated(task.id, newTask)
 										setAddTaskParentId(null)
 									}}
 								/>

@@ -1,9 +1,9 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Icon } from "@iconify/react"
 import CreateTaskForm from "./CreateTaskForm"
 import type { TaskNode } from "@/helpers/buildTaskTree"
 import Task from "@/components/models/task/Task"
-import type { TagWithChildren } from "@/types/prisma-custom"
+import type { TagWithChildren, TaskWithTags } from "@/types/prisma-custom"
 
 interface Props {
 	tasks: TaskNode[]
@@ -14,6 +14,45 @@ interface Props {
 export default function Tasks({ tasks, tags, currentTag }: Props) {
 	const [allTasks, setAllTasks] = useState(tasks)
 	const [isAddingTask, setIsAddingTask] = useState(false)
+
+	useEffect(() => {
+		setAllTasks(tasks)
+	}, [tasks])
+
+	const handleTaskUpdated = (updatedTask: TaskWithTags) => {
+		setAllTasks((currentTasks) => {
+			const updateTask = (taskList: TaskNode[]): TaskNode[] =>
+				taskList.map((task) =>
+					task.id === updatedTask.id
+						? { ...task, ...updatedTask }
+						: { ...task, subtasks: updateTask(task.subtasks) },
+				)
+
+			return updateTask(currentTasks)
+		})
+	}
+
+	const handleSubtaskCreated = (
+		parentTaskId: number,
+		newTask: TaskWithTags,
+	) => {
+		setAllTasks((currentTasks) => {
+			const addSubtask = (taskList: TaskNode[]): TaskNode[] =>
+				taskList.map((task) =>
+					task.id === parentTaskId
+						? {
+								...task,
+								subtasks: [
+									...task.subtasks,
+									{ ...newTask, subtasks: [] },
+								],
+							}
+						: { ...task, subtasks: addSubtask(task.subtasks) },
+				)
+
+			return addSubtask(currentTasks)
+		})
+	}
 
 	return (
 		<>
@@ -75,7 +114,8 @@ export default function Tasks({ tasks, tags, currentTag }: Props) {
 						tasks={allTasks}
 						depth={0}
 						tags={tags}
-						updateTasks={setAllTasks}
+						onTaskUpdated={handleTaskUpdated}
+						onSubtaskCreated={handleSubtaskCreated}
 					/>
 				</tbody>
 			</table>
