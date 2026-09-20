@@ -6,7 +6,7 @@ import {
 	AlchemyLabBreadcrumb,
 } from "@/helpers/data/breadcrumbs"
 
-const result = Astro.getActionResult(actions.task.create)
+const result = Astro.getActionResult(actions.task.createByForm)
 ---
 
 <Layout
@@ -18,7 +18,7 @@ const result = Astro.getActionResult(actions.task.create)
 
 	<form
 		method="POST"
-		action={actions.task.create}
+		action={actions.task.createByForm}
 		class="flex flex-col space-y-1 max-w-lg"
 	>
 		<input

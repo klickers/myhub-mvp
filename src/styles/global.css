@@ -134,6 +134,18 @@
 		@apply transition-none;
 	}
 
+	.task {
+		@apply relative;
+		&:hover {
+			.button-add-task {
+				@apply block;
+			}
+		}
+		.button-add-task {
+			@apply absolute left-0 -bottom-2 z-10 hidden;
+		}
+	}
+
 	.side-tray input,
 	.side-tray select {
 		@apply max-w-full rounded-md border border-gray-300 bg-white/80 px-2 py-1 text-sm  transition-[background-color,border-color,box-shadow] duration-150 focus:border-gray-500 focus:bg-white focus:outline-none;

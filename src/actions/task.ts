@@ -17,6 +17,8 @@ const taskInput = z
 		deadline: z.coerce.date().optional(),
 
 		parentTaskId: z.number().int().positive().optional(),
+
+		tags: z.array(z.number().int().positive()).optional(),
 	})
 	.superRefine((data, ctx) => {
 		const parentIds = [data.parentTaskId].filter((v) => v != null)
@@ -331,6 +333,43 @@ async function buildSubtaskTree(rootTaskId: number): Promise<TaskNode[]> {
 
 export const task = {
 	create: defineAction({
+		input: taskInput,
+		handler: async (input) => {
+			return prisma.task.create({
+				data: {
+					name: input.name,
+					parentType: input.parentType,
+					makeTimeType:
+						input.makeTimeType === "none"
+							? null
+							: input.makeTimeType,
+					status: input.status,
+					estimatedTime: input.estimatedTime,
+					deadline: input.deadline && new Date(input.deadline),
+					parentTaskId: input.parentTaskId ?? null,
+					...(input.tags && input.tags.length > 0
+						? {
+								tags: {
+									createMany: {
+										data: input.tags.map((tagId) => ({
+											tagId,
+										})),
+									},
+								},
+							}
+						: {}),
+				},
+				include: {
+					tags: {
+						include: {
+							tag: true,
+						},
+					},
+				},
+			})
+		},
+	}),
+	createByForm: defineAction({
 		accept: "form",
 		input: taskInput,
 		handler: async (input) => {
