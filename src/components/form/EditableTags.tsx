@@ -43,9 +43,14 @@ export default function EditableTags({
 					value={input}
 					onChange={async (e) => {
 						setInput(e.target.value)
-						await onSave(selectedTags)
 						setSelectedTags((prevState) => [
 							...prevState,
+							tags
+								.flatMap((t) => t.children)
+								.find((c) => c.slug === e.target.value),
+						])
+						await onSave([
+							...selectedTags,
 							tags
 								.flatMap((t) => t.children)
 								.find((c) => c.slug === e.target.value),
