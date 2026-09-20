@@ -5,6 +5,7 @@ import GlobalSearch from "@/components/GlobalSearch"
 
 import { Icon } from "astro-icon/components"
 import { ToastContainer } from "react-toastify"
+import "react-toastify/dist/ReactToastify.css"
 import { ClientRouter } from "astro:transitions"
 
 type Breadcrumb = {
@@ -46,6 +47,7 @@ const breadcrumbs = Astro.props.breadcrumbs || [{ name: "Home", href: "/" }]
 			<ToastContainer
 				client:load
 				transition:animate="none"
+				transition:persist
 			/>
 			<Sidebar
 				path={path}
