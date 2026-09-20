@@ -6,13 +6,13 @@ import type { TaskWithTags } from "@/types/prisma-custom"
 
 type Props = {
 	parentId?: number | undefined
-	parentTags?: number[] | undefined
+	tags?: number[] | undefined
 	onCreated?: (task: TaskWithTags) => void
 }
 
 export default function TaskCreateForm({
 	parentId = undefined,
-	parentTags = undefined,
+	tags = undefined,
 	onCreated,
 }: Props) {
 	const [name, setName] = useState("")
@@ -23,7 +23,7 @@ export default function TaskCreateForm({
 				name,
 				parentType: parentId ? "task" : "none",
 				parentTaskId: parentId,
-				tags: parentTags,
+				tags,
 			})
 			if (error) {
 				toast.error(`Failed to create task "${name}": ${error.message}`)

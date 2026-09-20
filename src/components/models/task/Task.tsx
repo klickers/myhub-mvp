@@ -188,9 +188,7 @@ export default function Task({ initialTasks, depth = 0, tags }: Props) {
 							>
 								<CreateTaskForm
 									parentId={task.id}
-									parentTags={task.tags.map(
-										(tag) => tag.tag.id,
-									)}
+									tags={task.tags.map((tag) => tag.tag.id)}
 									onCreated={(newTask) => {
 										setTasks((prev) =>
 											prev.map((t) =>
@@ -223,7 +221,7 @@ export default function Task({ initialTasks, depth = 0, tags }: Props) {
 				<tr>
 					<td className="max-w-[400px]">
 						<CreateTaskForm
-							// parentTags={task.tags.map((tag) => tag.tag.id)}
+							// tags={task.tags.map((tag) => tag.tag.id)}
 							onCreated={(newTask) => {
 								setTasks((prev) => [
 									...prev,
