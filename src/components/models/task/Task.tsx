@@ -67,6 +67,7 @@ export default function Task({ initialTasks, depth = 0, tags }: Props) {
 								onSave={(status) =>
 									saveTaskChange({ id: task.id, status })
 								}
+								className="p-0 -ml-1 text-xs bg-transparent border-0"
 							/>
 						</td>
 						<td className="font-mono text-right">
