@@ -20,7 +20,7 @@ export default function EditableTags({
 
 	return (
 		<div className="text-xs">
-			<div className="flex items-center gap-0.5">
+			<div className="flex items-center gap-0.5 flex-wrap">
 				{selectedTags.map((tag) => (
 					<button
 						key={tag.id}

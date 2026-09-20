@@ -99,18 +99,16 @@ export default function Task({ initialTasks, depth = 0, tags }: Props) {
 							/>
 						</td>
 						<td>
-							<span>
-								<EditableTags
-									value={task.tags.map((tag) => tag.tag)}
-									tags={tags}
-									onSave={(tags) =>
-										saveTaskChange({
-											id: task.id,
-											tags: tags.map((tag) => tag.id),
-										})
-									}
-								/>
-							</span>
+							<EditableTags
+								value={task.tags.map((tag) => tag.tag)}
+								tags={tags}
+								onSave={(tags) =>
+									saveTaskChange({
+										id: task.id,
+										tags: tags.map((tag) => tag.id),
+									})
+								}
+							/>
 						</td>
 						<td>
 							<span className="flex gap-2 justify-end">
