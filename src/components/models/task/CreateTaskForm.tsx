@@ -21,7 +21,7 @@ export default function TaskCreateForm({
 		if (e.key === "Enter" && name) {
 			const { data, error } = await actions.task.create({
 				name,
-				parentType: "task",
+				parentType: parentId ? "task" : "none",
 				parentTaskId: parentId,
 				tags: parentTags,
 			})
