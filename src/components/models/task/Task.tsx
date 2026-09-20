@@ -48,7 +48,9 @@ export default function Task({ tasks, depth = 0, tags, updateTasks }: Props) {
 							"task border-b border-gray-200" +
 							(task.status === "inprogress"
 								? " bg-yellow-50 hover:bg-yellow-100"
-								: " hover:bg-gray-100")
+								: task.status === "completed"
+									? " bg-green-50 hover:bg-green-100"
+									: " hover:bg-gray-100")
 						}
 					>
 						<td
