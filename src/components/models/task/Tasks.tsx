@@ -52,7 +52,10 @@ export default function Tasks({ tasks, tags, currentTag }: Props) {
 					{/* Add task section */}
 					{isAddingTask && (
 						<tr>
-							<td className="max-w-[400px]">
+							<td
+								className="max-w-[400px]"
+								colSpan={5}
+							>
 								<CreateTaskForm
 									tags={
 										currentTag ? [currentTag.id] : undefined
