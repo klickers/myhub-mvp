@@ -129,7 +129,7 @@ export default function Task({ initialTasks, depth = 0, tags }: Props) {
 							</span>
 						</td>
 						<button
-							className="button-add-task"
+							className="button-add-subtask"
 							style={{ left: depth + 0.75 + "rem" }}
 							onClick={() =>
 								setAddTaskParentId((current) =>

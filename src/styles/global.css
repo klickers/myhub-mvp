@@ -137,11 +137,11 @@
 	.task {
 		@apply relative;
 		&:hover {
-			.button-add-task {
+			.button-add-subtask {
 				@apply block;
 			}
 		}
-		.button-add-task {
+		.button-add-subtask {
 			@apply absolute left-0 -bottom-2 z-10 hidden;
 		}
 	}
