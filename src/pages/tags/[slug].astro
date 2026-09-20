@@ -35,5 +35,6 @@ const tags = await Astro.callAction(actions.tag.getAllTagGroups, {})
 		client:load
 		tasks={taskTree}
 		tags={tags.data ?? []}
+		currentTag={tag}
 	/>
 </TasksLayout>
