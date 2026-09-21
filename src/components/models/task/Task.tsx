@@ -122,14 +122,14 @@ export default function Task({
 							/>
 						</td>
 						<td>
-							<span className="flex gap-2 justify-end">
+							<span className="flex gap-1 justify-end">
 								<SessionPlayButton
 									itemType="task"
 									itemId={task.id}
 								/>
-								<button className="text-blue-400 hover:text-blue-600">
+								{/* <button className="text-blue-400 hover:text-blue-600">
 									<Icon icon="mingcute:pencil-3-fill" />
-								</button>
+								</button> */}
 								<button className="text-red-300 hover:text-red-500">
 									<Icon icon="mingcute:delete-2-fill" />
 								</button>
