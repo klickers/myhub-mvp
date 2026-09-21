@@ -60,11 +60,10 @@ export default function Task({
 					>
 						<td
 							className={
-								"pl-" +
-								depth * 4 +
-								" max-w-[400px]" +
+								"max-w-[400px]" +
 								(depth == 0 ? " font-medium" : "")
 							}
+							style={{ paddingLeft: depth + 1 + "rem" }}
 						>
 							<EditableText
 								value={task.name}
