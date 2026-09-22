@@ -1,7 +1,7 @@
 ---
 import TasksLayout from "@/layouts/TasksLayout.astro"
 import prisma from "@/helpers/prisma"
-import Tasks from "@/components/models/task/Tasks"
+import Wrapper from "@/components/Wrapper"
 import { format } from "date-fns"
 
 const tag = await prisma.tag.findUnique({
@@ -13,62 +13,13 @@ const tag = await prisma.tag.findUnique({
 	},
 })
 if (!tag) return Astro.redirect("/tasks")
-
-const days = [
-	{
-		day: "Sunday",
-		date: new Date(),
-	},
-	{
-		day: "Monday",
-		date: new Date(),
-	},
-	{
-		day: "Tuesday",
-		date: new Date(),
-	},
-	{
-		day: "Wednesday",
-		date: new Date(),
-	},
-	{
-		day: "Thursday",
-		date: new Date(),
-	},
-	{
-		day: "Friday",
-		date: new Date(),
-	},
-	{
-		day: "Saturday",
-		date: new Date(),
-	},
-]
 ---
 
 <TasksLayout>
 	<h1>{tag.name}</h1>
 
-	<div class="grid grid-cols-7 gap-2 mb-6 text-xs">
-		{
-			days.map((day) => (
-				<div>
-					<p class="flex gap-1 uppercase">
-						<span class="font-semibold">
-							{format(day.date, "EEE")}
-						</span>
-						<span>{format(day.date, "MM/dd")}</span>
-					</p>
-					<div class="rounded-sm border border-gray-200 bg-gray-50 py-0.5 px-1">
-						Sample task name goes here
-					</div>
-				</div>
-			))
-		}
-	</div>
-
-	<Tasks
+	<Wrapper
 		client:load
-		filter={{ type: "tag", id: tag.id }}
+		tagId={tag.id}
 	/>
 </TasksLayout>
