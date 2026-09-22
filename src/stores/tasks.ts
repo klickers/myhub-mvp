@@ -7,6 +7,12 @@ type TasksStore = {
 	isLoading: boolean
 	isLoaded: boolean
 
+	// indices
+	// rootTaskIds: number[]
+	// childrenByParentId: Record<number, number[]>
+	// taskIdsByTagId: Record<number, number[]>
+	// untaggedTaskIds: number[]
+
 	// setting
 	loadTasks: () => void
 
@@ -34,6 +40,14 @@ export const useTasksStore = create<TasksStore>((set, get) => ({
 	isLoaded: false,
 
 	// ===================================
+	// Indices
+	// ===================================
+	// rootTaskIds: [],
+	// childrenByParentId: {},
+	// taskIdsByTagId: {},
+	// untaggedTaskIds: [],
+
+	// ===================================
 	// Setting
 	// ===================================
 	loadTasks: async () => {
@@ -50,6 +64,37 @@ export const useTasksStore = create<TasksStore>((set, get) => ({
 			tasks: res.data ?? [],
 			isLoaded: true,
 			isLoading: false,
+			// rootTaskIds:
+			// 	res.data
+			// 		?.filter((task) => !task.parentTaskId)
+			// 		.map((task) => task.id) ?? [],
+			// childrenByParentId:
+			// 	res.data?.reduce(
+			// 		(acc, task) => {
+			// 			if (task.parentTaskId) {
+			// 				if (!acc[task.parentTaskId])
+			// 					acc[task.parentTaskId] = []
+			// 				acc[task.parentTaskId].push(task.id)
+			// 			}
+			// 			return acc
+			// 		},
+			// 		{} as Record<number, number[]>,
+			// 	) ?? {},
+			// taskIdsByTagId:
+			// 	res.data?.reduce(
+			// 		(acc, task) => {
+			// 			for (const tag of task.tags) {
+			// 				if (!acc[tag.tagId]) acc[tag.tagId] = []
+			// 				acc[tag.tagId].push(task.id)
+			// 			}
+			// 			return acc
+			// 		},
+			// 		{} as Record<number, number[]>,
+			// 	) ?? {},
+			// untaggedTaskIds:
+			// 	res.data
+			// 		?.filter((task) => task.tags.length === 0)
+			// 		.map((task) => task.id) ?? [],
 		})
 	},
 
