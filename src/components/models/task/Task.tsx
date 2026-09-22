@@ -7,6 +7,7 @@ import EditableText from "@/components/form/EditableText"
 import EditableStatus from "@/components/form/EditableStatus"
 import EditableNumber from "@/components/form/EditableNumber"
 import EditableDate from "@/components/form/EditableDate"
+import TrashButton from "@/components/TrashButton"
 import { dateKeyToUtcDate, getUtcDateKey } from "@/helpers/dateOnly"
 import SessionPlayButton from "../session/SessionPlayButton"
 import EditableTags from "@/components/form/EditableTags"
@@ -151,9 +152,7 @@ export default function Task({ task, depth = 0 }: Props) {
 					/>
 				</td>
 				<td className="pr-0">
-					<button className="text-red-300 hover:text-red-500">
-						<Icon icon="mingcute:delete-2-fill" />
-					</button>
+					<TrashButton />
 				</td>
 				<button
 					className="button-add-subtask"

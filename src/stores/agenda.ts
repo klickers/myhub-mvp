@@ -22,6 +22,7 @@ type AgendaStore = {
 		id: number,
 		patch: Parameters<typeof actions.agenda.update>[0],
 	) => Promise<any | undefined>
+	removeAgendaItem: (id: number) => Promise<any | undefined>
 }
 
 export const useAgendaStore = create<AgendaStore>((set, get) => ({
@@ -89,6 +90,17 @@ export const useAgendaStore = create<AgendaStore>((set, get) => ({
 			agenda: state.agenda.map((agenda) =>
 				agenda.id === id ? { ...agenda, ...res.data } : agenda,
 			),
+		}))
+		return res.data
+	},
+	removeAgendaItem: async (id) => {
+		const res = await actions.agenda.delete({ id })
+		if (res.error) {
+			console.error("Failed to delete agenda item:", res.error)
+			return undefined
+		}
+		set((state) => ({
+			agenda: state.agenda.filter((agenda) => agenda.id !== id),
 		}))
 		return res.data
 	},

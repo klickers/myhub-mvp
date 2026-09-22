@@ -74,6 +74,17 @@ export const agenda = {
 		},
 	}),
 
+	delete: defineAction({
+		input: z.object({
+			id: z.coerce.number().int(),
+		}),
+		handler: async ({ id }) => {
+			return prisma.agenda.delete({
+				where: { id },
+			})
+		},
+	}),
+
 	getBetweenRange: defineAction({
 		input: z.object({
 			start: z.coerce.date(),
