@@ -7,6 +7,13 @@ type TasksStore = {
 	isLoading: boolean
 	isLoaded: boolean
 
+	// side tray
+	selectedTaskId: number | null
+	isSideTrayOpen: boolean
+	setSelectedTaskId: (id: number | null) => void
+	openSideTray: (id: number) => void
+	closeSideTray: () => void
+
 	// indices
 	// rootTaskIds: number[]
 	// childrenByParentId: Record<number, number[]>
@@ -36,6 +43,21 @@ export const useTasksStore = create<TasksStore>((set, get) => ({
 	tasks: [],
 	isLoading: false,
 	isLoaded: false,
+
+	// ===================================
+	// Side Tray
+	// ===================================
+	selectedTaskId: null,
+	isSideTrayOpen: false,
+	setSelectedTaskId: (id: number | null) => {
+		set({ selectedTaskId: id, isSideTrayOpen: id !== null })
+	},
+	openSideTray: (id: number) => {
+		set({ selectedTaskId: id, isSideTrayOpen: true })
+	},
+	closeSideTray: () => {
+		set({ selectedTaskId: null, isSideTrayOpen: false })
+	},
 
 	// ===================================
 	// Indices

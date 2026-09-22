@@ -17,16 +17,14 @@ import { useTagsStore } from "@/stores/tags"
 interface Props {
 	tasks: TaskNode[]
 	depth?: number
-	onClick: (task: TaskNode) => void
 }
 
-export default function Task({ tasks, depth = 0, onClick }: Props) {
+export default function Task({ tasks, depth = 0 }: Props) {
 	const updateTask = useTasksStore((state) => state.updateTask)
 	const [addTaskParentId, setAddTaskParentId] = React.useState<number | null>(
 		null,
 	)
-	const tags = useTagsStore((state) => state.tags)
-
+	const openSideTray = useTasksStore((state) => state.openSideTray)
 	const saveTaskChange = async (
 		patch: Parameters<typeof actions.task.update>[0],
 	) => {
@@ -34,6 +32,8 @@ export default function Task({ tasks, depth = 0, onClick }: Props) {
 		if (res === undefined) toast.error("Failed to update task")
 		else toast.success("Task updated successfully")
 	}
+
+	const tags = useTagsStore((state) => state.tags)
 
 	return (
 		<>
@@ -72,7 +72,7 @@ export default function Task({ tasks, depth = 0, onClick }: Props) {
 								/>
 								<button
 									className="text-blue-400 hover:text-blue-600"
-									onClick={() => onClick(task)}
+									onClick={() => openSideTray(task.id)}
 								>
 									<Icon icon="mingcute:pencil-3-fill" />
 								</button>
@@ -156,7 +156,6 @@ export default function Task({ tasks, depth = 0, onClick }: Props) {
 							key={task.id + "-subtasks"}
 							tasks={task.subtasks}
 							depth={depth + 1}
-							onClick={onClick}
 						/>
 					)}
 

@@ -6,7 +6,6 @@ import Task from "@/components/models/task/Task"
 import { useTasksStore } from "@/stores/tasks"
 import { useTagsStore } from "@/stores/tags"
 import buildTaskTree from "@/helpers/buildTaskTree"
-import SideTray from "@/components/SideTray"
 
 type TasksFilter =
 	| { type: "all" }
@@ -22,7 +21,6 @@ export default function Tasks({ filter }: Props) {
 	const loadTasks = useTasksStore((state) => state.loadTasks)
 	const allTasks = useTasksStore((state) => state.tasks)
 	const [isAddingTask, setIsAddingTask] = useState(false)
-	const [selectedTask, setSelectedTask] = useState<number | null>(null)
 
 	const loadTags = useTagsStore((state) => state.loadTags)
 
@@ -104,19 +102,9 @@ export default function Tasks({ filter }: Props) {
 					<Task
 						tasks={tasks}
 						depth={0}
-						onClick={(task) => setSelectedTask(task.id)}
 					/>
 				</tbody>
 			</table>
-
-			{/* Side tray */}
-			{selectedTask && (
-				<SideTray
-					type="task"
-					taskId={selectedTask}
-					setSelected={setSelectedTask}
-				/>
-			)}
 		</>
 	)
 }

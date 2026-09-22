@@ -2,6 +2,7 @@
 import "@/styles/global.css"
 import Sidebar from "@/components/Sidebar.astro"
 import GlobalSearch from "@/components/GlobalSearch"
+import SideTray from "@/components/SideTray"
 
 import { ClientRouter } from "astro:transitions"
 import { Icon } from "astro-icon/components"
@@ -109,6 +110,7 @@ const breadcrumbs = Astro.props.breadcrumbs || [{ name: "Home", href: "/" }]
 					transition:persist
 				/>
 				<main class="px-8 pb-8 pl-10 pt-20"><slot /></main>
+				<SideTray client:load />
 			</div>
 		</div>
 	</body>

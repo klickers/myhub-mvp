@@ -1,4 +1,4 @@
-import type { Status, Task } from "@/generated/prisma/client"
+import type { Status } from "@/generated/prisma/client"
 import { toast } from "react-toastify"
 import { actions } from "astro:actions"
 import EditableText from "./form/EditableText"
@@ -9,23 +9,11 @@ import EditableTags from "./form/EditableTags"
 import SessionPlayButton from "./models/session/SessionPlayButton"
 import Tasks from "./models/task/Tasks"
 import { ChevronRight, X } from "lucide-react"
-import {
-	useEffect,
-	useMemo,
-	useState,
-	type Dispatch,
-	type SetStateAction,
-} from "react"
+import { useEffect, useMemo, useState } from "react"
 import TaskDeleteButton from "@/components/models/task/TaskDeleteButton"
 import { dateKeyToUtcDate, getUtcDateKey } from "@/helpers/dateOnly"
 import { useTasksStore } from "@/stores/tasks"
 import { useTagsStore } from "@/stores/tags"
-
-type Props = {
-	type: "task"
-	taskId: number
-	setSelected: Dispatch<SetStateAction<any>>
-}
 
 type TaskBreadcrumbItem = {
 	type: "area" | "task" | "task-root"
@@ -34,70 +22,80 @@ type TaskBreadcrumbItem = {
 	href: string | null
 }
 
-export default function SideTray({ type, taskId, setSelected }: Props) {
-	const task = useTasksStore((state) => state.getTaskById(taskId))
+export default function SideTray() {
+	const setSelectedTaskId = useTasksStore((state) => state.setSelectedTaskId)
+	const selectedTaskId = useTasksStore((state) => state.selectedTaskId)
+	const isSideTrayOpen = useTasksStore((state) => state.isSideTrayOpen)
+	const closeSideTray = useTasksStore((state) => state.closeSideTray)
+
+	const task = useTasksStore((state) =>
+		state.tasks.find((task) => task.id === selectedTaskId),
+	)
 	const updateTask = useTasksStore((state) => state.updateTask)
+	const loadTasks = useTasksStore((state) => state.loadTasks)
 
 	const tags = useTagsStore((state) => state.tags)
 	const loadTags = useTagsStore((state) => state.loadTags)
 
 	const [breadcrumbs, setBreadcrumbs] = useState<TaskBreadcrumbItem[]>([])
 	const [breadcrumbsLoading, setBreadcrumbsLoading] = useState(false)
-	const closeTray = () => setSelected(null)
 
 	useEffect(() => {
+		loadTasks()
 		loadTags()
 	}, [])
 
 	// Handle Escape key to close the tray
 	useEffect(() => {
 		const handleKeyDown = (event: KeyboardEvent) => {
-			if (event.key === "Escape") setSelected(null)
+			if (event.key === "Escape") setSelectedTaskId(null)
 		}
 		document.addEventListener("keydown", handleKeyDown)
 		return () => document.removeEventListener("keydown", handleKeyDown)
-	}, [setSelected])
+	}, [setSelectedTaskId])
 
 	// Load breadcrumbs for the selected task
 	useEffect(() => {
-		let cancelled = false
+		if (selectedTaskId) {
+			let cancelled = false
 
-		setBreadcrumbs([])
-		setBreadcrumbsLoading(true)
+			setBreadcrumbs([])
+			setBreadcrumbsLoading(true)
 
-		actions.task
-			.breadcrumbs({ taskId })
-			.then((res) => {
-				if (cancelled) return
-				setBreadcrumbs(res.data?.breadcrumbs ?? [])
-			})
-			.catch((error) => {
-				if (cancelled) return
-				console.error("Failed to load task breadcrumbs", error)
-				setBreadcrumbs([])
-			})
-			.finally(() => {
-				if (!cancelled) setBreadcrumbsLoading(false)
-			})
+			actions.task
+				.breadcrumbs({ taskId: selectedTaskId })
+				.then((res) => {
+					if (cancelled) return
+					setBreadcrumbs(res.data?.breadcrumbs ?? [])
+				})
+				.catch((error) => {
+					if (cancelled) return
+					console.error("Failed to load task breadcrumbs", error)
+					setBreadcrumbs([])
+				})
+				.finally(() => {
+					if (!cancelled) setBreadcrumbsLoading(false)
+				})
 
-		return () => {
-			cancelled = true
+			return () => {
+				cancelled = true
+			}
 		}
-	}, [taskId])
+	}, [selectedTaskId])
 
 	const visibleBreadcrumbs = useMemo(
 		() =>
 			breadcrumbs.map((breadcrumb) =>
-				breadcrumb.type === "task" && breadcrumb.id === taskId
+				breadcrumb.type === "task" && breadcrumb.id === selectedTaskId
 					? { ...breadcrumb, name: task?.name || breadcrumb.name }
 					: breadcrumb,
 			),
-		[breadcrumbs, taskId, task?.name],
+		[breadcrumbs, selectedTaskId, task?.name],
 	)
 
 	const openTaskBreadcrumb = async (taskId: number) => {
 		const res = await actions.task.getById({ id: taskId })
-		if (res.data) setSelected(res.data)
+		if (res.data) setSelectedTaskId(res.data.id)
 	}
 
 	const saveTaskChange = async (
@@ -110,12 +108,13 @@ export default function SideTray({ type, taskId, setSelected }: Props) {
 
 	const deadlineValue = task?.deadline ? getUtcDateKey(task.deadline) : null
 
+	if (!selectedTaskId || !isSideTrayOpen || !task) return null
 	return (
 		<>
 			{/* Backdrop */}
 			<div
 				className="fixed inset-0 z-40 bg-gray-900/10 backdrop-blur-[2px]"
-				onClick={closeTray}
+				onClick={closeSideTray}
 				aria-hidden="true"
 			/>
 
@@ -139,14 +138,14 @@ export default function SideTray({ type, taskId, setSelected }: Props) {
 							breadcrumbs={visibleBreadcrumbs}
 							isLoading={breadcrumbsLoading}
 							onTaskSelect={openTaskBreadcrumb}
-							selectedTaskId={taskId}
+							selectedTaskId={selectedTaskId}
 						/>
 						<div className="flex min-w-0 items-center gap-2">
 							<EditableText
-								value={task?.name}
+								value={task.name}
 								onSave={(name) =>
 									saveTaskChange({
-										id: task?.id,
+										id: task.id,
 										name,
 									})
 								}
@@ -154,20 +153,20 @@ export default function SideTray({ type, taskId, setSelected }: Props) {
 							/>
 							<div className="inline-flex size-9 flex-none items-center justify-center">
 								<SessionPlayButton
-									itemType={type}
-									itemId={task?.id}
+									itemType="task"
+									itemId={task.id}
 								/>
 							</div>
 							<TaskDeleteButton
-								taskId={task?.id}
-								taskName={task?.name}
+								taskId={task.id}
+								taskName={task.name}
 								className="size-9 rounded-lg"
 							/>
 						</div>
 					</div>
 					<button
 						type="button"
-						onClick={closeTray}
+						onClick={closeSideTray}
 						className="inline-flex size-9 flex-none items-center justify-center rounded-lg border border-gray-300/70 bg-white/70 p-0 text-gray-600 shadow-sm transition-colors hover:bg-white hover:text-gray-950 focus-visible:outline-none"
 						aria-label="Close task panel"
 					>
@@ -190,27 +189,26 @@ export default function SideTray({ type, taskId, setSelected }: Props) {
 								</dt>
 								<dd>
 									<EditableStatus
-										value={task?.status as Status}
+										value={task.status as Status}
 										onSave={(status) =>
 											saveTaskChange({
-												id: task?.id,
+												id: task.id,
 												status,
 											})
 										}
 									/>
 								</dd>
 							</div>
-							{/* TODO: hide relevant for Evergreen */}
 							<div className="grid gap-1 sm:grid-cols-[7.25rem_minmax(0,1fr)] sm:items-center sm:gap-2">
 								<dt className="text-xs font-semibold text-gray-500">
 									Estimated Time
 								</dt>
 								<dd>
 									<EditableNumber
-										value={task?.estimatedTime}
+										value={task.estimatedTime}
 										onSave={(v) =>
 											saveTaskChange({
-												id: task?.id,
+												id: task.id,
 												estimatedTime: v,
 											} as Parameters<
 												typeof actions.task.update
@@ -230,7 +228,7 @@ export default function SideTray({ type, taskId, setSelected }: Props) {
 										value={deadlineValue}
 										onSave={(date) =>
 											saveTaskChange({
-												id: task?.id,
+												id: task.id,
 												deadline: date
 													? dateKeyToUtcDate(date)
 													: null,
@@ -249,7 +247,7 @@ export default function SideTray({ type, taskId, setSelected }: Props) {
 										tags={tags}
 										onSave={(tags) =>
 											saveTaskChange({
-												id: task?.id,
+												id: task.id,
 												tags: tags.map((tag) => tag.id),
 											})
 										}
@@ -265,7 +263,7 @@ export default function SideTray({ type, taskId, setSelected }: Props) {
 						aria-label="Subtasks"
 					>
 						<h2 className="text-lg">Subtasks</h2>
-						<Tasks filter={{ type: "task", id: task?.id }} />
+						<Tasks filter={{ type: "task", id: task.id }} />
 					</section>
 				</div>
 
