@@ -149,7 +149,6 @@ export default function Task({ task, depth = 0 }: Props) {
 					<Task
 						key={task.id + "-subtasks"}
 						task={task}
-						tasks={task.subtasks}
 						depth={depth + 1}
 					/>
 				))}
