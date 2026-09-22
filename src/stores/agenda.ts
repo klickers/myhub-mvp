@@ -18,6 +18,10 @@ type AgendaStore = {
 		itemType: "task" | "tag",
 		itemId: number,
 	) => Promise<void>
+	updateAgendaItem: (
+		id: number,
+		patch: Parameters<typeof actions.agenda.update>[0],
+	) => Promise<any | undefined>
 }
 
 export const useAgendaStore = create<AgendaStore>((set, get) => ({
@@ -74,5 +78,18 @@ export const useAgendaStore = create<AgendaStore>((set, get) => ({
 		set((state) => ({
 			agenda: [...state.agenda, res.data as AgendaWithIncludes],
 		}))
+	},
+	updateAgendaItem: async (id, patch) => {
+		const res = await actions.agenda.update({ ...patch })
+		if (res.error) {
+			console.error("Failed to update agenda item:", res.error)
+			return undefined
+		}
+		set((state) => ({
+			agenda: state.agenda.map((agenda) =>
+				agenda.id === id ? { ...agenda, ...res.data } : agenda,
+			),
+		}))
+		return res.data
 	},
 }))

@@ -48,6 +48,32 @@ export const agenda = {
 		},
 	}),
 
+	update: defineAction({
+		input: z.object({
+			id: z.coerce.number().int(),
+			date: z.coerce.date().optional(),
+			scheduledTime: z.coerce.number().int().optional().default(0),
+			description: z.string().optional().default(""),
+			// status: z.string().optional().default("notstarted"),
+		}),
+		handler: async ({ id, ...data }) => {
+			return prisma.agenda.update({
+				where: { id },
+				data: {
+					...data,
+				},
+				include: {
+					tag: true,
+					task: {
+						include: {
+							tags: true,
+						},
+					},
+				},
+			})
+		},
+	}),
+
 	getBetweenRange: defineAction({
 		input: z.object({
 			start: z.coerce.date(),

@@ -1,9 +1,12 @@
-import { useMemo } from "react"
+import { useMemo, useState } from "react"
 import { useDroppable } from "@dnd-kit/react"
 import { format, isSameDay, isToday } from "date-fns"
 import { useAgendaStore } from "@/stores/agenda"
 import { useTasksStore } from "@/stores/tasks"
 import { Icon } from "@iconify/react"
+import EditableText from "@/components/form/EditableText"
+import { toast } from "react-toastify"
+import { actions } from "astro:actions"
 
 interface Props {
 	date: Date
@@ -15,6 +18,7 @@ interface Props {
 
 export default function DayAgenda({ date, filter }: Props) {
 	const agenda = useAgendaStore((state) => state.agenda)
+	const updateAgendaItem = useAgendaStore((state) => state.updateAgendaItem)
 	const agendaItems = useMemo(() => {
 		return agenda.filter((item) => {
 			switch (filter.type) {
@@ -31,12 +35,22 @@ export default function DayAgenda({ date, filter }: Props) {
 			}
 		})
 	}, [agenda, date, filter])
+	const saveAgendaChange = async (
+		patch: Parameters<typeof actions.agenda.update>[0],
+	) => {
+		const res = await updateAgendaItem(patch.id, patch)
+		if (res === undefined) toast.error("Failed to update agenda item")
+		else toast.success("Agenda item updated successfully")
+	}
 
 	const { isDropTarget, ref } = useDroppable({
 		id: date.toISOString(),
 		data: { date },
 	})
 
+	const [openDescriptionId, setOpenDescriptionId] = useState<number | null>(
+		null,
+	)
 	const openSideTray = useTasksStore((state) => state.openSideTray)
 
 	return (
@@ -53,7 +67,7 @@ export default function DayAgenda({ date, filter }: Props) {
 					<div
 						key={item.id}
 						className={
-							"relative cursor-pointer rounded-sm border border-gray-200 bg-gray-50 py-0.5 px-1" +
+							"relative rounded-sm border border-gray-200 bg-gray-50 py-0.5 px-1" +
 							(item.status === "completed"
 								? " border-green-200 bg-green-50"
 								: "")
@@ -63,11 +77,36 @@ export default function DayAgenda({ date, filter }: Props) {
 							onClick={() =>
 								item.task && openSideTray(item.task.id)
 							}
-							className="absolute right-0.5 top-0.5 text-[0.75rem] text-gray-500 hover:text-gray-800"
+							className="absolute right-0.5 top-0.5 text-xs text-gray-500 hover:text-gray-800"
 						>
 							<Icon icon="mingcute:external-link-line" />
 						</button>
-						{item.task?.name}
+						<span
+							className="cursor-pointer"
+							onClick={() =>
+								setOpenDescriptionId(
+									openDescriptionId === item.id
+										? null
+										: item.id,
+								)
+							}
+						>
+							{item.task?.name}
+						</span>
+						{(item.description ||
+							openDescriptionId === item.id) && (
+							<EditableText
+								value={item.description || "No description"}
+								onSave={(description) =>
+									saveAgendaChange({
+										id: item.id,
+										description,
+									})
+								}
+								className="text-[10px] text-gray-500"
+								inputClassName="text-[10px] text-gray-500"
+							/>
+						)}
 					</div>
 				))}
 				{!isDropTarget && agendaItems.length === 0 && (
