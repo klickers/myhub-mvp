@@ -3,6 +3,7 @@ import Tasks from "@/components/models/task/Tasks"
 import WeeklyAgenda from "@/components/models/agenda/WeeklyAgenda"
 import { useAgendaStore } from "@/stores/agenda"
 import { useTasksStore } from "@/stores/tasks"
+import { toast } from "react-toastify"
 
 interface Props {
 	filter:
@@ -26,6 +27,7 @@ export default function Wrapper({ filter }: Props) {
 						source.id as number,
 					)
 					refetchTaskById(source.id as number)
+					toast.success("Task added to agenda")
 				}
 			}}
 		>
