@@ -41,26 +41,25 @@ export default function DayAgenda({ date, filter }: Props) {
 	return (
 		<div
 			ref={ref}
-			className={isToday(date) ? "bg-green-50" : ""}
+			className={isToday(date) ? "bg-yellow-100" : ""}
 		>
 			<p className="flex gap-1 uppercase">
 				<span className="font-semibold">{format(date, "EEE")}</span>
 				<span>{format(date, "MM/dd")}</span>
 			</p>
-			<div>
+			<div className="space-y-0.5">
 				{agendaItems.map((item) => (
 					<div
 						key={item.id}
-						className="rounded-sm border border-gray-200 bg-gray-50 py-0.5 px-1"
+						className={
+							"cursor-pointer rounded-sm border border-gray-200 bg-gray-50 py-0.5 px-1" +
+							(item.status === "completed"
+								? " border-green-200 bg-green-50"
+								: "")
+						}
+						onClick={() => item.task && openSideTray(item.task.id)}
 					>
-						{item.task && (
-							<div
-								onClick={() => openSideTray(item.task!.id)}
-								className="cursor-pointer"
-							>
-								{item.task.name}
-							</div>
-						)}
+						{item.task?.name}
 					</div>
 				))}
 				{!isDropTarget && agendaItems.length === 0 && (
