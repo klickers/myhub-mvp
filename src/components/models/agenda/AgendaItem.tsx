@@ -38,6 +38,9 @@ export default function AgendaItem({ item }: Props) {
 	const { ref } = useDraggable({
 		id: item.id,
 		type: "agenda-item",
+		data: {
+			date: item.date,
+		},
 	})
 
 	return (

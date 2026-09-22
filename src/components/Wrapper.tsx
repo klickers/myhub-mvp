@@ -4,6 +4,7 @@ import WeeklyAgenda from "@/components/models/agenda/WeeklyAgenda"
 import { useAgendaStore } from "@/stores/agenda"
 import { useTasksStore } from "@/stores/tasks"
 import { toast } from "react-toastify"
+import { format, isSameDay } from "date-fns"
 
 interface Props {
 	filter:
@@ -23,7 +24,10 @@ export default function Wrapper({ filter }: Props) {
 				const { source, target } = operation
 				if (source && target) {
 					let res = undefined
-					if (source.type === "agenda-item") {
+					if (
+						source.type === "agenda-item" &&
+						!isSameDay(source.data.date, target.data.date)
+					) {
 						res = await updateAgendaItem(source.id as number, {
 							id: source.id as number,
 							date: target.data.date,
@@ -31,7 +35,13 @@ export default function Wrapper({ filter }: Props) {
 
 						if (res === undefined)
 							toast.error("Failed to move agenda item")
-						else toast.success("Agenda item moved successfully")
+						else
+							toast.success(
+								"Agenda item moved successfully from " +
+									format(source.data.date, "MMM d") +
+									" to " +
+									format(target.data.date, "MMM d"),
+							)
 					} else if (source.type === "task") {
 						res = await createAgendaItem(
 							target.data.date,
