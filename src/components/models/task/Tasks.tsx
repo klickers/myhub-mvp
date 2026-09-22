@@ -99,10 +99,15 @@ export default function Tasks({ filter }: Props) {
 							</td>
 						</tr>
 					)}
-					<Task
-						tasks={tasks}
-						depth={0}
-					/>
+
+					{/* Task rows */}
+					{tasks.map((task) => (
+						<Task
+							key={task.id}
+							task={task}
+							depth={0}
+						/>
+					))}
 				</tbody>
 			</table>
 		</>
