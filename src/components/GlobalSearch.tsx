@@ -237,29 +237,22 @@ export default function GlobalSearch() {
 									const isSelected = index === activeIndex
 									const content = (
 										<>
-											<div className="min-w-0 flex-1">
+											<div className="min-w-0 flex items-center gap-3">
 												<p className="truncate text-sm font-semibold text-gray-950">
 													{result.title}
 												</p>
-												<div className="mt-1 flex min-w-0 flex-wrap items-center gap-1.5">
-													<span className="rounded-md border border-gray-200 bg-gray-50 px-1.5 py-0.5 text-[0.68rem] font-semibold uppercase text-gray-500">
-														{getTypeLabel(
-															result.type,
-														)}
-													</span>
-													<span
-														className={cn(
-															"rounded-md border px-1.5 py-0.5 text-[0.68rem] font-semibold",
-															getStatusClass(
-																result.status,
-															),
-														)}
-													>
-														{formatStatus(
+												<span
+													className={cn(
+														"rounded-md border px-1.5 py-0.5 text-[0.68rem] font-semibold",
+														getStatusClass(
 															result.status,
-														)}
-													</span>
-												</div>
+														),
+													)}
+												>
+													{formatStatus(
+														result.status,
+													)}
+												</span>
 											</div>
 											{result.type !== "task" && (
 												<ArrowUpRight
