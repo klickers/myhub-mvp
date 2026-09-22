@@ -1,7 +1,6 @@
 import { create } from "zustand"
 import type { TaskWithTags, TaskNode } from "@/types/prisma-custom"
 import { actions } from "astro:actions"
-import buildTaskTree, { buildFlatTaskTree } from "@/helpers/buildTaskTree"
 
 type TaskStore = {
 	tasks: TaskWithTags[]
