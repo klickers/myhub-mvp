@@ -1,9 +1,6 @@
 ---
 import TasksLayout from "@/layouts/TasksLayout.astro"
 import Tasks from "@/components/models/task/Tasks"
-import { actions } from "astro:actions"
-
-const tags = await Astro.callAction(actions.tag.getAllTagGroups, {})
 ---
 
 <TasksLayout>
@@ -11,6 +8,5 @@ const tags = await Astro.callAction(actions.tag.getAllTagGroups, {})
 	<Tasks
 		client:load
 		filter={{ type: "all" }}
-		tags={tags.data ?? []}
 	/>
 </TasksLayout>

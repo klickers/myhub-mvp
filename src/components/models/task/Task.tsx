@@ -10,21 +10,21 @@ import EditableDate from "@/components/form/EditableDate"
 import { dateKeyToUtcDate, getUtcDateKey } from "@/helpers/dateOnly"
 import SessionPlayButton from "../session/SessionPlayButton"
 import EditableTags from "@/components/form/EditableTags"
-import type { TagWithChildren } from "@/types/prisma-custom"
 import CreateTaskForm from "./CreateTaskForm"
 import { useTasksStore } from "@/stores/tasks"
+import { useTagsStore } from "@/stores/tags"
 
 interface Props {
 	tasks: TaskNode[]
 	depth?: number
-	tags: TagWithChildren[]
 }
 
-export default function Task({ tasks, depth = 0, tags }: Props) {
+export default function Task({ tasks, depth = 0 }: Props) {
 	const updateTask = useTasksStore((state) => state.updateTask)
 	const [addTaskParentId, setAddTaskParentId] = React.useState<number | null>(
 		null,
 	)
+	const tags = useTagsStore((state) => state.tags)
 
 	const saveTaskChange = async (
 		patch: Parameters<typeof actions.task.update>[0],
@@ -146,10 +146,9 @@ export default function Task({ tasks, depth = 0, tags }: Props) {
 					{/* Subtask rows */}
 					{task.subtasks.length > 0 && (
 						<Task
+							key={task.id + "-subtasks"}
 							tasks={task.subtasks}
 							depth={depth + 1}
-							tags={tags}
-							key={task.id + "-subtasks"}
 						/>
 					)}
 

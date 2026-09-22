@@ -5,6 +5,7 @@ import type { TaskNode } from "@/types/prisma-custom"
 import Task from "@/components/models/task/Task"
 import type { TagWithChildren } from "@/types/prisma-custom"
 import { useTasksStore } from "@/stores/tasks"
+import { useTagsStore } from "@/stores/tags"
 import buildTaskTree from "@/helpers/buildTaskTree"
 
 interface Props {
@@ -12,17 +13,19 @@ interface Props {
 		| { type: "all" }
 		| { type: "untagged" }
 		| { type: "tag"; slug: string }
-	tags: TagWithChildren[]
 	currentTag?: TagWithChildren | null
 }
 
-export default function Tasks({ filter, tags, currentTag }: Props) {
+export default function Tasks({ filter, currentTag }: Props) {
 	const loadTasks = useTasksStore((state) => state.loadTasks)
 	const allTasks = useTasksStore((state) => state.tasks)
 	const [isAddingTask, setIsAddingTask] = useState(false)
 
+	const loadTags = useTagsStore((state) => state.loadTags)
+
 	useEffect(() => {
 		loadTasks()
+		loadTags()
 	}, [])
 
 	const tasks: TaskNode[] = useMemo(() => {
@@ -89,7 +92,6 @@ export default function Tasks({ filter, tags, currentTag }: Props) {
 					<Task
 						tasks={tasks}
 						depth={0}
-						tags={tags}
 					/>
 				</tbody>
 			</table>

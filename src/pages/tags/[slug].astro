@@ -2,7 +2,6 @@
 import TasksLayout from "@/layouts/TasksLayout.astro"
 import prisma from "@/helpers/prisma"
 import Tasks from "@/components/models/task/Tasks"
-import { actions } from "astro:actions"
 import { format } from "date-fns"
 
 const tag = await prisma.tag.findUnique({
@@ -70,7 +69,6 @@ const days = [
 
 	<Tasks
 		client:load
-		tags={tags.data ?? []}
 		filter={{ type: "tag", slug: tag.slug }}
 		currentTag={tag}
 	/>
