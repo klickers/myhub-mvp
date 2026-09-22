@@ -43,7 +43,7 @@ export const useAgendaStore = create<AgendaStore>((set, get) => ({
 
 		const res = await actions.agenda.getBetweenRange({
 			start: days[0].date,
-			end: days[6].date,
+			end: addDays(days[6].date, 1), // add 1 day to include the last day
 		})
 		if (res.error) {
 			console.error("Failed to load agenda items:", res.error)
