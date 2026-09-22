@@ -7,7 +7,7 @@ import EditableStatus from "./form/EditableStatus"
 import EditableDate from "./form/EditableDate"
 import EditableTags from "./form/EditableTags"
 import SessionPlayButton from "./models/session/SessionPlayButton"
-import Subtasks from "./models/task/Subtasks"
+import Tasks from "./models/task/Tasks"
 import { TASK_REMOVED_EVENT, type TaskRemovedEvent } from "@/helpers/taskEvents"
 import { ChevronRight, X } from "lucide-react"
 import {
@@ -273,7 +273,8 @@ export default function SideTray({ type, taskId, setSelected }: Props) {
 					</section>
 
 					<section>
-						<Subtasks taskId={task?.id} />
+						<h2>Subtasks</h2>
+						<Tasks filter={{ type: "task", id: task?.id }} />
 					</section>
 				</div>
 

@@ -12,6 +12,7 @@ type TasksFilter =
 	| { type: "all" }
 	| { type: "untagged" }
 	| { type: "tag"; id: number }
+	| { type: "task"; id: number }
 
 interface Props {
 	filter: TasksFilter
@@ -37,6 +38,7 @@ export default function Tasks({ filter }: Props) {
 		return buildTaskTree(
 			filteredTasks,
 			filter.type === "tag" ? filter.id : null,
+			filter.type === "task" ? filter.id : null,
 		)
 	}, [allTasks, filter])
 
@@ -84,6 +86,11 @@ export default function Tasks({ filter }: Props) {
 								colSpan={5}
 							>
 								<CreateTaskForm
+									parentId={
+										filter.type === "task"
+											? filter.id
+											: undefined
+									}
 									tags={
 										filter.type === "tag"
 											? [filter.id]

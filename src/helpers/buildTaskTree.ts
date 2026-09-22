@@ -1,8 +1,6 @@
 import type { Status } from "@/generated/prisma/enums"
 import type { TaskWithTags, TaskNode } from "@/types/prisma-custom"
 
-// TODO: cache tree at some point
-// TODO: full load no tags option
 
 function statusQualifies(status: Status) {
 	return (
@@ -13,6 +11,7 @@ function statusQualifies(status: Status) {
 export default function buildTaskTree(
 	tasks: TaskWithTags[],
 	tagId: number | null = null,
+	taskId: number | null = null,
 ): TaskNode[] {
 	const map = new Map<number, TaskNode>()
 
@@ -51,9 +50,18 @@ export default function buildTaskTree(
 			})
 			.map((id) => map.get(id)!)
 			.filter((task) => statusQualifies(task.status))
-	} else {
-		return [...map.values()].filter(
-			(task) => !task.parentTaskId && statusQualifies(task.status),
-		)
 	}
+
+	if (taskId !== null) {
+		// Find the task with the given ID
+		const task = map.get(taskId)
+		if (!task) return []
+		return [task.subtasks]
+			.flat()
+			.filter((task) => statusQualifies(task.status))
+	}
+
+	return [...map.values()].filter(
+		(task) => !task.parentTaskId && statusQualifies(task.status),
+	)
 }
