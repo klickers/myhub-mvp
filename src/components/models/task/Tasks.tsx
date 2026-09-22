@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { Icon } from "@iconify/react"
 import CreateTaskForm from "./CreateTaskForm"
-import type { TaskNode } from "@/helpers/buildTaskTree"
+import type { TaskNode } from "@/types/prisma-custom"
 import Task from "@/components/models/task/Task"
 import type { TagWithChildren, TaskWithTags } from "@/types/prisma-custom"
 

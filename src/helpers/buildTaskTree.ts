@@ -1,13 +1,8 @@
 import type { Status } from "@/generated/prisma/enums"
-import type { TaskWithTags } from "@/types/prisma-custom"
+import type { TaskWithTags, TaskNode } from "@/types/prisma-custom"
 
 // TODO: cache tree at some point
 // TODO: full load no tags option
-
-
-export type TaskNode = TaskWithTags & {
-	subtasks: TaskNode[]
-}
 
 function statusQualifies(status: Status) {
 	return (

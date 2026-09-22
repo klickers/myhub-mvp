@@ -15,3 +15,7 @@ export type TaskWithTags = Prisma.TaskGetPayload<{
 		}
 	}
 }>
+
+export type TaskNode = TaskWithTags & {
+	subtasks: TaskNode[]
+}
