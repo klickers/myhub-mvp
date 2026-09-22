@@ -17,12 +17,11 @@ export default function EditableTags({
 	tagClassName?: string
 }) {
 	const [isEditing, setIsEditing] = useState(false)
-	const [selectedTags, setSelectedTags] = useState<Tag[]>(value ?? [])
 	const [input, setInput] = useState("")
 
 	return (
 		<div className="text-xs flex items-center gap-0.5 flex-wrap">
-			{selectedTags.map((tag) => (
+			{value?.map((tag) => (
 				<button
 					key={tag.id}
 					className={[
@@ -33,11 +32,8 @@ export default function EditableTags({
 						.join(" ")}
 					onClick={async (e) => {
 						e.preventDefault()
-						setSelectedTags((prevState) =>
-							prevState.filter((t) => t.id !== tag.id),
-						)
 						await onSave(
-							selectedTags.filter((t) => t.id !== tag.id),
+							value?.filter((t) => t.id !== tag.id) ?? [],
 						)
 					}}
 				>
@@ -57,18 +53,11 @@ export default function EditableTags({
 					value={input}
 					onChange={async (e) => {
 						setInput(e.target.value)
-						setSelectedTags((prevState) => [
-							...prevState,
-							tags
-								.flatMap((t) => t.children)
-								.find((c) => c.slug === e.target.value),
-						])
-						await onSave([
-							...selectedTags,
-							tags
-								.flatMap((t) => t.children)
-								.find((c) => c.slug === e.target.value),
-						])
+						const selectedTag = tags
+							.flatMap((t) => t.children)
+							.find((c) => c.slug === e.target.value)
+						if (selectedTag)
+							await onSave([...(value ?? []), selectedTag])
 						setInput("")
 					}}
 					className={[
