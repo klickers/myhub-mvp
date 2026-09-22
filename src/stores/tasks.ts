@@ -22,6 +22,7 @@ type TasksStore = {
 
 	// setting
 	loadTasks: () => void
+	refetchTaskById: (id: number) => Promise<TaskWithTags | undefined>
 
 	// getting
 	getTasks: () => TaskWithTags[]
@@ -118,6 +119,20 @@ export const useTasksStore = create<TasksStore>((set, get) => ({
 			// 		?.filter((task) => task.tags.length === 0)
 			// 		.map((task) => task.id) ?? [],
 		})
+	},
+	refetchTaskById: async (id) => {
+		const res = await actions.task.getById({ id })
+		if (res.error) {
+			console.error("Failed to refetch task:", res.error)
+			return undefined
+		}
+		if (!res.data) return undefined
+		set((state) => ({
+			tasks: state.tasks.map((task) =>
+				task.id === id ? { ...task, ...res.data } : task,
+			),
+		}))
+		return res.data
 	},
 
 	// ===================================

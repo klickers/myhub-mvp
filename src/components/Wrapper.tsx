@@ -2,6 +2,7 @@ import { DragDropProvider } from "@dnd-kit/react"
 import Tasks from "@/components/models/task/Tasks"
 import WeeklyAgenda from "@/components/models/agenda/WeeklyAgenda"
 import { useAgendaStore } from "@/stores/agenda"
+import { useTasksStore } from "@/stores/tasks"
 
 interface Props {
 	filter:
@@ -12,6 +13,7 @@ interface Props {
 
 export default function Wrapper({ filter }: Props) {
 	const createAgendaItem = useAgendaStore((state) => state.createAgendaItem)
+	const refetchTaskById = useTasksStore((state) => state.refetchTaskById)
 
 	return (
 		<DragDropProvider
@@ -23,6 +25,7 @@ export default function Wrapper({ filter }: Props) {
 						source.data.type,
 						source.id as number,
 					)
+					refetchTaskById(source.id as number)
 				}
 			}}
 		>

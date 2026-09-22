@@ -610,6 +610,14 @@ export const task = {
 		handler: async ({ id }) => {
 			return prisma.task.findUnique({
 				where: { id },
+				include: {
+					tags: {
+						include: {
+							tag: true,
+						},
+					},
+					agendas: true,
+				},
 			})
 		},
 	}),
