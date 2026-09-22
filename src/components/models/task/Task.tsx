@@ -13,6 +13,7 @@ import EditableTags from "@/components/form/EditableTags"
 import CreateTaskForm from "./CreateTaskForm"
 import { useTasksStore } from "@/stores/tasks"
 import { useTagsStore } from "@/stores/tags"
+import { useDraggable } from "@dnd-kit/react"
 
 interface Props {
 	task: TaskNode
@@ -35,11 +36,14 @@ export default function Task({ task, depth = 0 }: Props) {
 
 	const tags = useTagsStore((state) => state.tags)
 
+	const { ref } = useDraggable({
+		id: task.id,
+	})
+
 	return (
-		<React.Fragment
-			key={task.id}
-		>
+		<>
 			<tr
+				ref={ref}
 				className={
 					"task border-b border-gray-200" +
 					(task.status === "inprogress"
@@ -170,6 +174,6 @@ export default function Task({ task, depth = 0 }: Props) {
 					</td>
 				</tr>
 			)}
-		</React.Fragment>
+		</>
 	)
 }
