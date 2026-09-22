@@ -2,7 +2,6 @@
 import TasksLayout from "@/layouts/TasksLayout.astro"
 import prisma from "@/helpers/prisma"
 import Wrapper from "@/components/Wrapper"
-import { format } from "date-fns"
 
 const tag = await prisma.tag.findUnique({
 	where: { slug: Astro.params.slug },
