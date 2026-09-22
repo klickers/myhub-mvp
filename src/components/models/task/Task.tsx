@@ -38,6 +38,9 @@ export default function Task({ task, depth = 0 }: Props) {
 
 	const { ref } = useDraggable({
 		id: task.id,
+		data: {
+			type: "task",
+		},
 	})
 
 	return (

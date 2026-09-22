@@ -52,16 +52,11 @@ model Tag {
     @@index([parentId, order])
 }
 
-enum AgendaItemType {
-    none
-    tag
-    task
-}
-
 model Agenda {
-    id            Int     @id @default(autoincrement())
-    scheduledTime Int?    @default(0) // in minutes
-    status        Status  @default(notstarted)
+    id            Int      @id @default(autoincrement())
+    date          DateTime
+    scheduledTime Int?     @default(0) // in minutes
+    status        Status   @default(notstarted)
     description   String?
 
     tagId  Int?

@@ -8,6 +8,7 @@ import { session } from "./session"
 import { dailyHighlight } from "./dailyHighlight"
 import { search } from "./search"
 import { tag } from "./tag"
+import { agenda } from "./agenda"
 
 export const server = {
 	task,
@@ -15,6 +16,7 @@ export const server = {
 	dailyHighlight,
 	search,
 	tag,
+	agenda,
 	// ===============================
 	// Objective
 	// ===============================

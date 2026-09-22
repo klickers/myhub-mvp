@@ -1,5 +1,6 @@
 import { create } from "zustand"
 import type { TagWithChildren } from "@/types/prisma-custom"
+import { actions } from "astro:actions"
 import { startOfWeek, addDays } from "date-fns"
 
 type AgendaStore = {
@@ -10,6 +11,13 @@ type AgendaStore = {
 	days: { date: Date; tasks: any[] }[]
 
 	loadAgenda: () => void
+
+	// updating
+	createAgendaItem: (
+		date: Date,
+		itemType: "task" | "tag",
+		itemId: number,
+	) => Promise<void>
 }
 
 export const useAgendaStore = create<AgendaStore>((set, get) => ({
@@ -32,5 +40,20 @@ export const useAgendaStore = create<AgendaStore>((set, get) => ({
 				tasks: [],
 			})
 		set({ days })
+	},
+
+	// ===================================
+	// Updating
+	// ===================================
+	createAgendaItem: async (date, itemType, itemId) => {
+		const res = await actions.agenda.create({
+			date,
+			tagId: itemType === "tag" ? itemId : null,
+			taskId: itemType === "task" ? itemId : null,
+		})
+		if (res.error) {
+			console.error("Failed to create agenda item:", res.error)
+			return undefined
+		}
 	},
 }))
