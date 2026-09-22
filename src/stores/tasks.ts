@@ -2,7 +2,7 @@ import { create } from "zustand"
 import type { TaskWithTags, TaskNode } from "@/types/prisma-custom"
 import { actions } from "astro:actions"
 
-type TaskStore = {
+type TasksStore = {
 	tasks: TaskWithTags[]
 	isLoading: boolean
 	isLoaded: boolean
@@ -26,7 +26,7 @@ type TaskStore = {
 	) => Promise<TaskNode | undefined>
 }
 
-export const useTasksStore = create<TaskStore>((set, get) => ({
+export const useTasksStore = create<TasksStore>((set, get) => ({
 	tasks: [],
 	flatTasksTree: [],
 	tasksTree: [],
