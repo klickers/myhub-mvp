@@ -13,6 +13,7 @@ export type TaskWithTags = Prisma.TaskGetPayload<{
 				tag: true
 			}
 		}
+		agendas: true
 	}
 }>
 

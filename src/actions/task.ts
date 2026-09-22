@@ -365,6 +365,7 @@ export const task = {
 							tag: true,
 						},
 					},
+					agendas: true,
 				},
 			})
 		},
@@ -481,6 +482,7 @@ export const task = {
 							tag: true,
 						},
 					},
+					agendas: true,
 				},
 			})
 		},
@@ -595,6 +597,7 @@ export const task = {
 							tag: true,
 						},
 					},
+					agendas: true,
 				},
 				orderBy: { deadline: "asc" },
 			})

@@ -43,6 +43,25 @@ export default function Task({ task, depth = 0 }: Props) {
 		},
 	})
 
+	const agendaStatusColor = () => {
+		let color = "text-white"
+		if (task.agendas.length > 0) {
+			if (
+				task.agendas.some(
+					(agenda) =>
+						agenda.status === "inprogress" ||
+						agenda.status === "notstarted",
+				)
+			)
+				color = "text-yellow-400"
+			else if (
+				task.agendas.every((agenda) => agenda.status === "completed")
+			)
+				color = "text-green-400"
+		}
+		return color
+	}
+
 	return (
 		<>
 			<tr
@@ -69,6 +88,9 @@ export default function Task({ task, depth = 0 }: Props) {
 				</td>
 				<td>
 					<span className="flex items-center gap-1">
+						<span className={agendaStatusColor()}>
+							<Icon icon="mingcute:round-line" />
+						</span>
 						<SessionPlayButton
 							itemType="task"
 							itemId={task.id}

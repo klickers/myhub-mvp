@@ -27,7 +27,10 @@ export default function buildTaskTree(
 	for (const task of map.values()) {
 		if (!task.parentTaskId) continue
 		const parent = map.get(task.parentTaskId)
-		if (parent && statusQualifies(task.status)) parent.subtasks.push(task)
+		if (parent && statusQualifies(task.status)) {
+			parent.subtasks.push(task)
+			parent.agendas.push(...task.agendas)
+		}
 	}
 
 	if (tagId !== null) {
