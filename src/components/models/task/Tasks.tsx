@@ -32,11 +32,7 @@ export default function Tasks({ filter, currentTag }: Props) {
 
 	const tasks: TaskNode[] = useMemo(() => {
 		let filteredTasks = allTasks
-		if (filter.type === "tag" && currentTag)
-			filteredTasks = allTasks.filter((task) =>
-				task.tags.some((tag) => tag.tagId === currentTag.id),
-			)
-		else if (filter.type === "untagged")
+		if (filter.type === "untagged")
 			filteredTasks = allTasks.filter((task) => task.tags.length === 0)
 		return buildTaskTree(filteredTasks, currentTag?.id ?? null)
 	}, [allTasks, filter.type, currentTag?.id])
