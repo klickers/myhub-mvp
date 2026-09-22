@@ -69,7 +69,6 @@ const days = [
 
 	<Tasks
 		client:load
-		filter={{ type: "tag", slug: tag.slug }}
-		currentTag={tag}
+		filter={{ type: "tag", id: tag.id }}
 	/>
 </TasksLayout>

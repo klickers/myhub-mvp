@@ -3,21 +3,21 @@ import { Icon } from "@iconify/react"
 import CreateTaskForm from "./CreateTaskForm"
 import type { TaskNode } from "@/types/prisma-custom"
 import Task from "@/components/models/task/Task"
-import type { TagWithChildren } from "@/types/prisma-custom"
 import { useTasksStore } from "@/stores/tasks"
 import { useTagsStore } from "@/stores/tags"
 import buildTaskTree from "@/helpers/buildTaskTree"
 import SideTray from "@/components/SideTray"
 
+type TasksFilter =
+	| { type: "all" }
+	| { type: "untagged" }
+	| { type: "tag"; id: number }
+
 interface Props {
-	filter:
-		| { type: "all" }
-		| { type: "untagged" }
-		| { type: "tag"; slug: string }
-	currentTag?: TagWithChildren | null
+	filter: TasksFilter
 }
 
-export default function Tasks({ filter, currentTag }: Props) {
+export default function Tasks({ filter }: Props) {
 	const loadTasks = useTasksStore((state) => state.loadTasks)
 	const allTasks = useTasksStore((state) => state.tasks)
 	const [isAddingTask, setIsAddingTask] = useState(false)
@@ -34,8 +34,11 @@ export default function Tasks({ filter, currentTag }: Props) {
 		let filteredTasks = allTasks
 		if (filter.type === "untagged")
 			filteredTasks = allTasks.filter((task) => task.tags.length === 0)
-		return buildTaskTree(filteredTasks, currentTag?.id ?? null)
-	}, [allTasks, filter.type, currentTag?.id])
+		return buildTaskTree(
+			filteredTasks,
+			filter.type === "tag" ? filter.id : null,
+		)
+	}, [allTasks, filter])
 
 	return (
 		<>
@@ -82,7 +85,9 @@ export default function Tasks({ filter, currentTag }: Props) {
 							>
 								<CreateTaskForm
 									tags={
-										currentTag ? [currentTag.id] : undefined
+										filter.type === "tag"
+											? [filter.id]
+											: undefined
 									}
 									onCreated={() => setIsAddingTask(false)}
 								/>
