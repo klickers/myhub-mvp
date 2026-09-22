@@ -38,7 +38,7 @@ export const useTasksStore = create<TaskStore>((set, get) => ({
 	// Setting
 	// ===================================
 	loadTasks: async () => {
-		if (get().isLoaded) return
+		if (get().isLoaded || get().isLoading) return
 		set({ isLoading: true })
 
 		const res = await actions.task.getAll({})
