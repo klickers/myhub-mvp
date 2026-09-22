@@ -6,7 +6,7 @@ interface Props {
 }
 
 export default function DayAgenda({ date }: Props) {
-	const { ref } = useDroppable({ id: "droppable" })
+	const { isDropTarget, ref } = useDroppable({ id: "droppable" })
 
 	return (
 		<div>
@@ -16,7 +16,9 @@ export default function DayAgenda({ date }: Props) {
 			</p>
 			<div ref={ref}>
 				<div className="rounded-sm border border-gray-200 bg-gray-50 py-0.5 px-1">
-					Sample task name goes here
+					{isDropTarget
+						? "Draggable element is over me"
+						: "Drag something over me"}
 				</div>
 			</div>
 		</div>

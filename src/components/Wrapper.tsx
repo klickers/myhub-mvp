@@ -1,6 +1,6 @@
 import { DragDropProvider } from "@dnd-kit/react"
 import Tasks from "@/components/models/task/Tasks"
-import WeeklyAgenda from "./WeeklyAgenda"
+import WeeklyAgenda from "@/components/models/agenda/WeeklyAgenda"
 
 interface Props {
 	tagId: number
