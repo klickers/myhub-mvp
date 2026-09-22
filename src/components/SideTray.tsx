@@ -126,7 +126,7 @@ export default function SideTray({ type, taskId, setSelected }: Props) {
 		<>
 			{/* Backdrop */}
 			<div
-				className="fixed inset-0 z-40 bg-slate-900/10 backdrop-blur-[2px]"
+				className="fixed inset-0 z-40 bg-gray-900/10 backdrop-blur-[2px]"
 				onClick={closeTray}
 				aria-hidden="true"
 			/>
@@ -136,7 +136,7 @@ export default function SideTray({ type, taskId, setSelected }: Props) {
 				role="dialog"
 				aria-modal="true"
 				aria-labelledby="side-tray-title"
-				className="side-tray fixed bottom-3 right-3 top-3 z-50 flex w-[min(38rem,calc(100vw-1.5rem))] flex-col overflow-hidden rounded-lg bg-white backdrop-blur-2xl backdrop-saturate-150 sm:bottom-4 sm:right-4 sm:top-4 sm:w-[min(40rem,calc(100vw-2rem))]"
+				className="side-tray fixed bottom-3 right-3 top-3 z-50 flex w-[min(38rem,calc(100vw-1.5rem))] flex-col overflow-hidden rounded-lg bg-white backdrop-blur-2xl backdrop-saturate-150 sm:bottom-4 sm:right-4 sm:top-4 sm:w-[min(44rem,calc(100vw-2rem))]"
 				onClick={(e) => e.stopPropagation()}
 			>
 				<header className="flex items-start justify-between gap-4 border-b border-gray-300/60 px-5 py-4">
@@ -272,8 +272,11 @@ export default function SideTray({ type, taskId, setSelected }: Props) {
 						</dl>
 					</section>
 
-					<section>
-						<h2>Subtasks</h2>
+					<section
+						className="mt-6"
+						aria-label="Subtasks"
+					>
+						<h2 className="text-lg">Subtasks</h2>
 						<Tasks filter={{ type: "task", id: task?.id }} />
 					</section>
 				</div>

@@ -25,7 +25,7 @@
 	}
 
 	h2 {
-		@apply font-semibold text-2xl mb-4 leading-tight;
+		@apply font-semibold text-xl mb-3 leading-tight;
 	}
 
 	button {

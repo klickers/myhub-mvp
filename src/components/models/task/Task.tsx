@@ -57,12 +57,18 @@ export default function Task({ tasks, depth = 0, onClick }: Props) {
 							}
 							style={{ paddingLeft: depth + "rem" }}
 						>
-							<div className="flex gap-3">
-								<EditableText
-									value={task.name}
-									onSave={(name) =>
-										saveTaskChange({ id: task.id, name })
-									}
+							<EditableText
+								value={task.name}
+								onSave={(name) =>
+									saveTaskChange({ id: task.id, name })
+								}
+							/>
+						</td>
+						<td>
+							<span className="flex items-center gap-1">
+								<SessionPlayButton
+									itemType="task"
+									itemId={task.id}
 								/>
 								<button
 									className="text-blue-400 hover:text-blue-600"
@@ -70,13 +76,7 @@ export default function Task({ tasks, depth = 0, onClick }: Props) {
 								>
 									<Icon icon="mingcute:pencil-3-fill" />
 								</button>
-							</div>
-						</td>
-						<td>
-							<SessionPlayButton
-								itemType="task"
-								itemId={task.id}
-							/>
+							</span>
 						</td>
 						<td>
 							<EditableStatus
