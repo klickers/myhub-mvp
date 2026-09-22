@@ -16,6 +16,7 @@
 		"@astrojs/node": "^9.5.0",
 		"@astrojs/react": "^4.4.0",
 		"@astrojs/vercel": "^9.0.0",
+		"@dnd-kit/react": "^0.5.0",
 		"@emoji-mart/data": "^1.2.1",
 		"@excalidraw/excalidraw": "^0.18.0",
 		"@faker-js/faker": "^10.1.0",
