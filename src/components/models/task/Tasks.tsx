@@ -7,6 +7,7 @@ import type { TagWithChildren } from "@/types/prisma-custom"
 import { useTasksStore } from "@/stores/tasks"
 import { useTagsStore } from "@/stores/tags"
 import buildTaskTree from "@/helpers/buildTaskTree"
+import SideTray from "@/components/SideTray"
 
 interface Props {
 	filter:
@@ -20,6 +21,7 @@ export default function Tasks({ filter, currentTag }: Props) {
 	const loadTasks = useTasksStore((state) => state.loadTasks)
 	const allTasks = useTasksStore((state) => state.tasks)
 	const [isAddingTask, setIsAddingTask] = useState(false)
+	const [selectedTask, setSelectedTask] = useState<TaskNode | null>(null)
 
 	const loadTags = useTagsStore((state) => state.loadTags)
 
@@ -64,11 +66,13 @@ export default function Tasks({ filter, currentTag }: Props) {
 				<thead>
 					<tr>
 						<th>Task</th>
+						{/* Controls */}
+						<th></th>
 						<th>Status</th>
 						<th>Est. Time</th>
 						<th>Deadline</th>
 						<th>Tags</th>
-						{/* Controls */}
+						{/* Delete */}
 						<th></th>
 					</tr>
 				</thead>
@@ -92,9 +96,19 @@ export default function Tasks({ filter, currentTag }: Props) {
 					<Task
 						tasks={tasks}
 						depth={0}
+						onClick={(task) => setSelectedTask(task)}
 					/>
 				</tbody>
 			</table>
+
+			{/* Side tray */}
+			{selectedTask && (
+				<SideTray
+					type="task"
+					selected={selectedTask}
+					setSelected={setSelectedTask}
+				/>
+			)}
 		</>
 	)
 }
