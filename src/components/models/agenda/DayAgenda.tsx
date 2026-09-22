@@ -114,6 +114,7 @@ export default function DayAgenda({ date, filter }: Props) {
 						)}
 						{openEditingId === item.id && (
 							<TrashButton
+								className="absolute bottom-0.5 right-0.5"
 								onClick={() =>
 									handleAgendaItemRemoval(
 										item.id,
