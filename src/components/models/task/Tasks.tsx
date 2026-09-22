@@ -1,58 +1,40 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo } from "react"
 import { Icon } from "@iconify/react"
 import CreateTaskForm from "./CreateTaskForm"
 import type { TaskNode } from "@/types/prisma-custom"
 import Task from "@/components/models/task/Task"
-import type { TagWithChildren, TaskWithTags } from "@/types/prisma-custom"
+import type { TagWithChildren } from "@/types/prisma-custom"
+import { useTasksStore } from "@/stores/tasks"
+import buildTaskTree from "@/helpers/buildTaskTree"
 
 interface Props {
-	tasks: TaskNode[]
+	filter:
+		| { type: "all" }
+		| { type: "untagged" }
+		| { type: "tag"; slug: string }
 	tags: TagWithChildren[]
 	currentTag?: TagWithChildren | null
 }
 
-export default function Tasks({ tasks, tags, currentTag }: Props) {
-	const [allTasks, setAllTasks] = useState(tasks)
+export default function Tasks({ filter, tags, currentTag }: Props) {
+	const loadTasks = useTasksStore((state) => state.loadTasks)
+	const allTasks = useTasksStore((state) => state.tasks)
 	const [isAddingTask, setIsAddingTask] = useState(false)
 
 	useEffect(() => {
-		setAllTasks(tasks)
-	}, [tasks])
+		loadTasks()
+	}, [])
 
-	const handleTaskUpdated = (updatedTask: TaskWithTags) => {
-		setAllTasks((currentTasks) => {
-			const updateTask = (taskList: TaskNode[]): TaskNode[] =>
-				taskList.map((task) =>
-					task.id === updatedTask.id
-						? { ...task, ...updatedTask }
-						: { ...task, subtasks: updateTask(task.subtasks) },
-				)
-
-			return updateTask(currentTasks)
-		})
-	}
-
-	const handleSubtaskCreated = (
-		parentTaskId: number,
-		newTask: TaskWithTags,
-	) => {
-		setAllTasks((currentTasks) => {
-			const addSubtask = (taskList: TaskNode[]): TaskNode[] =>
-				taskList.map((task) =>
-					task.id === parentTaskId
-						? {
-								...task,
-								subtasks: [
-									...task.subtasks,
-									{ ...newTask, subtasks: [] },
-								],
-							}
-						: { ...task, subtasks: addSubtask(task.subtasks) },
-				)
-
-			return addSubtask(currentTasks)
-		})
-	}
+	const tasks: TaskNode[] = useMemo(() => {
+		let filteredTasks = allTasks
+		if (filter.type === "tag" && currentTag)
+			filteredTasks = allTasks.filter((task) =>
+				task.tags.some((tag) => tag.tagId === currentTag.id),
+			)
+		else if (filter.type === "untagged")
+			filteredTasks = allTasks.filter((task) => task.tags.length === 0)
+		return buildTaskTree(filteredTasks, currentTag?.id ?? null)
+	}, [allTasks, filter.type, currentTag?.id])
 
 	return (
 		<>
@@ -99,23 +81,15 @@ export default function Tasks({ tasks, tags, currentTag }: Props) {
 									tags={
 										currentTag ? [currentTag.id] : undefined
 									}
-									onCreated={(newTask) => {
-										setAllTasks((prev) => [
-											...prev,
-											{ ...newTask, subtasks: [] },
-										])
-										setIsAddingTask(false)
-									}}
+									onCreated={() => setIsAddingTask(false)}
 								/>
 							</td>
 						</tr>
 					)}
 					<Task
-						tasks={allTasks}
+						tasks={tasks}
 						depth={0}
 						tags={tags}
-						onTaskUpdated={handleTaskUpdated}
-						onSubtaskCreated={handleSubtaskCreated}
 					/>
 				</tbody>
 			</table>

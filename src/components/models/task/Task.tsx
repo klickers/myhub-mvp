@@ -10,24 +10,18 @@ import EditableDate from "@/components/form/EditableDate"
 import { dateKeyToUtcDate, getUtcDateKey } from "@/helpers/dateOnly"
 import SessionPlayButton from "../session/SessionPlayButton"
 import EditableTags from "@/components/form/EditableTags"
-import type { TagWithChildren, TaskWithTags } from "@/types/prisma-custom"
+import type { TagWithChildren } from "@/types/prisma-custom"
 import CreateTaskForm from "./CreateTaskForm"
+import { useTasksStore } from "@/stores/tasks"
 
 interface Props {
 	tasks: TaskNode[]
 	depth?: number
 	tags: TagWithChildren[]
-	onTaskUpdated: (task: TaskWithTags) => void
-	onSubtaskCreated: (parentTaskId: number, task: TaskWithTags) => void
 }
 
-export default function Task({
-	tasks,
-	depth = 0,
-	tags,
-	onTaskUpdated,
-	onSubtaskCreated,
-}: Props) {
+export default function Task({ tasks, depth = 0, tags }: Props) {
+	const updateTask = useTasksStore((state) => state.updateTask)
 	const [addTaskParentId, setAddTaskParentId] = React.useState<number | null>(
 		null,
 	)
@@ -35,12 +29,9 @@ export default function Task({
 	const saveTaskChange = async (
 		patch: Parameters<typeof actions.task.update>[0],
 	) => {
-		const res = await actions.task.update(patch)
-		if (res.error) toast.error("Failed to update task")
-		else {
-			toast.success("Task updated successfully")
-			onTaskUpdated(res.data)
-		}
+		const res = await updateTask(patch.id, patch)
+		if (res === undefined) toast.error("Failed to update task")
+		else toast.success("Task updated successfully")
 	}
 
 	return (
@@ -159,8 +150,6 @@ export default function Task({
 							depth={depth + 1}
 							tags={tags}
 							key={task.id + "-subtasks"}
-							onTaskUpdated={onTaskUpdated}
-							onSubtaskCreated={onSubtaskCreated}
 						/>
 					)}
 
@@ -176,10 +165,7 @@ export default function Task({
 								<CreateTaskForm
 									parentId={task.id}
 									tags={task.tags.map((tag) => tag.tag.id)}
-									onCreated={(newTask) => {
-										onSubtaskCreated(task.id, newTask)
-										setAddTaskParentId(null)
-									}}
+									onCreated={() => setAddTaskParentId(null)}
 								/>
 							</td>
 						</tr>

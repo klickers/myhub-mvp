@@ -570,6 +570,36 @@ export const task = {
 			return { taskIds }
 		},
 	}),
+	getAll: defineAction({
+		input: z.object({
+			status: z.array(z.nativeEnum(Status)).optional(),
+			from: z.coerce.date().optional(),
+			to: z.coerce.date().optional(),
+		}),
+		handler: async ({ status, from, to }) => {
+			return prisma.task.findMany({
+				where: {
+					...(status && { status: { in: status } }),
+					...(from || to
+						? {
+								deadline: {
+									...(from && { gte: from }),
+									...(to && { lte: to }),
+								},
+							}
+						: {}),
+				},
+				include: {
+					tags: {
+						include: {
+							tag: true,
+						},
+					},
+				},
+				orderBy: { deadline: "asc" },
+			})
+		},
+	}),
 	getById: defineAction({
 		input: z.object({
 			id: z.number(),

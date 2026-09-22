@@ -1,8 +1,8 @@
 import { useState } from "react"
 import { toast } from "react-toastify"
 
-import { actions } from "astro:actions"
 import type { TaskWithTags } from "@/types/prisma-custom"
+import { useTasksStore } from "@/stores/tasks"
 
 type Props = {
 	parentId?: number | undefined
@@ -16,22 +16,27 @@ export default function TaskCreateForm({
 	onCreated,
 }: Props) {
 	const [name, setName] = useState("")
+	const createTask = useTasksStore((state) => state.createTask)
 
 	async function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
 		if (e.key === "Enter" && name) {
-			const { data, error } = await actions.task.create({
+			await createTask({
 				name,
-				parentType: parentId ? "task" : "none",
 				parentTaskId: parentId,
 				tags,
 			})
-			if (error) {
-				toast.error(`Failed to create task "${name}": ${error.message}`)
-			} else {
-				toast.success(`Created task "${name}" successfully!`)
-				onCreated?.(data)
-				setName("")
-			}
+				.then((data) => {
+					if (data) {
+						toast.success(`Created task "${name}" successfully!`)
+						onCreated?.(data)
+						setName("")
+					}
+				})
+				.catch((error) => {
+					toast.error(
+						`Failed to create task "${name}": ${error.message}`,
+					)
+				})
 		}
 	}
 
