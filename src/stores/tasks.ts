@@ -34,8 +34,6 @@ type TasksStore = {
 
 export const useTasksStore = create<TasksStore>((set, get) => ({
 	tasks: [],
-	flatTasksTree: [],
-	tasksTree: [],
 	isLoading: false,
 	isLoaded: false,
 
