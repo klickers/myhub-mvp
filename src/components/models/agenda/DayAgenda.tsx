@@ -3,6 +3,7 @@ import { useDroppable } from "@dnd-kit/react"
 import { format, isSameDay, isToday } from "date-fns"
 import { useAgendaStore } from "@/stores/agenda"
 import { useTasksStore } from "@/stores/tasks"
+import { Icon } from "@iconify/react"
 
 interface Props {
 	date: Date
@@ -52,13 +53,20 @@ export default function DayAgenda({ date, filter }: Props) {
 					<div
 						key={item.id}
 						className={
-							"cursor-pointer rounded-sm border border-gray-200 bg-gray-50 py-0.5 px-1" +
+							"relative cursor-pointer rounded-sm border border-gray-200 bg-gray-50 py-0.5 px-1" +
 							(item.status === "completed"
 								? " border-green-200 bg-green-50"
 								: "")
 						}
-						onClick={() => item.task && openSideTray(item.task.id)}
 					>
+						<button
+							onClick={() =>
+								item.task && openSideTray(item.task.id)
+							}
+							className="absolute right-0.5 top-0.5 text-[0.75rem] text-gray-500 hover:text-gray-800"
+						>
+							<Icon icon="mingcute:external-link-line" />
+						</button>
 						{item.task?.name}
 					</div>
 				))}
