@@ -75,7 +75,6 @@ export const useAgendaStore = create<AgendaStore>((set, get) => ({
 			console.error("Failed to create agenda item:", res.error)
 			return undefined
 		}
-
 		set((state) => ({
 			agenda: [...state.agenda, res.data as AgendaWithIncludes],
 		}))
