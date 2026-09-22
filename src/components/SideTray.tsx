@@ -208,10 +208,28 @@ export default function SideTray({
 
 				<div className="flex-1 overflow-y-auto px-5 py-5">
 					<section
-						className="mb-4 rounded-lg border border-gray-300/70 bg-white/55 p-2.5 shadow-sm"
+						className="mb-4"
 						aria-label="Task details"
 					>
 						<dl className="grid gap-1 text-sm">
+							<div className="grid min-h-8 gap-1 rounded-md bg-white/40 px-2.5 py-1 sm:grid-cols-[7.25rem_minmax(0,1fr)] sm:items-center sm:gap-2">
+								<dt className="text-xs font-semibold text-gray-500">
+									Status
+								</dt>
+								<dd className="min-w-0 text-gray-900">
+									<EditableStatus
+										value={selected.status as Status}
+										onSave={async (status) => {
+											await actions.task.update({
+												id: selected.id,
+												status,
+											})
+											applySavedTaskChange({ status })
+										}}
+									/>
+								</dd>
+							</div>
+							{/* TODO: hide relevant for Evergreen */}
 							<div className="grid min-h-8 gap-1 rounded-md bg-white/40 px-2.5 py-1 sm:grid-cols-[7.25rem_minmax(0,1fr)] sm:items-center sm:gap-2">
 								<dt className="text-xs font-semibold text-gray-500">
 									Estimated Time
@@ -231,45 +249,6 @@ export default function SideTray({
 											applySavedTaskChange({
 												estimatedTime: v,
 											})
-										}}
-									/>
-								</dd>
-							</div>
-							<div className="grid min-h-8 gap-1 rounded-md bg-white/40 px-2.5 py-1 sm:grid-cols-[7.25rem_minmax(0,1fr)] sm:items-center sm:gap-2">
-								<dt className="text-xs font-semibold text-gray-500">
-									Make Time Type
-								</dt>
-								<dd className="min-w-0 text-gray-900">
-									<EditableMakeTimeType
-										value={selected.makeTimeType}
-										onSave={async (makeTimeType) => {
-											await actions.task.update({
-												id: selected.id,
-												makeTimeType,
-											})
-											applySavedTaskChange({
-												makeTimeType:
-													makeTimeType === "none"
-														? null
-														: makeTimeType,
-											})
-										}}
-									/>
-								</dd>
-							</div>
-							<div className="grid min-h-8 gap-1 rounded-md bg-white/40 px-2.5 py-1 sm:grid-cols-[7.25rem_minmax(0,1fr)] sm:items-center sm:gap-2">
-								<dt className="text-xs font-semibold text-gray-500">
-									Status
-								</dt>
-								<dd className="min-w-0 text-gray-900">
-									<EditableStatus
-										value={selected.status as Status}
-										onSave={async (status) => {
-											await actions.task.update({
-												id: selected.id,
-												status,
-											})
-											applySavedTaskChange({ status })
 										}}
 									/>
 								</dd>
@@ -296,10 +275,11 @@ export default function SideTray({
 									/>
 								</dd>
 							</div>
+							{/* TODO: add tags */}
 						</dl>
 					</section>
 
-					<section className="rounded-lg border border-gray-300/70 bg-white/55 p-4 shadow-sm">
+					<section>
 						<Subtasks taskId={selected.id} />
 					</section>
 				</div>
