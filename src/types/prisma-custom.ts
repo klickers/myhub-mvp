@@ -19,3 +19,10 @@ export type TaskWithTags = Prisma.TaskGetPayload<{
 export type TaskNode = TaskWithTags & {
 	subtasks: TaskNode[]
 }
+
+export type AgendaWithIncludes = Prisma.AgendaGetPayload<{
+	include: {
+		tag: true
+		task: true
+	}
+}>

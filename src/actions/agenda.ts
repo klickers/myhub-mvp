@@ -36,6 +36,31 @@ export const agenda = {
 					tagId: input.tagId ?? undefined,
 					taskId: input.taskId ?? undefined,
 				},
+				include: {
+					tag: true,
+					task: true,
+				},
+			})
+		},
+	}),
+
+	getBetweenRange: defineAction({
+		input: z.object({
+			start: z.coerce.date(),
+			end: z.coerce.date(),
+		}),
+		handler: async ({ start, end }) => {
+			return prisma.agenda.findMany({
+				where: {
+					date: {
+						gte: new Date(start),
+						lt: new Date(end),
+					},
+				},
+				include: {
+					tag: true,
+					task: true,
+				},
 			})
 		},
 	}),

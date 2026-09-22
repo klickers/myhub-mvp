@@ -1,10 +1,10 @@
 import { create } from "zustand"
-import type { TagWithChildren } from "@/types/prisma-custom"
 import { actions } from "astro:actions"
 import { startOfWeek, addDays } from "date-fns"
+import type { AgendaWithIncludes } from "@/types/prisma-custom"
 
 type AgendaStore = {
-	tags: TagWithChildren[]
+	agenda: AgendaWithIncludes[]
 	isLoading: boolean
 	isLoaded: boolean
 
@@ -21,7 +21,7 @@ type AgendaStore = {
 }
 
 export const useAgendaStore = create<AgendaStore>((set, get) => ({
-	tags: [],
+	agenda: [],
 	isLoading: false,
 	isLoaded: false,
 
@@ -40,6 +40,21 @@ export const useAgendaStore = create<AgendaStore>((set, get) => ({
 				tasks: [],
 			})
 		set({ days })
+
+		const res = await actions.agenda.getBetweenRange({
+			start: days[0].date,
+			end: days[6].date,
+		})
+		if (res.error) {
+			console.error("Failed to load agenda items:", res.error)
+			set({ isLoading: false })
+			return
+		}
+		set({
+			agenda: res.data ?? [],
+			isLoaded: true,
+			isLoading: false,
+		})
 	},
 
 	// ===================================
@@ -55,5 +70,9 @@ export const useAgendaStore = create<AgendaStore>((set, get) => ({
 			console.error("Failed to create agenda item:", res.error)
 			return undefined
 		}
+
+		set((state) => ({
+			agenda: [...state.agenda, res.data as AgendaWithIncludes],
+		}))
 	},
 }))
