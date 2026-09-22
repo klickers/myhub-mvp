@@ -17,7 +17,7 @@ type AgendaStore = {
 		date: Date,
 		itemType: "task" | "tag",
 		itemId: number,
-	) => Promise<void>
+	) => Promise<AgendaWithIncludes | undefined>
 	updateAgendaItem: (
 		id: number,
 		patch: Parameters<typeof actions.agenda.update>[0],
@@ -79,6 +79,7 @@ export const useAgendaStore = create<AgendaStore>((set, get) => ({
 		set((state) => ({
 			agenda: [...state.agenda, res.data as AgendaWithIncludes],
 		}))
+		return res.data
 	},
 	updateAgendaItem: async (id, patch) => {
 		const res = await actions.agenda.update({ ...patch })

@@ -18,16 +18,20 @@ export default function Wrapper({ filter }: Props) {
 
 	return (
 		<DragDropProvider
-			onDragEnd={({ operation }) => {
+			onDragEnd={async ({ operation }) => {
 				const { source, target } = operation
 				if (source && target) {
-					createAgendaItem(
+					const res = await createAgendaItem(
 						target.data.date,
 						source.data.type,
 						source.id as number,
 					)
-					refetchTaskById(source.id as number)
-					toast.success("Task added to agenda")
+					if (res === undefined)
+						toast.error("Failed to add task to agenda")
+					else {
+						refetchTaskById(source.id as number)
+						toast.success("Task added to agenda")
+					}
 				}
 			}}
 		>
