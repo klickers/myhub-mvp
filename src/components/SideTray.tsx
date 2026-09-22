@@ -8,7 +8,6 @@ import EditableDate from "./form/EditableDate"
 import EditableTags from "./form/EditableTags"
 import SessionPlayButton from "./models/session/SessionPlayButton"
 import Tasks from "./models/task/Tasks"
-import { TASK_REMOVED_EVENT, type TaskRemovedEvent } from "@/helpers/taskEvents"
 import { ChevronRight, X } from "lucide-react"
 import {
 	useEffect,
@@ -58,17 +57,6 @@ export default function SideTray({ type, taskId, setSelected }: Props) {
 		document.addEventListener("keydown", handleKeyDown)
 		return () => document.removeEventListener("keydown", handleKeyDown)
 	}, [setSelected])
-
-	// Handle task removed event to close the tray if the selected task is removed
-	useEffect(() => {
-		const handleTaskRemoved = (event: Event) => {
-			const { taskIds } = (event as TaskRemovedEvent).detail
-			if (taskIds.includes(taskId)) setSelected(null)
-		}
-		window.addEventListener(TASK_REMOVED_EVENT, handleTaskRemoved)
-		return () =>
-			window.removeEventListener(TASK_REMOVED_EVENT, handleTaskRemoved)
-	}, [taskId, setSelected])
 
 	// Load breadcrumbs for the selected task
 	useEffect(() => {
@@ -281,7 +269,6 @@ export default function SideTray({ type, taskId, setSelected }: Props) {
 					</section>
 				</div>
 
-				{/* TODO: add past sessions, add notes area? */}
 			</aside>
 		</>
 	)
