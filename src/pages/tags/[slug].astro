@@ -19,6 +19,6 @@ if (!tag) return Astro.redirect("/tasks")
 
 	<Wrapper
 		client:load
-		tagId={tag.id}
+		filter={{ type: "tag", id: tag.id }}
 	/>
 </TasksLayout>
