@@ -262,7 +262,7 @@ export default function SideTray() {
 						className="mt-6"
 						aria-label="Subtasks"
 					>
-						<h2 className="text-lg">Subtasks</h2>
+						<h2 className="text-lg mb-1">Subtasks</h2>
 						<Tasks filter={{ type: "task", id: task.id }} />
 					</section>
 				</div>
