@@ -1,7 +1,6 @@
 ---
 import TasksLayout from "@/layouts/TasksLayout.astro"
 import prisma from "@/helpers/prisma"
-import buildTaskTree from "@/helpers/buildTaskTree"
 import Tasks from "@/components/models/task/Tasks"
 import { actions } from "astro:actions"
 import { format } from "date-fns"
@@ -15,19 +14,6 @@ const tag = await prisma.tag.findUnique({
 	},
 })
 if (!tag) return Astro.redirect("/tasks")
-
-const tasks = await prisma.task.findMany({
-	include: {
-		tags: {
-			include: {
-				tag: true,
-			},
-		},
-	},
-})
-const taskTree = buildTaskTree(tasks, tag.id)
-
-const tags = await Astro.callAction(actions.tag.getAllTagGroups, {})
 
 const days = [
 	{
@@ -84,8 +70,8 @@ const days = [
 
 	<Tasks
 		client:load
-		tasks={taskTree}
 		tags={tags.data ?? []}
+		filter={{ type: "tag", slug: tag.slug }}
 		currentTag={tag}
 	/>
 </TasksLayout>
