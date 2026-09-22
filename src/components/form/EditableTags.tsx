@@ -8,44 +8,49 @@ export default function EditableTags({
 	tags,
 	onSave,
 	className,
+	tagClassName,
 }: {
 	value: Tag[] | null
 	tags: TagWithChildren[]
 	onSave: (v: Tag[]) => Promise<void>
 	className?: string
+	tagClassName?: string
 }) {
 	const [isEditing, setIsEditing] = useState(false)
 	const [selectedTags, setSelectedTags] = useState<Tag[]>(value ?? [])
 	const [input, setInput] = useState("")
 
 	return (
-		<div className="text-xs">
-			<div className="flex items-center gap-0.5 flex-wrap">
-				{selectedTags.map((tag) => (
-					<button
-						key={tag.id}
-						className="bg-gray-100 text-gray-700 rounded-3xl px-1 inline-block hover:bg-red-100 hover:text-red-700"
-						onClick={async (e) => {
-							e.preventDefault()
-							setSelectedTags((prevState) =>
-								prevState.filter((t) => t.id !== tag.id),
-							)
-							await onSave(
-								selectedTags.filter((t) => t.id !== tag.id),
-							)
-						}}
-					>
-						{tag.name}
-					</button>
-				))}
-				<button onClick={() => setIsEditing(!isEditing)}>
-					{isEditing ? (
-						<Icon icon="mingcute:minimize-fill" />
-					) : (
-						<Icon icon="mingcute:add-fill" />
-					)}
+		<div className="text-xs flex items-center gap-0.5 flex-wrap">
+			{selectedTags.map((tag) => (
+				<button
+					key={tag.id}
+					className={[
+						"bg-gray-100 text-gray-700 rounded-3xl px-1 inline-block hover:bg-red-100 hover:text-red-700",
+						tagClassName ?? "",
+					]
+						.filter(Boolean)
+						.join(" ")}
+					onClick={async (e) => {
+						e.preventDefault()
+						setSelectedTags((prevState) =>
+							prevState.filter((t) => t.id !== tag.id),
+						)
+						await onSave(
+							selectedTags.filter((t) => t.id !== tag.id),
+						)
+					}}
+				>
+					{tag.name}
 				</button>
-			</div>
+			))}
+			<button onClick={() => setIsEditing(!isEditing)}>
+				{isEditing ? (
+					<Icon icon="mingcute:minimize-fill" />
+				) : (
+					<Icon icon="mingcute:add-fill" />
+				)}
+			</button>
 
 			{isEditing && (
 				<select

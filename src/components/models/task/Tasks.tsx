@@ -21,7 +21,7 @@ export default function Tasks({ filter, currentTag }: Props) {
 	const loadTasks = useTasksStore((state) => state.loadTasks)
 	const allTasks = useTasksStore((state) => state.tasks)
 	const [isAddingTask, setIsAddingTask] = useState(false)
-	const [selectedTask, setSelectedTask] = useState<TaskNode | null>(null)
+	const [selectedTask, setSelectedTask] = useState<number | null>(null)
 
 	const loadTags = useTagsStore((state) => state.loadTags)
 
@@ -96,7 +96,7 @@ export default function Tasks({ filter, currentTag }: Props) {
 					<Task
 						tasks={tasks}
 						depth={0}
-						onClick={(task) => setSelectedTask(task)}
+						onClick={(task) => setSelectedTask(task.id)}
 					/>
 				</tbody>
 			</table>
@@ -105,7 +105,7 @@ export default function Tasks({ filter, currentTag }: Props) {
 			{selectedTask && (
 				<SideTray
 					type="task"
-					selected={selectedTask}
+					taskId={selectedTask}
 					setSelected={setSelectedTask}
 				/>
 			)}

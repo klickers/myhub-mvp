@@ -52,10 +52,7 @@ export default function EditableText({
 			<button
 				type="button"
 				onClick={() => setEditing(true)}
-				className={[
-					"border border-transparent text-left hover:underline",
-					className,
-				]
+				className={["w-full text-left hover:underline", className]
 					.filter(Boolean)
 					.join(" ")}
 			>
@@ -75,7 +72,7 @@ export default function EditableText({
 				if (e.key === "Escape") cancel()
 			}}
 			className={[
-				"w-full border-black px-1 py-0 bg-transparent",
+				"w-full border-0 border-b border-black px-1 py-0 bg-transparent rounded-none",
 				className,
 				inputClassName,
 			]

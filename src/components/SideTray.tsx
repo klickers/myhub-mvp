@@ -1,16 +1,14 @@
 import type { Status, Task } from "@/generated/prisma/client"
-import EditableText from "./form/EditableText"
+import { toast } from "react-toastify"
 import { actions } from "astro:actions"
-import SessionPlayButton from "./models/session/SessionPlayButton"
+import EditableText from "./form/EditableText"
 import EditableNumber from "./form/EditableNumber"
 import EditableStatus from "./form/EditableStatus"
 import EditableDate from "./form/EditableDate"
+import EditableTags from "./form/EditableTags"
+import SessionPlayButton from "./models/session/SessionPlayButton"
 import Subtasks from "./models/task/Subtasks"
-import {
-	TASK_REMOVED_EVENT,
-	dispatchTaskUpdated,
-	type TaskRemovedEvent,
-} from "@/helpers/taskEvents"
+import { TASK_REMOVED_EVENT, type TaskRemovedEvent } from "@/helpers/taskEvents"
 import { ChevronRight, X } from "lucide-react"
 import {
 	useEffect,
@@ -21,20 +19,14 @@ import {
 } from "react"
 import TaskDeleteButton from "@/components/models/task/TaskDeleteButton"
 import { dateKeyToUtcDate, getUtcDateKey } from "@/helpers/dateOnly"
+import { useTasksStore } from "@/stores/tasks"
+import { useTagsStore } from "@/stores/tags"
 
 type Props = {
 	type: "task"
-	selected: Task
-	selectedId?: never
+	taskId: number
 	setSelected: Dispatch<SetStateAction<any>>
-	onTaskChange?: (task: Task) => void
 }
-// | {
-// 		type: "task"
-// 		selected?: never
-// 		selectedId: number
-// 		setSelected: (id: number) => void
-//   }
 
 type TaskBreadcrumbItem = {
 	type: "area" | "task" | "task-root"
@@ -43,46 +35,42 @@ type TaskBreadcrumbItem = {
 	href: string | null
 }
 
-export default function SideTray({
-	type,
-	selected,
-	// selectedId,
-	setSelected,
-	onTaskChange,
-}: Props) {
+export default function SideTray({ type, taskId, setSelected }: Props) {
+	const task = useTasksStore((state) => state.getTaskById(taskId))
+	const updateTask = useTasksStore((state) => state.updateTask)
+
+	const tags = useTagsStore((state) => state.tags)
+	const loadTags = useTagsStore((state) => state.loadTags)
+
 	const [breadcrumbs, setBreadcrumbs] = useState<TaskBreadcrumbItem[]>([])
 	const [breadcrumbsLoading, setBreadcrumbsLoading] = useState(false)
 	const closeTray = () => setSelected(null)
 
-	// useEffect(() => {
-	// 	if (selectedId && !selected) {
-	// 		// fetch the task by id and set it as selected
-	// 		actions.task.getById({ id: selectedId }).then((task) => {
-	// 			if (task) setSelected(task)
-	// 		})
-	// 	}
-	// }, [selectedId])
+	useEffect(() => {
+		loadTags()
+	}, [])
 
+	// Handle Escape key to close the tray
 	useEffect(() => {
 		const handleKeyDown = (event: KeyboardEvent) => {
 			if (event.key === "Escape") setSelected(null)
 		}
-
 		document.addEventListener("keydown", handleKeyDown)
 		return () => document.removeEventListener("keydown", handleKeyDown)
 	}, [setSelected])
 
+	// Handle task removed event to close the tray if the selected task is removed
 	useEffect(() => {
 		const handleTaskRemoved = (event: Event) => {
 			const { taskIds } = (event as TaskRemovedEvent).detail
-			if (taskIds.includes(selected.id)) setSelected(null)
+			if (taskIds.includes(taskId)) setSelected(null)
 		}
-
 		window.addEventListener(TASK_REMOVED_EVENT, handleTaskRemoved)
 		return () =>
 			window.removeEventListener(TASK_REMOVED_EVENT, handleTaskRemoved)
-	}, [selected.id, setSelected])
+	}, [taskId, setSelected])
 
+	// Load breadcrumbs for the selected task
 	useEffect(() => {
 		let cancelled = false
 
@@ -90,7 +78,7 @@ export default function SideTray({
 		setBreadcrumbsLoading(true)
 
 		actions.task
-			.breadcrumbs({ taskId: selected.id })
+			.breadcrumbs({ taskId })
 			.then((res) => {
 				if (cancelled) return
 				setBreadcrumbs(res.data?.breadcrumbs ?? [])
@@ -107,16 +95,16 @@ export default function SideTray({
 		return () => {
 			cancelled = true
 		}
-	}, [selected.id])
+	}, [taskId])
 
 	const visibleBreadcrumbs = useMemo(
 		() =>
 			breadcrumbs.map((breadcrumb) =>
-				breadcrumb.type === "task" && breadcrumb.id === selected.id
-					? { ...breadcrumb, name: selected.name }
+				breadcrumb.type === "task" && breadcrumb.id === taskId
+					? { ...breadcrumb, name: task?.name || breadcrumb.name }
 					: breadcrumb,
 			),
-		[breadcrumbs, selected.id, selected.name],
+		[breadcrumbs, taskId, task?.name],
 	)
 
 	const openTaskBreadcrumb = async (taskId: number) => {
@@ -124,70 +112,67 @@ export default function SideTray({
 		if (res.data) setSelected(res.data)
 	}
 
-	const applySavedTaskChange = (patch: Partial<Task>) => {
-		const updatedTask = { ...selected, ...patch }
-		setSelected(updatedTask)
-		onTaskChange?.(updatedTask)
-		dispatchTaskUpdated(updatedTask)
+	const saveTaskChange = async (
+		patch: Parameters<typeof actions.task.update>[0],
+	) => {
+		const res = await updateTask(patch.id, patch)
+		if (res === undefined) toast.error("Failed to update task")
+		else toast.success("Task updated successfully")
 	}
 
-	const deadlineValue = selected.deadline
-		? getUtcDateKey(selected.deadline)
-		: null
+	const deadlineValue = task?.deadline ? getUtcDateKey(task.deadline) : null
 
 	return (
 		<>
-			{/* BACKDROP */}
+			{/* Backdrop */}
 			<div
 				className="fixed inset-0 z-40 bg-slate-900/10 backdrop-blur-[2px]"
 				onClick={closeTray}
 				aria-hidden="true"
 			/>
 
-			{/* TRAY */}
+			{/* Tray */}
 			<aside
 				role="dialog"
 				aria-modal="true"
 				aria-labelledby="side-tray-title"
-				className="side-tray fixed bottom-3 right-3 top-3 z-50 flex w-[min(38rem,calc(100vw-1.5rem))] flex-col overflow-hidden rounded-lg border border-gray-300/70 bg-white/70 shadow-2xl shadow-slate-900/15 backdrop-blur-2xl backdrop-saturate-150 sm:bottom-4 sm:right-4 sm:top-4 sm:w-[min(40rem,calc(100vw-2rem))]"
+				className="side-tray fixed bottom-3 right-3 top-3 z-50 flex w-[min(38rem,calc(100vw-1.5rem))] flex-col overflow-hidden rounded-lg bg-white backdrop-blur-2xl backdrop-saturate-150 sm:bottom-4 sm:right-4 sm:top-4 sm:w-[min(40rem,calc(100vw-2rem))]"
 				onClick={(e) => e.stopPropagation()}
 			>
-				<header className="flex items-start justify-between gap-4 border-b border-gray-300/60 bg-white/45 px-5 py-4">
+				<header className="flex items-start justify-between gap-4 border-b border-gray-300/60 px-5 py-4">
 					<div className="min-w-0 flex-1">
 						<p
 							id="side-tray-title"
 							className="sr-only"
 						>
-							Task details for {selected.name}
+							Task details for {task?.name}
 						</p>
 						<TaskBreadcrumbs
 							breadcrumbs={visibleBreadcrumbs}
 							isLoading={breadcrumbsLoading}
 							onTaskSelect={openTaskBreadcrumb}
-							selectedTaskId={selected.id}
+							selectedTaskId={taskId}
 						/>
 						<div className="flex min-w-0 items-center gap-2">
 							<EditableText
-								value={selected.name}
-								onSave={async (name) => {
-									await actions.task.update({
-										id: selected.id,
+								value={task?.name}
+								onSave={(name) =>
+									saveTaskChange({
+										id: task?.id,
 										name,
 									})
-									applySavedTaskChange({ name })
-								}}
-								className="min-h-9 min-w-0 flex-1 rounded-md px-1 py-0.5 text-left text-xl font-semibold leading-tight text-gray-950 transition-colors hover:bg-white/55 hover:no-underline"
-								inputClassName="border-gray-300/80 bg-white/85 shadow-sm"
+								}
+								className="pl-0 text-xl font-semibold leading-tight hover:no-underline"
 							/>
-							<div className="inline-flex size-9 flex-none items-center justify-center rounded-lg border border-gray-300/70 bg-white/65 shadow-sm">
+							<div className="inline-flex size-9 flex-none items-center justify-center">
 								<SessionPlayButton
 									itemType={type}
-									itemId={selected.id}
+									itemId={task?.id}
 								/>
 							</div>
 							<TaskDeleteButton
-								taskId={selected.id}
-								taskName={selected.name}
+								taskId={task?.id}
+								taskName={task?.name}
 								className="size-9 rounded-lg"
 							/>
 						</div>
@@ -211,75 +196,84 @@ export default function SideTray({
 						aria-label="Task details"
 					>
 						<dl className="grid gap-1 text-sm">
-							<div className="grid min-h-8 gap-1 rounded-md bg-white/40 px-2.5 py-1 sm:grid-cols-[7.25rem_minmax(0,1fr)] sm:items-center sm:gap-2">
+							<div className="grid gap-1 sm:grid-cols-[7.25rem_minmax(0,1fr)] sm:items-center sm:gap-2">
 								<dt className="text-xs font-semibold text-gray-500">
 									Status
 								</dt>
-								<dd className="min-w-0 text-gray-900">
+								<dd>
 									<EditableStatus
-										value={selected.status as Status}
-										onSave={async (status) => {
-											await actions.task.update({
-												id: selected.id,
+										value={task?.status as Status}
+										onSave={(status) =>
+											saveTaskChange({
+												id: task?.id,
 												status,
 											})
-											applySavedTaskChange({ status })
-										}}
+										}
 									/>
 								</dd>
 							</div>
 							{/* TODO: hide relevant for Evergreen */}
-							<div className="grid min-h-8 gap-1 rounded-md bg-white/40 px-2.5 py-1 sm:grid-cols-[7.25rem_minmax(0,1fr)] sm:items-center sm:gap-2">
+							<div className="grid gap-1 sm:grid-cols-[7.25rem_minmax(0,1fr)] sm:items-center sm:gap-2">
 								<dt className="text-xs font-semibold text-gray-500">
 									Estimated Time
 								</dt>
-								<dd className="min-w-0 text-gray-900">
+								<dd>
 									<EditableNumber
-										value={selected.estimatedTime}
-										onSave={async (v) => {
-											await actions.task.update({
-												id: selected.id,
+										value={task?.estimatedTime}
+										onSave={(v) =>
+											saveTaskChange({
+												id: task?.id,
 												estimatedTime: v,
 											} as Parameters<
 												typeof actions.task.update
 											>[0] & {
 												estimatedTime: number | null
 											})
-											applySavedTaskChange({
-												estimatedTime: v,
-											})
-										}}
+										}
 									/>
 								</dd>
 							</div>
-							<div className="grid min-h-8 gap-1 rounded-md bg-white/40 px-2.5 py-1 sm:grid-cols-[7.25rem_minmax(0,1fr)] sm:items-center sm:gap-2">
+							<div className="grid gap-1 sm:grid-cols-[7.25rem_minmax(0,1fr)] sm:items-center sm:gap-2">
 								<dt className="text-xs font-semibold text-gray-500">
 									Deadline
 								</dt>
-								<dd className="min-w-0 text-gray-900">
+								<dd>
 									<EditableDate
 										value={deadlineValue}
-										onSave={async (date) => {
-											const d = date
-												? dateKeyToUtcDate(date)
-												: null
-											await actions.task.update({
-												id: selected.id,
-												deadline: d,
+										onSave={(date) =>
+											saveTaskChange({
+												id: task?.id,
+												deadline: date
+													? dateKeyToUtcDate(date)
+													: null,
 											})
-											applySavedTaskChange({
-												deadline: d,
-											})
-										}}
+										}
 									/>
 								</dd>
 							</div>
-							{/* TODO: add tags */}
+							<div className="grid gap-1 sm:grid-cols-[7.25rem_minmax(0,1fr)] sm:items-center sm:gap-2">
+								<dt className="text-xs font-semibold text-gray-500">
+									Tags
+								</dt>
+								<dd>
+									<EditableTags
+										value={task.tags.map((tag) => tag.tag)}
+										tags={tags}
+										onSave={(tags) =>
+											saveTaskChange({
+												id: task?.id,
+												tags: tags.map((tag) => tag.id),
+											})
+										}
+										tagClassName="px-2 py-1"
+									/>
+								</dd>
+							</div>
 						</dl>
 					</section>
 
 					<section>
-						<Subtasks taskId={selected.id} />
+						<Subtasks taskId={task?.id} />
 					</section>
 				</div>
 

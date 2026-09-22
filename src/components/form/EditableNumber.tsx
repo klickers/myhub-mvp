@@ -3,9 +3,11 @@ import { useState } from "react"
 export default function EditableNumber({
 	value,
 	onSave,
+	className,
 }: {
 	value: number | null
 	onSave: (v: number | null) => Promise<void>
+	className?: string
 }) {
 	const [editing, setEditing] = useState(false)
 	const [draft, setDraft] = useState(value?.toString() ?? "")
@@ -27,13 +29,16 @@ export default function EditableNumber({
 	}
 
 	return (
-		<input
-			type="number"
-			className="border-black px-1 py-0 w-12"
-			value={draft}
-			onChange={(e) => setDraft(e.target.value)}
-			onBlur={save}
-			onKeyDown={(e) => e.key === "Enter" && save()}
-		/>
+		<div className="flex items-center gap-0">
+			<input
+				type="number"
+				className={[className].filter(Boolean).join(" ")}
+				value={draft}
+				onChange={(e) => setDraft(e.target.value)}
+				onBlur={save}
+				onKeyDown={(e) => e.key === "Enter" && save()}
+			/>
+			min
+		</div>
 	)
 }

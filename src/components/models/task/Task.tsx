@@ -97,6 +97,7 @@ export default function Task({ tasks, depth = 0, onClick }: Props) {
 										estimatedTime,
 									})
 								}
+								className="px-1 py-0 w-12 bg-transparent"
 							/>
 						</td>
 						<td className="font-mono text-right">
