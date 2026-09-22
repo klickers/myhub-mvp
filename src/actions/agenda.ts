@@ -38,7 +38,11 @@ export const agenda = {
 				},
 				include: {
 					tag: true,
-					task: true,
+					task: {
+						include: {
+							tags: true,
+						},
+					},
 				},
 			})
 		},
@@ -59,7 +63,11 @@ export const agenda = {
 				},
 				include: {
 					tag: true,
-					task: true,
+					task: {
+						include: {
+							tags: true,
+						},
+					},
 				},
 			})
 		},

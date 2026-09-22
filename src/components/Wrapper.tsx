@@ -4,10 +4,13 @@ import WeeklyAgenda from "@/components/models/agenda/WeeklyAgenda"
 import { useAgendaStore } from "@/stores/agenda"
 
 interface Props {
-	tagId: number
+	filter:
+		| { type: "all" }
+		| { type: "tag"; id: number }
+		| { type: "task"; id: number }
 }
 
-export default function Wrapper({ tagId }: Props) {
+export default function Wrapper({ filter }: Props) {
 	const createAgendaItem = useAgendaStore((state) => state.createAgendaItem)
 
 	return (
@@ -23,8 +26,8 @@ export default function Wrapper({ tagId }: Props) {
 				}
 			}}
 		>
-			<WeeklyAgenda />
-			<Tasks filter={{ type: "tag", id: tagId }} />
+			<WeeklyAgenda filter={filter} />
+			<Tasks filter={filter} />
 		</DragDropProvider>
 	)
 }

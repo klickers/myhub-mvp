@@ -2,7 +2,14 @@ import { useEffect } from "react"
 import DayAgenda from "./DayAgenda"
 import { useAgendaStore } from "@/stores/agenda"
 
-export default function WeeklyAgenda() {
+interface Props {
+	filter:
+		| { type: "all" }
+		| { type: "tag"; id: number }
+		| { type: "task"; id: number }
+}
+
+export default function WeeklyAgenda({ filter }: Props) {
 	const loadAgenda = useAgendaStore((state) => state.loadAgenda)
 	const days = useAgendaStore((state) => state.days)
 
@@ -16,6 +23,7 @@ export default function WeeklyAgenda() {
 				<DayAgenda
 					key={index}
 					date={day.date}
+					filter={filter}
 				/>
 			))}
 		</div>

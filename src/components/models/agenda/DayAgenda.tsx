@@ -6,13 +6,30 @@ import { useTasksStore } from "@/stores/tasks"
 
 interface Props {
 	date: Date
+	filter:
+		| { type: "all" }
+		| { type: "tag"; id: number }
+		| { type: "task"; id: number }
 }
 
-export default function DayAgenda({ date }: Props) {
+export default function DayAgenda({ date, filter }: Props) {
 	const agenda = useAgendaStore((state) => state.agenda)
 	const agendaItems = useMemo(() => {
-		return agenda.filter((item) => isSameDay(item.date, date))
-	}, [agenda, date])
+		return agenda.filter((item) => {
+			switch (filter.type) {
+				case "tag":
+					return (
+						isSameDay(item.date, date) &&
+						item.task?.tags.some((tag) => tag.tagId === filter.id)
+					)
+				// case "task":
+				// 	return where one parent task is the filter.id
+				case "all":
+				default:
+					return isSameDay(item.date, date)
+			}
+		})
+	}, [agenda, date, filter])
 
 	const { isDropTarget, ref } = useDroppable({
 		id: date.toISOString(),

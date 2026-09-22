@@ -1,11 +1,11 @@
 ---
 import TasksLayout from "@/layouts/TasksLayout.astro"
-import Tasks from "@/components/models/task/Tasks"
+import Wrapper from "@/components/Wrapper"
 ---
 
 <TasksLayout>
 	<h1>All Tasks</h1>
-	<Tasks
+	<Wrapper
 		client:load
 		filter={{ type: "all" }}
 	/>
