@@ -6,7 +6,7 @@ interface Props {
 }
 
 export default function DayAgenda({ date }: Props) {
-	const { isDropTarget, ref } = useDroppable({ id: "droppable" })
+	const { isDropTarget, ref } = useDroppable({ id: date.toISOString() })
 
 	return (
 		<div>
