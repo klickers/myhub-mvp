@@ -73,7 +73,7 @@ export default function Tasks({ filter, currentTag }: Props) {
 						<th>Deadline</th>
 						<th>Tags</th>
 						{/* Delete */}
-						<th></th>
+						<th className="pr-0"></th>
 					</tr>
 				</thead>
 				<tbody>

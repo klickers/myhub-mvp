@@ -127,7 +127,7 @@ export default function Task({ tasks, depth = 0, onClick }: Props) {
 								}
 							/>
 						</td>
-						<td>
+						<td className="pr-0">
 							<button className="text-red-300 hover:text-red-500">
 								<Icon icon="mingcute:delete-2-fill" />
 							</button>
