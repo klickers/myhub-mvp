@@ -7,6 +7,7 @@ import { useTasksStore } from "@/stores/tasks"
 import { useAgendaStore } from "@/stores/agenda"
 import { toast } from "react-toastify"
 import { actions } from "astro:actions"
+import { useDraggable } from "@dnd-kit/react"
 
 interface Props {
 	item: AgendaWithIncludes
@@ -34,9 +35,14 @@ export default function AgendaItem({ item }: Props) {
 	const [openEditing, setOpenEditing] = useState<boolean>(false)
 	const openSideTray = useTasksStore((state) => state.openSideTray)
 
+	const { ref } = useDraggable({
+		id: item.id,
+		type: "agenda-item",
+	})
+
 	return (
 		<div
-			key={item.id}
+			ref={ref}
 			className={
 				"relative rounded-sm border border-gray-200 bg-gray-50 py-0.5 px-1" +
 				(item.status === "completed"

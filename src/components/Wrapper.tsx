@@ -14,6 +14,7 @@ interface Props {
 
 export default function Wrapper({ filter }: Props) {
 	const createAgendaItem = useAgendaStore((state) => state.createAgendaItem)
+	const updateAgendaItem = useAgendaStore((state) => state.updateAgendaItem)
 	const refetchTaskById = useTasksStore((state) => state.refetchTaskById)
 
 	return (
@@ -21,16 +22,28 @@ export default function Wrapper({ filter }: Props) {
 			onDragEnd={async ({ operation }) => {
 				const { source, target } = operation
 				if (source && target) {
-					const res = await createAgendaItem(
-						target.data.date,
-						source.data.type,
-						source.id as number,
-					)
-					if (res === undefined)
-						toast.error("Failed to add task to agenda")
-					else {
-						refetchTaskById(source.id as number)
-						toast.success("Task added to agenda")
+					let res = undefined
+					if (source.type === "agenda-item") {
+						res = await updateAgendaItem(source.id as number, {
+							id: source.id as number,
+							date: target.data.date,
+						})
+
+						if (res === undefined)
+							toast.error("Failed to move agenda item")
+						else toast.success("Agenda item moved successfully")
+					} else if (source.type === "task") {
+						res = await createAgendaItem(
+							target.data.date,
+							source.data.type,
+							source.id as number,
+						)
+						if (res === undefined)
+							toast.error("Failed to add task to agenda")
+						else {
+							refetchTaskById(source.id as number)
+							toast.success("Task added to agenda")
+						}
 					}
 				}
 			}}
