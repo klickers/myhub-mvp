@@ -96,11 +96,8 @@ export default function Task({ task, depth = 0 }: Props) {
 							itemType="task"
 							itemId={task.id}
 						/>
-						<button
-							className="text-blue-400 hover:text-blue-600"
-							onClick={() => openSideTray(task.id)}
-						>
-							<Icon icon="mingcute:pencil-3-fill" />
+						<button onClick={() => openSideTray(task.id)}>
+							<Icon icon="mingcute:external-link-line" />
 						</button>
 					</span>
 				</td>
