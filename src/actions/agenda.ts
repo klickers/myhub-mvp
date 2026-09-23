@@ -54,9 +54,9 @@ export const agenda = {
 		input: z.object({
 			id: z.coerce.number().int(),
 			date: z.coerce.date().optional(),
-			scheduledTime: z.coerce.number().int().optional().default(0),
-			description: z.string().optional().default(""),
-			status: z.nativeEnum(Status).optional().default(Status.notstarted),
+			scheduledTime: z.coerce.number().int().optional(),
+			description: z.string().optional(),
+			status: z.nativeEnum(Status).optional(),
 		}),
 		handler: async ({ id, ...data }) => {
 			return prisma.agenda.update({
