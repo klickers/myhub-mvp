@@ -75,6 +75,7 @@ export default function WeeklyAgenda({ filter }: Props) {
 						isSameDay(item.date, day.date),
 					)}
 					dropId={`${filter.type}-${day.date.toISOString()}`}
+					addTaskId={filter.type === "task" ? filter.id : undefined}
 				/>
 			))}
 		</div>
