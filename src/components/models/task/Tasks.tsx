@@ -103,13 +103,15 @@ export default function Tasks({ filter }: Props) {
 					)}
 
 					{/* Task rows */}
-					{tasks.map((task) => (
-						<Task
-							key={task.id}
-							task={task}
-							depth={0}
-						/>
-					))}
+					{(filter.type === "task" ? tasks[0].subtasks : tasks).map(
+						(task) => (
+							<Task
+								key={task.id}
+								task={task}
+								depth={0}
+							/>
+						),
+					)}
 				</tbody>
 			</table>
 		</>

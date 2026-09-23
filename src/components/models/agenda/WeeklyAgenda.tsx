@@ -2,8 +2,11 @@ import { useEffect, useMemo } from "react"
 import { isSameDay, isToday } from "date-fns"
 import { useAgendaStore } from "@/stores/agenda"
 import { useTagsStore } from "@/stores/tags"
+import { useTasksStore } from "@/stores/tasks"
 import DayAgenda from "./DayAgenda"
 import DayAgendaHeader from "./DayAgendaHeader"
+import buildTaskTree from "@/helpers/buildTaskTree"
+import type { TaskNode } from "@/types/prisma-custom"
 
 interface Props {
 	filter:
@@ -19,6 +22,9 @@ export default function WeeklyAgenda({ filter }: Props) {
 	const days = useAgendaStore((state) => state.days)
 	const allTags = useTagsStore((state) => state.tags)
 	const loadTags = useTagsStore((state) => state.loadTags)
+
+	const tasks =
+		filter.type === "task" ? useTasksStore((state) => state.tasks) : []
 
 	useEffect(() => {
 		loadAgenda()
@@ -39,6 +45,15 @@ export default function WeeklyAgenda({ filter }: Props) {
 					return item.task?.tags.some(
 						(tag) => tag.tagId === filter.id,
 					)
+				case "task":
+					const isInTree = (task: TaskNode | undefined): boolean => {
+						if (!task) return false
+						if (task.id === item.task?.id) return true
+						return task.subtasks.some(isInTree)
+					}
+					return isInTree(
+						buildTaskTree(tasks, null, filter.id, null)[0],
+					)
 				case "group":
 					return item.task?.tags.some((tag) =>
 						tags.some((groupTag) => groupTag.id === tag.tagId),
@@ -48,7 +63,7 @@ export default function WeeklyAgenda({ filter }: Props) {
 					return true
 			}
 		})
-	}, [agenda, filter])
+	}, [agenda, filter, tasks, tags])
 
 	return filter.type !== "group" ? (
 		<div className="grid grid-cols-7 mb-6 text-xs">
@@ -59,6 +74,7 @@ export default function WeeklyAgenda({ filter }: Props) {
 					items={agendaItems.filter((item) =>
 						isSameDay(item.date, day.date),
 					)}
+					dropId={`${filter.type}-${day.date.toISOString()}`}
 				/>
 			))}
 		</div>

@@ -65,10 +65,7 @@ export default function buildTaskTree(
 	if (taskId !== null) {
 		// Find the task with the given ID
 		const task = map.get(taskId)
-		if (!task) return []
-		return [task.subtasks]
-			.flat()
-			.filter((task) => statusQualifies(task.status))
+		return !task ? [] : [task]
 	}
 
 	return [...map.values()].filter(

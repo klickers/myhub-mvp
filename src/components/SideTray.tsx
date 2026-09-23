@@ -14,6 +14,7 @@ import TrashButton from "@/components/TrashButton"
 import { dateKeyToUtcDate, getUtcDateKey } from "@/helpers/dateOnly"
 import { useTasksStore } from "@/stores/tasks"
 import { useTagsStore } from "@/stores/tags"
+import Wrapper from "./Wrapper"
 
 type TaskBreadcrumbItem = {
 	type: "area" | "task" | "task-root"
@@ -180,10 +181,10 @@ export default function SideTray() {
 					</button>
 				</header>
 
-				<div className="flex-1 overflow-y-auto px-5 py-5">
+				<div className="flex-1 overflow-y-auto px-5 py-5 space-y-5">
 					<section
-						className="mb-4"
 						aria-label="Task details"
+						className="border-b border-gray-200 pb-5"
 					>
 						<dl className="grid gap-1 text-sm">
 							<div className="grid gap-1 sm:grid-cols-[7.25rem_minmax(0,1fr)] sm:items-center sm:gap-2">
@@ -265,12 +266,8 @@ export default function SideTray() {
 						</dl>
 					</section>
 
-					<section
-						className="mt-6"
-						aria-label="Subtasks"
-					>
-						<h2 className="text-lg mb-1">Subtasks</h2>
-						<Tasks filter={{ type: "task", id: task.id }} />
+					<section>
+						<Wrapper filter={{ type: "task", id: task.id }} />
 					</section>
 				</div>
 
