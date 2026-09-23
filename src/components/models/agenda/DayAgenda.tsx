@@ -31,7 +31,7 @@ export default function DayAgenda({ date, items, showHeader = true }: Props) {
 				))}
 				{!isDropTarget && items.length === 0 && (
 					<div className="rounded-sm border border-dashed border-gray-200 py-0.5 px-1 opacity-70">
-						No agenda items yet.
+						No items yet.
 					</div>
 				)}
 				{isDropTarget && (
