@@ -1,14 +1,16 @@
 import { useDroppable } from "@dnd-kit/react"
-import { format, isToday } from "date-fns"
+import { isToday } from "date-fns"
 import AgendaItem from "./AgendaItem"
 import type { AgendaWithIncludes } from "@/types/prisma-custom"
+import DayAgendaHeader from "./DayAgendaHeader"
 
 interface Props {
 	date: Date
 	items: AgendaWithIncludes[]
+	showHeader?: boolean
 }
 
-export default function DayAgenda({ date, items }: Props) {
+export default function DayAgenda({ date, items, showHeader = true }: Props) {
 	const { isDropTarget, ref } = useDroppable({
 		id: date.toISOString(),
 		data: { date },
@@ -17,12 +19,9 @@ export default function DayAgenda({ date, items }: Props) {
 	return (
 		<div
 			ref={ref}
-			className={isToday(date) ? "bg-yellow-100" : ""}
+			className={"p-1 " + (isToday(date) ? "bg-yellow-50" : "")}
 		>
-			<p className="flex gap-1 uppercase">
-				<span className="font-semibold">{format(date, "EEE")}</span>
-				<span>{format(date, "MM/dd")}</span>
-			</p>
+			{showHeader && <DayAgendaHeader date={date} />}
 			<div className="space-y-0.5">
 				{items.map((item) => (
 					<AgendaItem

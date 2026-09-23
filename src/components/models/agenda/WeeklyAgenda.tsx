@@ -1,8 +1,9 @@
 import { useEffect, useMemo } from "react"
-import { isSameDay } from "date-fns"
+import { isSameDay, isToday } from "date-fns"
 import { useAgendaStore } from "@/stores/agenda"
 import { useTagsStore } from "@/stores/tags"
 import DayAgenda from "./DayAgenda"
+import DayAgendaHeader from "./DayAgendaHeader"
 
 interface Props {
 	filter:
@@ -39,7 +40,6 @@ export default function WeeklyAgenda({ filter }: Props) {
 						(tag) => tag.tagId === filter.id,
 					)
 				case "group":
-					console.log("tags", tags)
 					return item.task?.tags.some((tag) =>
 						tags.some((groupTag) => groupTag.id === tag.tagId),
 					)
@@ -50,8 +50,8 @@ export default function WeeklyAgenda({ filter }: Props) {
 		})
 	}, [agenda, filter])
 
-	return (
-		<div className="grid grid-cols-7 gap-2 mb-6 text-xs">
+	return filter.type !== "group" ? (
+		<div className="grid grid-cols-7 mb-6 text-xs">
 			{days.map((day, index) => (
 				<DayAgenda
 					key={index}
@@ -60,6 +60,44 @@ export default function WeeklyAgenda({ filter }: Props) {
 						isSameDay(item.date, day.date),
 					)}
 				/>
+			))}
+		</div>
+	) : (
+		<div className="flex flex-col mb-6">
+			<div className="grid grid-cols-8 text-xs">
+				<div></div>
+				{days.map((day, index) => (
+					<div
+						className={
+							"px-1" + (isToday(day.date) ? " bg-yellow-50" : "")
+						}
+						key={index}
+					>
+						<DayAgendaHeader date={day.date} />
+					</div>
+				))}
+			</div>
+			{tags.map((tag) => (
+				<div
+					key={tag.id}
+					className="grid grid-cols-8 text-xs"
+				>
+					<div className="pr-1">{tag.name}</div>
+					{days.map((day, index) => (
+						<DayAgenda
+							key={index}
+							date={day.date}
+							showHeader={false}
+							items={agendaItems.filter(
+								(item) =>
+									isSameDay(item.date, day.date) &&
+									item.task?.tags.some(
+										(taskTag) => taskTag.tagId === tag.id,
+									),
+							)}
+						/>
+					))}
+				</div>
 			))}
 		</div>
 	)
