@@ -10,7 +10,7 @@ import SessionPlayButton from "./models/session/SessionPlayButton"
 import Tasks from "./models/task/Tasks"
 import { ChevronRight, X } from "lucide-react"
 import { useEffect, useMemo, useState } from "react"
-import TaskDeleteButton from "@/components/models/task/TaskDeleteButton"
+import TrashButton from "@/components/TrashButton"
 import { dateKeyToUtcDate, getUtcDateKey } from "@/helpers/dateOnly"
 import { useTasksStore } from "@/stores/tasks"
 import { useTagsStore } from "@/stores/tags"
@@ -33,6 +33,7 @@ export default function SideTray() {
 	)
 	const updateTask = useTasksStore((state) => state.updateTask)
 	const loadTasks = useTasksStore((state) => state.loadTasks)
+	const removeTask = useTasksStore((state) => state.removeTask)
 
 	const tags = useTagsStore((state) => state.tags)
 	const loadTags = useTagsStore((state) => state.loadTags)
@@ -106,7 +107,14 @@ export default function SideTray() {
 		else toast.success("Task updated successfully")
 	}
 
-	const deadlineValue = task?.deadline ? getUtcDateKey(task.deadline) : null
+	const handleTaskDelete = async (id: number) => {
+		const res = await removeTask(id)
+		if (res === undefined) toast.error("Failed to delete task")
+		else {
+			toast.success("Task deleted successfully")
+			closeSideTray()
+		}
+	}
 
 	if (!selectedTaskId || !isSideTrayOpen || !task) return null
 	return (
@@ -156,12 +164,11 @@ export default function SideTray() {
 									itemType="task"
 									itemId={task.id}
 								/>
+								<TrashButton
+									className="ml-1"
+									onClick={() => handleTaskDelete(task.id)}
+								/>
 							</div>
-							<TaskDeleteButton
-								taskId={task.id}
-								taskName={task.name}
-								className="size-9 rounded-lg"
-							/>
 						</div>
 					</div>
 					<button
@@ -225,7 +232,11 @@ export default function SideTray() {
 								</dt>
 								<dd>
 									<EditableDate
-										value={deadlineValue}
+										value={
+											task?.deadline
+												? getUtcDateKey(task.deadline)
+												: null
+										}
 										onSave={(date) =>
 											saveTaskChange({
 												id: task.id,

@@ -34,6 +34,7 @@ type TasksStore = {
 		parentTaskId?: number | null
 		tags?: number[] | undefined
 	}) => Promise<TaskNode | undefined> // return id
+	removeTask: (id: number) => void
 	updateTask: (
 		id: number,
 		patch: Parameters<typeof actions.task.update>[0],
@@ -169,6 +170,17 @@ export const useTasksStore = create<TasksStore>((set, get) => ({
 			...res.data,
 			subtasks: [],
 		}
+	},
+	removeTask: async (id: number) => {
+		const res = await actions.task.delete({ id })
+		if (res.error) {
+			console.error("Failed to delete task:", res.error)
+			return undefined
+		}
+		set((state) => ({
+			tasks: state.tasks.filter((task) => task.id !== id),
+		}))
+		return res.data
 	},
 	updateTask: async (id, patch) => {
 		const res = await actions.task.update({ ...patch })
