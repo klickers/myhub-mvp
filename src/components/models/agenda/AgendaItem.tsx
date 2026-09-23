@@ -8,6 +8,7 @@ import { useAgendaStore } from "@/stores/agenda"
 import { toast } from "react-toastify"
 import { actions } from "astro:actions"
 import { useDraggable } from "@dnd-kit/react"
+import SessionPlayButton from "../session/SessionPlayButton"
 
 interface Props {
 	item: AgendaWithIncludes
@@ -116,6 +117,12 @@ export default function AgendaItem({ item }: Props) {
 						>
 							<Icon icon="mingcute:check-circle-dash-fill" />
 						</button>
+						{item.task && (
+							<SessionPlayButton
+								itemType="task"
+								itemId={item.task.id}
+							/>
+						)}
 					</div>
 					<TrashButton
 						className=""
