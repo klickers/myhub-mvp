@@ -8,8 +8,8 @@ import EditableDate from "./form/EditableDate"
 import EditableTags from "./form/EditableTags"
 import SessionPlayButton from "./models/session/SessionPlayButton"
 import Tasks from "./models/task/Tasks"
-import { ChevronRight, X } from "lucide-react"
 import { useEffect, useMemo, useState } from "react"
+import { Icon } from "@iconify/react"
 import TrashButton from "@/components/TrashButton"
 import { dateKeyToUtcDate, getUtcDateKey } from "@/helpers/dateOnly"
 import { useTasksStore } from "@/stores/tasks"
@@ -174,13 +174,9 @@ export default function SideTray() {
 					<button
 						type="button"
 						onClick={closeSideTray}
-						className="inline-flex size-9 flex-none items-center justify-center rounded-lg border border-gray-300/70 bg-white/70 p-0 text-gray-600 shadow-sm transition-colors hover:bg-white hover:text-gray-950 focus-visible:outline-none"
 						aria-label="Close task panel"
 					>
-						<X
-							className="size-4"
-							aria-hidden="true"
-						/>
+						<Icon icon="mingcute:close-fill" />
 					</button>
 				</header>
 
@@ -359,7 +355,8 @@ function TaskBreadcrumbs({
 							</span>
 						)}
 						{!isLast && (
-							<ChevronRight
+							<Icon
+								icon="mingcute:right-fill"
 								className="size-3 flex-none text-gray-400"
 								aria-hidden="true"
 							/>
