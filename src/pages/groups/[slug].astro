@@ -1,0 +1,23 @@
+---
+import TasksLayout from "@/layouts/TasksLayout.astro"
+import prisma from "@/helpers/prisma"
+import Wrapper from "@/components/Wrapper"
+
+const group = await prisma.tag.findUnique({
+	where: { slug: Astro.params.slug },
+	include: {
+		children: {
+			orderBy: { order: "asc" },
+		},
+	},
+})
+if (!group) return Astro.redirect("/tasks")
+---
+
+<TasksLayout>
+	<h1>{group.name}</h1>
+	<Wrapper
+		client:load
+		filter={{ type: "group", id: group.id }}
+	/>
+</TasksLayout>

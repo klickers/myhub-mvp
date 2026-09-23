@@ -12,6 +12,7 @@ type TasksFilter =
 	| { type: "untagged" }
 	| { type: "tag"; id: number }
 	| { type: "task"; id: number }
+	| { type: "group"; id: number }
 
 interface Props {
 	filter: TasksFilter
@@ -37,6 +38,7 @@ export default function Tasks({ filter }: Props) {
 			filteredTasks,
 			filter.type === "tag" ? filter.id : null,
 			filter.type === "task" ? filter.id : null,
+			filter.type === "group" ? filter.id : null,
 		)
 	}, [allTasks, filter])
 

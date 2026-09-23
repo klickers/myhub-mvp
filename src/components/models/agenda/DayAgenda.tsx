@@ -1,37 +1,14 @@
-import { useMemo } from "react"
 import { useDroppable } from "@dnd-kit/react"
-import { format, isSameDay, isToday } from "date-fns"
-import { useAgendaStore } from "@/stores/agenda"
+import { format, isToday } from "date-fns"
 import AgendaItem from "./AgendaItem"
+import type { AgendaWithIncludes } from "@/types/prisma-custom"
 
 interface Props {
 	date: Date
-	filter:
-		| { type: "all" }
-		| { type: "tag"; id: number }
-		| { type: "task"; id: number }
+	items: AgendaWithIncludes[]
 }
 
-export default function DayAgenda({ date, filter }: Props) {
-	const agenda = useAgendaStore((state) => state.agenda)
-
-	const agendaItems = useMemo(() => {
-		return agenda.filter((item) => {
-			switch (filter.type) {
-				case "tag":
-					return (
-						isSameDay(item.date, date) &&
-						item.task?.tags.some((tag) => tag.tagId === filter.id)
-					)
-				// case "task":
-				// 	return where one parent task is the filter.id
-				case "all":
-				default:
-					return isSameDay(item.date, date)
-			}
-		})
-	}, [agenda, date, filter])
-
+export default function DayAgenda({ date, items }: Props) {
 	const { isDropTarget, ref } = useDroppable({
 		id: date.toISOString(),
 		data: { date },
@@ -47,13 +24,13 @@ export default function DayAgenda({ date, filter }: Props) {
 				<span>{format(date, "MM/dd")}</span>
 			</p>
 			<div className="space-y-0.5">
-				{agendaItems.map((item) => (
+				{items.map((item) => (
 					<AgendaItem
 						item={item}
 						key={item.id}
 					/>
 				))}
-				{!isDropTarget && agendaItems.length === 0 && (
+				{!isDropTarget && items.length === 0 && (
 					<div className="rounded-sm border border-dashed border-gray-200 bg-gray-50 py-0.5 px-1 opacity-70">
 						No agenda items yet.
 					</div>

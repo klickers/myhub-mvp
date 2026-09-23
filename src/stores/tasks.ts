@@ -76,9 +76,7 @@ export const useTasksStore = create<TasksStore>((set, get) => ({
 		if (get().isLoaded || get().isLoading) return
 		set({ isLoading: true })
 
-		const res = await actions.task.getAll({
-			status: ["notstarted", "inprogress"],
-		})
+		const res = await actions.task.getAll({})
 		if (res.error) {
 			console.error("Failed to load tasks:", res.error)
 			set({ isLoading: false })

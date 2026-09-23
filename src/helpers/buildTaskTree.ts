@@ -12,6 +12,7 @@ export default function buildTaskTree(
 	tasks: TaskWithTags[],
 	tagId: number | null = null,
 	taskId: number | null = null,
+	tagGroupId: number | null = null,
 ): TaskNode[] {
 	const map = new Map<number, TaskNode>()
 
@@ -33,11 +34,17 @@ export default function buildTaskTree(
 		}
 	}
 
-	if (tagId !== null) {
+	if (tagId !== null || tagGroupId !== null) {
 		// Find tasks directly containing this tag
 		const taggedIds = new Set(
 			tasks
-				.filter((task) => task.tags.some((tag) => tag.tagId === tagId))
+				.filter((task) =>
+					task.tags.some((tag) =>
+						tagId !== null
+							? tag.tagId === tagId
+							: tag.tag.parentId === tagGroupId,
+					),
+				)
 				.map((task) => task.id),
 		)
 

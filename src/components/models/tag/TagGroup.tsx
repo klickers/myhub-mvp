@@ -11,7 +11,12 @@ export default function TagGroup({ group }: { group: Tag | TagWithChildren }) {
 	return (
 		<div>
 			<div className="flex items-center gap-1 w-full">
-				<span className="text-sm font-medium">{group.name}</span>
+				<a
+					href={`/groups/${group.slug}`}
+					className="text-sm font-medium"
+				>
+					{group.name}
+				</a>
 				<button onClick={() => setShowInput(!showInput)}>
 					{showInput ? (
 						<Icon icon="mingcute:minimize-fill" />

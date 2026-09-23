@@ -11,6 +11,7 @@ interface Props {
 		| { type: "all" }
 		| { type: "tag"; id: number }
 		| { type: "task"; id: number }
+		| { type: "group"; id: number }
 }
 
 export default function Wrapper({ filter }: Props) {
