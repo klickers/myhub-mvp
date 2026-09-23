@@ -57,12 +57,12 @@ export default function AgendaItem({ item }: Props) {
 		<div
 			ref={ref}
 			className={
-				"relative rounded-sm border border-gray-200 bg-gray-50 py-0.5 px-1" +
+				"relative rounded-sm border py-0.5 px-1" +
 				(item.status === "completed"
 					? " border-green-200 bg-green-50"
 					: item.status === "inprogress"
-						? " border-yellow-200 bg-yellow-50"
-						: "")
+						? " border-amber-200 bg-amber-50"
+						: " border-gray-200 bg-gray-50")
 			}
 		>
 			<button
