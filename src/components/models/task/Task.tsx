@@ -23,6 +23,7 @@ interface Props {
 
 export default function Task({ task, depth = 0 }: Props) {
 	const updateTask = useTasksStore((state) => state.updateTask)
+	const removeTask = useTasksStore((state) => state.removeTask)
 	const [addTaskParentId, setAddTaskParentId] = React.useState<number | null>(
 		null,
 	)
@@ -33,6 +34,11 @@ export default function Task({ task, depth = 0 }: Props) {
 		const res = await updateTask(patch.id, patch)
 		if (res === undefined) toast.error("Failed to update task")
 		else toast.success("Task updated successfully")
+	}
+	const handleTaskDelete = async (id: number) => {
+		const res = await removeTask(id)
+		if (res === undefined) toast.error("Failed to delete task")
+		else toast.success("Task deleted successfully")
 	}
 
 	const tags = useTagsStore((state) => state.tags)
@@ -150,7 +156,7 @@ export default function Task({ task, depth = 0 }: Props) {
 					/>
 				</td>
 				<td className="pr-0">
-					<TrashButton />
+					<TrashButton onClick={() => handleTaskDelete(task.id)} />
 				</td>
 				<button
 					className="button-add-subtask"
