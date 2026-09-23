@@ -99,7 +99,12 @@ export default function WeeklyAgenda({ filter }: Props) {
 					key={tag.id}
 					className="grid grid-cols-8 text-xs"
 				>
-					<div className="pr-1">{tag.name}</div>
+					<a
+						href={`/tags/${tag.slug}`}
+						className="pr-1 cursor-pointer hover:underline"
+					>
+						{tag.name}
+					</a>
 					{days.map((day, index) => (
 						<DayAgenda
 							key={index}
