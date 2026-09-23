@@ -15,7 +15,7 @@ if (!group) return Astro.redirect("/tasks")
 ---
 
 <Layout>
-	<h1>Agenda: {group.name}</h1>
+	<h1>Agenda</h1>
 	<WeeklyAgenda
 		client:load
 		filter={{ type: "group", id: group.id }}
