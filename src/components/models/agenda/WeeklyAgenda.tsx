@@ -87,6 +87,7 @@ export default function WeeklyAgenda({ filter }: Props) {
 						<DayAgenda
 							key={index}
 							date={day.date}
+							dropId={`tag-${tag.id}-${day.date.toISOString()}`}
 							showHeader={false}
 							items={agendaItems.filter(
 								(item) =>

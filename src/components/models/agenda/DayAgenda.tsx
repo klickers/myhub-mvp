@@ -7,12 +7,18 @@ import DayAgendaHeader from "./DayAgendaHeader"
 interface Props {
 	date: Date
 	items: AgendaWithIncludes[]
+	dropId?: string
 	showHeader?: boolean
 }
 
-export default function DayAgenda({ date, items, showHeader = true }: Props) {
+export default function DayAgenda({
+	date,
+	items,
+	dropId = date.toISOString(),
+	showHeader = true,
+}: Props) {
 	const { isDropTarget, ref } = useDroppable({
-		id: date.toISOString(),
+		id: dropId,
 		data: { date },
 	})
 

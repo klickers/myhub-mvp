@@ -12,9 +12,10 @@ interface Props {
 		| { type: "tag"; id: number }
 		| { type: "task"; id: number }
 		| { type: "group"; id: number }
+	showTasks?: boolean
 }
 
-export default function Wrapper({ filter }: Props) {
+export default function Wrapper({ filter, showTasks = true }: Props) {
 	const createAgendaItem = useAgendaStore((state) => state.createAgendaItem)
 	const updateAgendaItem = useAgendaStore((state) => state.updateAgendaItem)
 	const refetchTaskById = useTasksStore((state) => state.refetchTaskById)
@@ -60,7 +61,7 @@ export default function Wrapper({ filter }: Props) {
 			}}
 		>
 			<WeeklyAgenda filter={filter} />
-			<Tasks filter={filter} />
+			{showTasks && <Tasks filter={filter} />}
 		</DragDropProvider>
 	)
 }

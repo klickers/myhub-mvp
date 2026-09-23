@@ -1,7 +1,7 @@
 ---
 import Layout from "@/layouts/Layout.astro"
 import prisma from "@/helpers/prisma"
-import WeeklyAgenda from "@/components/models/agenda/WeeklyAgenda"
+import Wrapper from "@/components/Wrapper"
 
 const group = await prisma.tag.findUnique({
 	where: { slug: import.meta.env.AGENDA_DEFAULT_GROUP_SLUG },
@@ -16,8 +16,9 @@ if (!group) return Astro.redirect("/tasks")
 
 <Layout>
 	<h1>Agenda</h1>
-	<WeeklyAgenda
+	<Wrapper
 		client:load
 		filter={{ type: "group", id: group.id }}
+		showTasks={false}
 	/>
 </Layout>
