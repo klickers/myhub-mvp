@@ -1,13 +1,14 @@
 import { defineAction } from "astro:actions"
 import { z } from "zod"
 import prisma from "@/helpers/prisma"
+import { Status } from "@/generated/prisma/browser"
 
 const agendaInput = z
 	.object({
 		date: z.coerce.date(),
 		scheduledTime: z.coerce.number().int().optional().default(0),
 		description: z.string().optional().default(""),
-		// status: z.string().optional().default("notstarted"),
+		status: z.nativeEnum(Status).optional().default(Status.notstarted),
 		tagId: z.coerce.number().int().nullable().optional(),
 		taskId: z.coerce.number().int().nullable().optional(),
 	})
@@ -33,6 +34,7 @@ export const agenda = {
 					date: input.date,
 					scheduledTime: input.scheduledTime,
 					description: input.description,
+					status: input.status,
 					tagId: input.tagId ?? undefined,
 					taskId: input.taskId ?? undefined,
 				},
@@ -54,7 +56,7 @@ export const agenda = {
 			date: z.coerce.date().optional(),
 			scheduledTime: z.coerce.number().int().optional().default(0),
 			description: z.string().optional().default(""),
-			// status: z.string().optional().default("notstarted"),
+			status: z.nativeEnum(Status).optional().default(Status.notstarted),
 		}),
 		handler: async ({ id, ...data }) => {
 			return prisma.agenda.update({

@@ -31,6 +31,15 @@ export default function AgendaItem({ item }: Props) {
 		else toast.success("Agenda item removed successfully")
 		refreshTaskById(taskId)
 	}
+	const handleAgendaItemStatusChange = async (
+		status: "notstarted" | "inprogress" | "completed",
+	) => {
+		const res = await updateAgendaItem(item.id, { id: item.id, status })
+		if (res === undefined)
+			toast.error("Failed to update agenda item status")
+		else toast.success("Agenda item status updated successfully")
+		// refreshTaskById(taskId)
+	}
 
 	const [openEditing, setOpenEditing] = useState<boolean>(false)
 	const openSideTray = useTasksStore((state) => state.openSideTray)
@@ -50,7 +59,9 @@ export default function AgendaItem({ item }: Props) {
 				"relative rounded-sm border border-gray-200 bg-gray-50 py-0.5 px-1" +
 				(item.status === "completed"
 					? " border-green-200 bg-green-50"
-					: "")
+					: item.status === "inprogress"
+						? " border-yellow-200 bg-yellow-50"
+						: "")
 			}
 		>
 			<button
@@ -79,12 +90,40 @@ export default function AgendaItem({ item }: Props) {
 				/>
 			)}
 			{openEditing && (
-				<TrashButton
-					className="absolute bottom-0.5 right-0.5"
-					onClick={() =>
-						handleAgendaItemRemoval(item.id, item.task?.id ?? 0)
-					}
-				/>
+				<div className="flex gap-1 justify-between mt-0.5">
+					<div className="flex gap-0.5">
+						<button
+							className="text-gray-400 hover:text-gray-600"
+							onClick={() =>
+								handleAgendaItemStatusChange("notstarted")
+							}
+						>
+							<Icon icon="mingcute:circle-dash-fill" />
+						</button>
+						<button
+							className="text-yellow-400 hover:text-yellow-600"
+							onClick={() =>
+								handleAgendaItemStatusChange("inprogress")
+							}
+						>
+							<Icon icon="mingcute:semicircle-dash-fill" />
+						</button>
+						<button
+							className="text-green-400 hover:text-green-600"
+							onClick={() =>
+								handleAgendaItemStatusChange("completed")
+							}
+						>
+							<Icon icon="mingcute:check-circle-dash-fill" />
+						</button>
+					</div>
+					<TrashButton
+						className=""
+						onClick={() =>
+							handleAgendaItemRemoval(item.id, item.task?.id ?? 0)
+						}
+					/>
+				</div>
 			)}
 		</div>
 	)
