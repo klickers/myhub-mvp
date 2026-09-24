@@ -117,7 +117,10 @@ export default function SideTray() {
 		}
 	}
 
-	if (!selectedTaskId || !isSideTrayOpen || !task) return null
+	if (!selectedTaskId || !isSideTrayOpen || !task) {
+		closeSideTray()
+		return null
+	}
 	return (
 		<>
 			{/* Backdrop */}
