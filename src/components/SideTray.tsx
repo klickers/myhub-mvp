@@ -161,7 +161,8 @@ export default function SideTray() {
 										name,
 									})
 								}
-								className="pl-0 text-xl font-semibold leading-tight hover:no-underline"
+								className="w-full pl-0 text-xl font-semibold leading-tight hover:no-underline"
+								inputClassName="w-full"
 							/>
 							<div className="inline-flex size-9 flex-none items-center justify-center">
 								<SessionPlayButton

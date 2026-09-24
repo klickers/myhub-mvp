@@ -10,6 +10,7 @@ import EditableDate from "@/components/form/EditableDate"
 import TrashButton from "@/components/TrashButton"
 import { dateKeyToUtcDate, getUtcDateKey } from "@/helpers/dateOnly"
 import SessionPlayButton from "../session/SessionPlayButton"
+import SideTrayOpenButton from "@/components/SideTrayOpenButton"
 import EditableTags from "@/components/form/EditableTags"
 import CreateTaskForm from "./CreateTaskForm"
 import { useTasksStore } from "@/stores/tasks"
@@ -75,7 +76,7 @@ export default function Task({ task, depth = 0 }: Props) {
 			<tr
 				ref={ref}
 				className={
-					"task border-b border-gray-200" +
+					"task border-b border-b-gray-200" +
 					(task.status === "inprogress"
 						? " bg-yellow-50 hover:bg-yellow-100"
 						: task.status === "completed"
@@ -85,7 +86,8 @@ export default function Task({ task, depth = 0 }: Props) {
 			>
 				<td
 					className={
-						"max-w-[400px]" + (depth == 0 ? " font-medium" : "")
+						"flex items-center gap-1 max-w-[400px]" +
+						(depth == 0 || task.isEvergreen ? " font-medium" : "")
 					}
 					style={{ paddingLeft: depth + "rem" }}
 				>
@@ -93,6 +95,12 @@ export default function Task({ task, depth = 0 }: Props) {
 						value={task.name}
 						onSave={(name) => saveTaskChange({ id: task.id, name })}
 					/>
+					{task.isEvergreen && (
+						<Icon
+							icon="mingcute:tree-fill"
+							className="text-green-700 opacity-60"
+						/>
+					)}
 				</td>
 				<td>
 					<span className="flex items-center gap-1">
@@ -103,9 +111,9 @@ export default function Task({ task, depth = 0 }: Props) {
 							itemType="task"
 							itemId={task.id}
 						/>
-						<button onClick={() => openSideTray(task.id)}>
-							<Icon icon="mingcute:external-link-line" />
-						</button>
+						<SideTrayOpenButton
+							onClick={() => openSideTray(task.id)}
+						/>
 					</span>
 				</td>
 				<td>
@@ -118,30 +126,35 @@ export default function Task({ task, depth = 0 }: Props) {
 					/>
 				</td>
 				<td className="font-mono text-right">
-					{/* TODO: hide if evergreen */}
-					<EditableNumber
-						value={task.estimatedTime}
-						onSave={(estimatedTime) =>
-							saveTaskChange({
-								id: task.id,
-								estimatedTime,
-							})
-						}
-						className="px-1 py-0 w-12 bg-transparent"
-					/>
+					{!task.isEvergreen && (
+						<EditableNumber
+							value={task.estimatedTime}
+							onSave={(estimatedTime) =>
+								saveTaskChange({
+									id: task.id,
+									estimatedTime,
+								})
+							}
+							className="px-1 py-0 w-12 bg-transparent"
+						/>
+					)}
 				</td>
 				<td className="font-mono text-right">
-					<EditableDate
-						value={task.deadline && getUtcDateKey(task.deadline)}
-						onSave={(deadline) =>
-							saveTaskChange({
-								id: task.id,
-								deadline: deadline
-									? dateKeyToUtcDate(deadline)
-									: null,
-							})
-						}
-					/>
+					{!task.isEvergreen && (
+						<EditableDate
+							value={
+								task.deadline && getUtcDateKey(task.deadline)
+							}
+							onSave={(deadline) =>
+								saveTaskChange({
+									id: task.id,
+									deadline: deadline
+										? dateKeyToUtcDate(deadline)
+										: null,
+								})
+							}
+						/>
+					)}
 				</td>
 				<td>
 					<EditableTags

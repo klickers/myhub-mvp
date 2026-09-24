@@ -9,6 +9,7 @@ import { toast } from "react-toastify"
 import { actions } from "astro:actions"
 import { useDraggable } from "@dnd-kit/react"
 import SessionPlayButton from "../session/SessionPlayButton"
+import SideTrayOpenButton from "@/components/SideTrayOpenButton"
 
 interface Props {
 	item: AgendaWithIncludes
@@ -65,12 +66,10 @@ export default function AgendaItem({ item }: Props) {
 						: " border-gray-200 bg-gray-50")
 			}
 		>
-			<button
+			<SideTrayOpenButton
 				onClick={() => item.task && openSideTray(item.task.id)}
 				className="absolute right-0.5 top-0.5 text-xs text-gray-500 hover:text-gray-800"
-			>
-				<Icon icon="mingcute:external-link-line" />
-			</button>
+			/>
 			<span
 				className="cursor-pointer"
 				onClick={() => setOpenEditing(!openEditing)}

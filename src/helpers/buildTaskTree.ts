@@ -30,6 +30,9 @@ export default function buildTaskTree(
 		const parent = map.get(task.parentTaskId)
 		if (parent && statusQualifies(task.status)) {
 			parent.subtasks.push(task)
+			parent.subtasks.sort((a, b) =>
+				a.isEvergreen === b.isEvergreen ? 0 : a.isEvergreen ? -1 : 1,
+			)
 			parent.agendas.push(...task.agendas)
 		}
 	}
@@ -60,15 +63,33 @@ export default function buildTaskTree(
 			})
 			.map((id) => map.get(id)!)
 			.filter((task) => statusQualifies(task.status))
+			.sort((a, b) =>
+				a.isEvergreen === b.isEvergreen ? 0 : a.isEvergreen ? -1 : 1,
+			)
 	}
 
 	if (taskId !== null) {
 		// Find the task with the given ID
 		const task = map.get(taskId)
-		return !task ? [] : [task]
+		return !task
+			? []
+			: [
+					{
+						...task,
+						subtasks: task.subtasks.sort((a, b) =>
+							a.isEvergreen === b.isEvergreen
+								? 0
+								: a.isEvergreen
+									? -1
+									: 1,
+						),
+					},
+				]
 	}
 
-	return [...map.values()].filter(
-		(task) => !task.parentTaskId && statusQualifies(task.status),
-	)
+	return [...map.values()]
+		.filter((task) => !task.parentTaskId && statusQualifies(task.status))
+		.sort((a, b) =>
+			a.isEvergreen === b.isEvergreen ? 0 : a.isEvergreen ? -1 : 1,
+		)
 }
