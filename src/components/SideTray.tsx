@@ -12,6 +12,7 @@ import { useEffect, useMemo, useState } from "react"
 import { Icon } from "@iconify/react"
 import TrashButton from "@/components/TrashButton"
 import { dateKeyToUtcDate, getUtcDateKey } from "@/helpers/dateOnly"
+import saveTaskChange from "@/helpers/saveTaskChange"
 import { useTasksStore } from "@/stores/tasks"
 import { useTagsStore } from "@/stores/tags"
 import Wrapper from "./Wrapper"
@@ -98,14 +99,6 @@ export default function SideTray() {
 	const openTaskBreadcrumb = async (taskId: number) => {
 		const res = await actions.task.getById({ id: taskId })
 		if (res.data) setSelectedTaskId(res.data.id)
-	}
-
-	const saveTaskChange = async (
-		patch: Parameters<typeof actions.task.update>[0],
-	) => {
-		const res = await updateTask(patch.id, patch)
-		if (res === undefined) toast.error("Failed to update task")
-		else toast.success("Task updated successfully")
 	}
 
 	const handleTaskDelete = async (id: number) => {

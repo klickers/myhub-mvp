@@ -1,7 +1,7 @@
 import React from "react"
 import { Icon } from "@iconify/react"
 import { toast } from "react-toastify"
-import { actions } from "astro:actions"
+import saveTaskChange from "@/helpers/saveTaskChange"
 import type { TaskNode } from "@/types/prisma-custom"
 import EditableText from "@/components/form/EditableText"
 import EditableStatus from "@/components/form/EditableStatus"
@@ -29,13 +29,6 @@ export default function Task({ task, depth = 0 }: Props) {
 		null,
 	)
 	const openSideTray = useTasksStore((state) => state.openSideTray)
-	const saveTaskChange = async (
-		patch: Parameters<typeof actions.task.update>[0],
-	) => {
-		const res = await updateTask(patch.id, patch)
-		if (res === undefined) toast.error("Failed to update task")
-		else toast.success("Task updated successfully")
-	}
 	const handleTaskDelete = async (id: number) => {
 		const res = await removeTask(id)
 		if (res === undefined) toast.error("Failed to delete task")
