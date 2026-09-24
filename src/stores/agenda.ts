@@ -1,16 +1,18 @@
 import { create } from "zustand"
 import { actions } from "astro:actions"
-import { startOfWeek, addDays } from "date-fns"
+import { startOfWeek, addDays, format } from "date-fns"
 import type { AgendaWithIncludes } from "@/types/prisma-custom"
 
 type AgendaStore = {
-	agenda: AgendaWithIncludes[]
-	isLoading: boolean
-	isLoaded: boolean
+	agendaByWeek: Record<string, AgendaWithIncludes[]>
+	loadingWeeks: Record<string, boolean>
+	daysByWeek: Record<string, { date: Date; tasks: AgendaWithIncludes[] }[]>
 
-	days: { date: Date; tasks: any[] }[]
+	// setting
+	loadAgendaWeek: (dayInWeek?: Date) => Promise<void>
 
-	loadAgenda: () => void
+	// getting
+	getWeekKey: (dayInWeek?: Date) => string
 
 	// updating
 	createAgendaItem: (
@@ -26,25 +28,25 @@ type AgendaStore = {
 }
 
 export const useAgendaStore = create<AgendaStore>((set, get) => ({
-	agenda: [],
-	isLoading: false,
-	isLoaded: false,
+	agendaByWeek: {},
+	loadingWeeks: {},
+	daysByWeek: {},
 
-	days: [],
-
-	loadAgenda: async () => {
-		if (get().isLoaded || get().isLoading) return
-		set({ isLoading: true })
-
-		// initialize the week
+	loadAgendaWeek: async (dayInWeek = new Date()) => {
+		// check if week loaded
 		const days = [],
-			sun = startOfWeek(new Date())
+			sun = startOfWeek(dayInWeek, { weekStartsOn: 0 }),
+			weekKey = format(sun, "yyyy-MM-dd")
+		if (get().loadingWeeks[weekKey] || get().agendaByWeek[weekKey]) return
+		set({ loadingWeeks: { ...get().loadingWeeks, [weekKey]: true } })
+
+		// initialize week
 		for (let i = 0; i < 7; i++)
 			days.push({
 				date: addDays(sun, i),
 				tasks: [],
 			})
-		set({ days })
+		set({ daysByWeek: { ...get().daysByWeek, [weekKey]: days } })
 
 		const res = await actions.agenda.getBetweenRange({
 			start: days[0].date,
@@ -52,14 +54,20 @@ export const useAgendaStore = create<AgendaStore>((set, get) => ({
 		})
 		if (res.error) {
 			console.error("Failed to load agenda items:", res.error)
-			set({ isLoading: false })
 			return
 		}
-		set({
-			agenda: res.data ?? [],
-			isLoaded: true,
-			isLoading: false,
-		})
+		set((state) => ({
+			agendaByWeek: { ...state.agendaByWeek, [weekKey]: res.data ?? [] },
+			loadingWeeks: { ...state.loadingWeeks, [weekKey]: false },
+		}))
+	},
+
+	// ===================================
+	// Getting
+	// ===================================
+	getWeekKey: (dayInWeek = new Date()) => {
+		const sun = startOfWeek(dayInWeek, { weekStartsOn: 0 })
+		return format(sun, "yyyy-MM-dd")
 	},
 
 	// ===================================
@@ -75,8 +83,15 @@ export const useAgendaStore = create<AgendaStore>((set, get) => ({
 			console.error("Failed to create agenda item:", res.error)
 			return undefined
 		}
+		const weekKey = get().getWeekKey(date)
 		set((state) => ({
-			agenda: [...state.agenda, res.data as AgendaWithIncludes],
+			agendaByWeek: {
+				...state.agendaByWeek,
+				[weekKey]: [
+					...state.agendaByWeek[weekKey],
+					res.data as AgendaWithIncludes,
+				],
+			},
 		}))
 		return res.data
 	},
@@ -86,10 +101,14 @@ export const useAgendaStore = create<AgendaStore>((set, get) => ({
 			console.error("Failed to update agenda item:", res.error)
 			return undefined
 		}
+		const weekKey = get().getWeekKey(res.data.date)
 		set((state) => ({
-			agenda: state.agenda.map((agenda) =>
-				agenda.id === id ? { ...agenda, ...res.data } : agenda,
-			),
+			agendaByWeek: {
+				...state.agendaByWeek,
+				[weekKey]: state.agendaByWeek[weekKey].map((agenda) =>
+					agenda.id === id ? { ...agenda, ...res.data } : agenda,
+				),
+			},
 		}))
 		return res.data
 	},
@@ -99,8 +118,14 @@ export const useAgendaStore = create<AgendaStore>((set, get) => ({
 			console.error("Failed to delete agenda item:", res.error)
 			return undefined
 		}
+		const weekKey = get().getWeekKey(res.data.date)
 		set((state) => ({
-			agenda: state.agenda.filter((agenda) => agenda.id !== id),
+			agendaByWeek: {
+				...state.agendaByWeek,
+				[weekKey]: state.agendaByWeek[weekKey].filter(
+					(agenda) => agenda.id !== id,
+				),
+			},
 		}))
 		return res.data
 	},

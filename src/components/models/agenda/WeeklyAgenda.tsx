@@ -9,6 +9,7 @@ import buildTaskTree from "@/helpers/buildTaskTree"
 import type { TaskNode } from "@/types/prisma-custom"
 
 interface Props {
+	date?: Date
 	filter:
 		| { type: "all" }
 		| { type: "tag"; id: number }
@@ -16,20 +17,29 @@ interface Props {
 		| { type: "group"; id: number }
 }
 
-export default function WeeklyAgenda({ filter }: Props) {
-	const agenda = useAgendaStore((state) => state.agenda)
-	const loadAgenda = useAgendaStore((state) => state.loadAgenda)
-	const days = useAgendaStore((state) => state.days)
+export default function WeeklyAgenda({ date = new Date(), filter }: Props) {
+	const getWeekKey = useAgendaStore((state) => state.getWeekKey)
+	const loadAgendaWeek = useAgendaStore((state) => state.loadAgendaWeek)
+	const agendaByWeek = useAgendaStore((state) => state.agendaByWeek)
+	const daysByWeek = useAgendaStore((state) => state.daysByWeek)
 	const allTags = useTagsStore((state) => state.tags)
 	const loadTags = useTagsStore((state) => state.loadTags)
-
 	const tasks =
 		filter.type === "task" ? useTasksStore((state) => state.tasks) : []
 
 	useEffect(() => {
-		loadAgenda()
+		loadAgendaWeek(date)
 		loadTags()
-	}, [])
+	}, [date, loadAgendaWeek, loadTags])
+
+	const weekKey = useMemo(() => getWeekKey(date), [getWeekKey, date])
+
+	const agenda = useMemo(
+		() => agendaByWeek[weekKey] ?? [],
+		[agendaByWeek, weekKey],
+	)
+
+	const days = useMemo(() => daysByWeek[weekKey] ?? [], [daysByWeek, weekKey])
 
 	const tags = useMemo(() => {
 		if (filter.type !== "group") return []
