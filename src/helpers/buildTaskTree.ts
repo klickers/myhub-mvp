@@ -20,13 +20,15 @@ export default function buildTaskTree(
 	for (const task of tasks) {
 		map.set(task.id, {
 			...task,
+			agendas: [...task.agendas],
+			tags: [...task.tags],
 			subtasks: [],
 		})
 	}
 
 	// Connect all valid tasks to their parents
 	for (const task of map.values()) {
-		if (!task.parentTaskId) continue
+		if (!task.parentTaskId || task.parentTaskId === task.id) continue
 		const parent = map.get(task.parentTaskId)
 		if (parent && statusQualifies(task.status)) {
 			parent.subtasks.push(task)

@@ -36,7 +36,12 @@ export default function WeeklyAgenda({ filter }: Props) {
 		return allTags
 			.flatMap((t) => t.children)
 			.filter((tag) => tag.parentId === filter.id)
-	}, [allTags, filter.type])
+	}, [allTags, filter.type, filter.id])
+
+	const taskTree = useMemo(() => {
+		if (filter.type !== "task") return undefined
+		return buildTaskTree(tasks, null, filter.id, null)[0]
+	}, [filter.type, filter.id, tasks])
 
 	const agendaItems = useMemo(() => {
 		return agenda.filter((item) => {
@@ -51,9 +56,7 @@ export default function WeeklyAgenda({ filter }: Props) {
 						if (task.id === item.task?.id) return true
 						return task.subtasks.some(isInTree)
 					}
-					return isInTree(
-						buildTaskTree(tasks, null, filter.id, null)[0],
-					)
+					return isInTree(taskTree)
 				case "group":
 					return item.task?.tags.some((tag) =>
 						tags.some((groupTag) => groupTag.id === tag.tagId),
@@ -63,7 +66,7 @@ export default function WeeklyAgenda({ filter }: Props) {
 					return true
 			}
 		})
-	}, [agenda, filter, tasks, tags])
+	}, [agenda, filter, tags, taskTree])
 
 	return filter.type !== "group" ? (
 		<div className="grid grid-cols-7 mb-6 text-xs">
