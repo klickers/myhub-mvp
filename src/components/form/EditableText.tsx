@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react"
+import TextareaAutosize from "react-textarea-autosize"
 
 export default function EditableText({
 	value,
@@ -13,7 +14,7 @@ export default function EditableText({
 }) {
 	const [editing, setEditing] = useState(false)
 	const [draft, setDraft] = useState(value)
-	const ref = useRef<HTMLInputElement | null>(null)
+	const ref = useRef<HTMLTextAreaElement | null>(null)
 	const skipNextBlurSave = useRef(false)
 
 	useEffect(() => {
@@ -62,7 +63,7 @@ export default function EditableText({
 	}
 
 	return (
-		<input
+		<TextareaAutosize
 			ref={ref}
 			value={draft}
 			onChange={(e) => setDraft(e.target.value)}
@@ -78,6 +79,7 @@ export default function EditableText({
 			]
 				.filter(Boolean)
 				.join(" ")}
+			minRows={1}
 		/>
 	)
 }
