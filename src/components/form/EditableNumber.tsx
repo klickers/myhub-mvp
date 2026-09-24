@@ -4,10 +4,12 @@ export default function EditableNumber({
 	value,
 	onSave,
 	className,
+	inputClassName,
 }: {
 	value: number | null
 	onSave: (v: number | null) => Promise<void>
 	className?: string
+	inputClassName?: string
 }) {
 	const [editing, setEditing] = useState(false)
 	const [draft, setDraft] = useState(value?.toString() ?? "")
@@ -21,7 +23,12 @@ export default function EditableNumber({
 		return (
 			<button
 				onClick={() => setEditing(true)}
-				className="border border-transparent hover:underline"
+				className={[
+					"border border-transparent hover:underline",
+					className ?? "",
+				]
+					.filter(Boolean)
+					.join(" ")}
 			>
 				{value ?? "—"}min
 			</button>
@@ -32,7 +39,7 @@ export default function EditableNumber({
 		<div className="flex items-center gap-0">
 			<input
 				type="number"
-				className={[className].filter(Boolean).join(" ")}
+				className={[inputClassName].filter(Boolean).join(" ")}
 				value={draft}
 				onChange={(e) => setDraft(e.target.value)}
 				onBlur={save}

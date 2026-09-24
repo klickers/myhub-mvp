@@ -13,7 +13,7 @@ export default function EditableStatus({
 		<select
 			value={value}
 			onChange={(e) => onSave(e.target.value as Status)}
-			className={["", className ?? ""].filter(Boolean).join(" ")}
+			className={["text-sm", className ?? ""].filter(Boolean).join(" ")}
 		>
 			<option value="notstarted">Not started</option>
 			<option value="inprogress">In progress</option>

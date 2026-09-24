@@ -6,6 +6,7 @@ import EditableNumber from "./form/EditableNumber"
 import EditableStatus from "./form/EditableStatus"
 import EditableDate from "./form/EditableDate"
 import EditableTags from "./form/EditableTags"
+import EditableBoolean from "./form/EditableBoolean"
 import SessionPlayButton from "./models/session/SessionPlayButton"
 import { useEffect, useMemo, useState } from "react"
 import { Icon } from "@iconify/react"
@@ -188,80 +189,116 @@ export default function SideTray() {
 						aria-label="Task details"
 						className="border-b border-gray-200 pb-5"
 					>
-						<dl className="grid gap-1 text-sm">
-							<div className="grid gap-1 sm:grid-cols-[7.25rem_minmax(0,1fr)] sm:items-center sm:gap-2">
-								<dt className="text-xs font-semibold text-gray-500">
-									Status
-								</dt>
-								<dd>
-									<EditableStatus
-										value={task.status as Status}
-										onSave={(status) =>
-											saveTaskChange({
-												id: task.id,
-												status,
-											})
-										}
-									/>
-								</dd>
+						<dl className="grid grid-cols-2 gap-6 items-start text-sm">
+							<div className="space-y-1 sm:space-y-2">
+								<div className="grid gap-1 sm:grid-cols-[7.25rem_minmax(0,1fr)] sm:items-center sm:gap-2">
+									<dt className="text-xs font-semibold text-gray-500">
+										Status
+									</dt>
+									<dd>
+										<EditableStatus
+											value={task.status as Status}
+											onSave={(status) =>
+												saveTaskChange({
+													id: task.id,
+													status,
+												})
+											}
+											className="text-xs"
+										/>
+									</dd>
+								</div>
+								{!task.isEvergreen && (
+									<>
+										<div className="grid gap-1 sm:grid-cols-[7.25rem_minmax(0,1fr)] sm:items-center sm:gap-2">
+											<dt className="text-xs font-semibold text-gray-500">
+												Estimated Time
+											</dt>
+											<dd>
+												<EditableNumber
+													value={task.estimatedTime}
+													onSave={(v) =>
+														saveTaskChange({
+															id: task.id,
+															estimatedTime: v,
+														} as Parameters<
+															typeof actions.task.update
+														>[0] & {
+															estimatedTime:
+																| number
+																| null
+														})
+													}
+													className="text-xs pl-0"
+													inputClassName="text-xs"
+												/>
+											</dd>
+										</div>
+										<div className="grid gap-1 sm:grid-cols-[7.25rem_minmax(0,1fr)] sm:items-center sm:gap-2">
+											<dt className="text-xs font-semibold text-gray-500">
+												Deadline
+											</dt>
+											<dd>
+												<EditableDate
+													value={
+														task?.deadline
+															? getUtcDateKey(
+																	task.deadline,
+																)
+															: null
+													}
+													onSave={(date) =>
+														saveTaskChange({
+															id: task.id,
+															deadline: date
+																? dateKeyToUtcDate(
+																		date,
+																	)
+																: null,
+														})
+													}
+													className="text-xs"
+												/>
+											</dd>
+										</div>
+									</>
+								)}
+								<div className="grid gap-1 sm:grid-cols-[7.25rem_minmax(0,1fr)] sm:items-center sm:gap-2">
+									<dt className="text-xs font-semibold text-gray-500">
+										Tags
+									</dt>
+									<dd>
+										<EditableTags
+											value={task.tags.map(
+												(tag) => tag.tag,
+											)}
+											tags={tags}
+											onSave={(tags) =>
+												saveTaskChange({
+													id: task.id,
+													tags: tags.map(
+														(tag) => tag.id,
+													),
+												})
+											}
+											tagClassName="px-2 py-1"
+										/>
+									</dd>
+								</div>
 							</div>
 							<div className="grid gap-1 sm:grid-cols-[7.25rem_minmax(0,1fr)] sm:items-center sm:gap-2">
 								<dt className="text-xs font-semibold text-gray-500">
-									Estimated Time
+									Evergreen
 								</dt>
 								<dd>
-									<EditableNumber
-										value={task.estimatedTime}
-										onSave={(v) =>
+									<EditableBoolean
+										value={task.isEvergreen}
+										onSave={(isEvergreen) =>
 											saveTaskChange({
 												id: task.id,
-												estimatedTime: v,
-											} as Parameters<
-												typeof actions.task.update
-											>[0] & {
-												estimatedTime: number | null
+												isEvergreen,
 											})
 										}
-									/>
-								</dd>
-							</div>
-							<div className="grid gap-1 sm:grid-cols-[7.25rem_minmax(0,1fr)] sm:items-center sm:gap-2">
-								<dt className="text-xs font-semibold text-gray-500">
-									Deadline
-								</dt>
-								<dd>
-									<EditableDate
-										value={
-											task?.deadline
-												? getUtcDateKey(task.deadline)
-												: null
-										}
-										onSave={(date) =>
-											saveTaskChange({
-												id: task.id,
-												deadline: date
-													? dateKeyToUtcDate(date)
-													: null,
-											})
-										}
-									/>
-								</dd>
-							</div>
-							<div className="grid gap-1 sm:grid-cols-[7.25rem_minmax(0,1fr)] sm:items-center sm:gap-2">
-								<dt className="text-xs font-semibold text-gray-500">
-									Tags
-								</dt>
-								<dd>
-									<EditableTags
-										value={task.tags.map((tag) => tag.tag)}
-										tags={tags}
-										onSave={(tags) =>
-											saveTaskChange({
-												id: task.id,
-												tags: tags.map((tag) => tag.id),
-											})
-										}
-										tagClassName="px-2 py-1"
 									/>
 								</dd>
 							</div>

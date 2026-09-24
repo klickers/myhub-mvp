@@ -456,6 +456,7 @@ export const task = {
 			estimatedTime: z.number().int().nonnegative().nullable().optional(),
 			deadline: z.coerce.date().optional().nullable(),
 			tags: z.array(z.number().int().positive()).optional(),
+			isEvergreen: z.coerce.boolean().optional(),
 		}),
 		handler: async ({ id, tags, ...data }) => {
 			return prisma.task.update({

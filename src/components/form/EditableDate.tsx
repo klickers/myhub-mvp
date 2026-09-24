@@ -1,16 +1,20 @@
 export default function EditableDate({
 	value,
 	onSave,
+	className,
 }: {
 	value: string | null
 	onSave: (v: string | null) => Promise<void>
+	className?: string
 }) {
 	return (
 		<input
 			type="date"
 			value={value ? value.slice(0, 10) : ""}
 			onChange={(e) => onSave(e.target.value || null)}
-			className="border-0 bg-transparent p-0 max-w-26"
+			className={["border-0 bg-transparent p-0 max-w-26", className ?? ""]
+				.filter(Boolean)
+				.join(" ")}
 		/>
 	)
 }
