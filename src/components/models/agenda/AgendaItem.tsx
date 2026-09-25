@@ -31,6 +31,7 @@ export default function AgendaItem({ item }: Props) {
 		const res = await removeAgendaItem(id)
 		if (res === undefined) toast.error("Failed to remove agenda item")
 		else toast.success("Agenda item removed successfully")
+		setOpenEditing(false)
 		refreshTaskById(taskId)
 	}
 	const handleAgendaItemStatusChange = async (
@@ -40,6 +41,7 @@ export default function AgendaItem({ item }: Props) {
 		if (res === undefined)
 			toast.error("Failed to update agenda item status")
 		else toast.success("Agenda item status updated successfully")
+		setOpenEditing(false)
 		// refreshTaskById(taskId)
 	}
 
