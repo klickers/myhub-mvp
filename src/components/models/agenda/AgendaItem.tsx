@@ -25,7 +25,10 @@ export default function AgendaItem({ item }: Props) {
 	) => {
 		const res = await updateAgendaItem(patch.id, patch)
 		if (res === undefined) toast.error("Failed to update agenda item")
-		else toast.success("Agenda item updated successfully")
+		else {
+			toast.success("Agenda item updated successfully")
+			setOpenEditing(false)
+		}
 	}
 	const handleAgendaItemRemoval = async (id: number, taskId: number) => {
 		const res = await removeAgendaItem(id)
