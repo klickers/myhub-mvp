@@ -80,7 +80,7 @@ model Task {
     status        Status         @default(notstarted)
     estimatedTime Int?           @default(0) // in minutes
     // scheduled     Boolean        @default(false)
-    // startDate     DateTime?
+    startDate     DateTime?
     deadline      DateTime?
     isEvergreen   Boolean        @default(false)
 

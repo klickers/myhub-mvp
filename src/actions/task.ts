@@ -14,6 +14,7 @@ const taskInput = z
 		status: z.nativeEnum(Status).default("notstarted"),
 
 		estimatedTime: z.number().int().nonnegative().optional(),
+		startDate: z.coerce.date().optional(),
 		deadline: z.coerce.date().optional(),
 
 		parentTaskId: z.number().int().positive().optional(),
@@ -54,6 +55,7 @@ type TaskNode = {
 	status: Status
 	parentTaskId: number | null
 	estimatedTime: number | null
+	startDate: Date | null
 	deadline: Date | null
 	children: TaskNode[]
 }
@@ -74,6 +76,7 @@ type TaskAncestor = {
 	makeTimeType: MakeTimeType | null
 	status: Status
 	estimatedTime: number | null
+	startDate: Date | null
 	deadline: Date | null
 }
 
@@ -167,6 +170,7 @@ async function getTaskAncestors(
 				makeTimeType: true,
 				status: true,
 				estimatedTime: true,
+				startDate: true,
 				deadline: true,
 			},
 		})
@@ -263,6 +267,7 @@ async function buildSubtaskTree(rootTaskId: number): Promise<TaskNode[]> {
 		makeTimeType: MakeTimeType | null
 		status: Status
 		estimatedTime: number | null
+		startDate: Date | null
 		deadline: Date | null
 	}> = []
 
@@ -281,6 +286,7 @@ async function buildSubtaskTree(rootTaskId: number): Promise<TaskNode[]> {
 				makeTimeType: true,
 				status: true,
 				estimatedTime: true,
+				startDate: true,
 				deadline: true,
 				parentTaskId: true,
 			},
@@ -345,6 +351,7 @@ export const task = {
 							: input.makeTimeType,
 					status: input.status,
 					estimatedTime: input.estimatedTime,
+					startDate: input.startDate && new Date(input.startDate),
 					deadline: input.deadline && new Date(input.deadline),
 					parentTaskId: input.parentTaskId ?? null,
 					...(input.tags && input.tags.length > 0
@@ -384,6 +391,7 @@ export const task = {
 							: input.makeTimeType,
 					status: input.status,
 					estimatedTime: input.estimatedTime,
+					startDate: input.startDate && new Date(input.startDate),
 					deadline: input.deadline && new Date(input.deadline),
 					parentTaskId: input.parentTaskId ?? null,
 				},
@@ -399,6 +407,7 @@ export const task = {
 			parentTaskId: z.number().int().positive(),
 			status: z.nativeEnum(Status).optional(),
 			estimatedTime: z.number().int().nonnegative().optional(),
+			startDate: z.coerce.date().optional().nullable(),
 			deadline: z.coerce.date().optional().nullable(),
 		}),
 		handler: async ({
@@ -454,6 +463,7 @@ export const task = {
 				.transform((val) => (val === "none" ? null : val))
 				.optional(),
 			estimatedTime: z.number().int().nonnegative().nullable().optional(),
+			startDate: z.coerce.date().optional().nullable(),
 			deadline: z.coerce.date().optional().nullable(),
 			tags: z.array(z.number().int().positive()).optional(),
 			isEvergreen: z.coerce.boolean().optional(),

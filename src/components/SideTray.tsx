@@ -230,6 +230,33 @@ export default function SideTray() {
 										</div>
 										<div className="grid gap-1 sm:grid-cols-[7.25rem_minmax(0,1fr)] sm:items-center sm:gap-2">
 											<dt className="text-xs font-semibold text-gray-500">
+												Start Date
+											</dt>
+											<dd>
+												<EditableDate
+													value={
+														task?.startDate
+															? getUtcDateKey(
+																	task.startDate,
+																)
+															: null
+													}
+													onSave={(date) =>
+														saveTaskChange({
+															id: task.id,
+															startDate: date
+																? dateKeyToUtcDate(
+																		date,
+																	)
+																: null,
+														})
+													}
+													className="text-xs"
+												/>
+											</dd>
+										</div>
+										<div className="grid gap-1 sm:grid-cols-[7.25rem_minmax(0,1fr)] sm:items-center sm:gap-2">
+											<dt className="text-xs font-semibold text-gray-500">
 												Deadline
 											</dt>
 											<dd>
