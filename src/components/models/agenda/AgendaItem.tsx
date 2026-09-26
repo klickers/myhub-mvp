@@ -76,7 +76,7 @@ export default function AgendaItem({ item }: Props) {
 				className="absolute right-0.5 top-0.5 text-xs text-gray-500 hover:text-gray-800"
 			/>
 			<span
-				className="cursor-pointer"
+				className="cursor-pointer block"
 				onClick={() => setOpenEditing(!openEditing)}
 			>
 				{item.task?.name}
