@@ -7,6 +7,8 @@ type TagsStore = {
 	isLoading: boolean
 	isLoaded: boolean
 
+	// tagMap: Record<number, TagWithChildren>
+
 	loadTags: () => void
 }
 
@@ -14,6 +16,8 @@ export const useTagsStore = create<TagsStore>((set, get) => ({
 	tags: [],
 	isLoading: false,
 	isLoaded: false,
+
+	// tagMap: {},
 
 	loadTags: async () => {
 		if (get().isLoaded || get().isLoading) return
@@ -27,6 +31,13 @@ export const useTagsStore = create<TagsStore>((set, get) => ({
 		}
 		set({
 			tags: res.data ?? [],
+			// tagMap: (res.data ?? []).reduce(
+			// 	(acc, tag) => {
+			// 		acc[tag.id] = tag
+			// 		return acc
+			// 	},
+			// 	{} as Record<number, TagWithChildren>,
+			// ),
 			isLoaded: true,
 			isLoading: false,
 		})

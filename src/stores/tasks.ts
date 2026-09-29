@@ -15,6 +15,7 @@ type TasksStore = {
 	closeSideTray: () => void
 
 	// indices
+	// tasksMap: Record<number, TaskWithTags>
 	// rootTaskIds: number[]
 	// childrenByParentId: Record<number, number[]>
 	// taskIdsByTagId: Record<number, number[]>
@@ -64,6 +65,7 @@ export const useTasksStore = create<TasksStore>((set, get) => ({
 	// ===================================
 	// Indices
 	// ===================================
+	// tasksMap: {},
 	// rootTaskIds: [],
 	// childrenByParentId: {},
 	// taskIdsByTagId: {},
@@ -86,6 +88,13 @@ export const useTasksStore = create<TasksStore>((set, get) => ({
 			tasks: res.data ?? [],
 			isLoaded: true,
 			isLoading: false,
+			// tasksMap: (res.data ?? []).reduce(
+			// 	(acc, task) => {
+			// 		acc[task.id] = task
+			// 		return acc
+			// 	},
+			// 	{} as Record<number, TaskWithTags>,
+			// ),
 			// rootTaskIds:
 			// 	res.data
 			// 		?.filter((task) => !task.parentTaskId)
