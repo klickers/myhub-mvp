@@ -33,7 +33,6 @@ export default function SideTray() {
 	const task = useTasksStore((state) =>
 		state.tasks.find((task) => task.id === selectedTaskId),
 	)
-	const updateTask = useTasksStore((state) => state.updateTask)
 	const loadTasks = useTasksStore((state) => state.loadTasks)
 	const removeTask = useTasksStore((state) => state.removeTask)
 
