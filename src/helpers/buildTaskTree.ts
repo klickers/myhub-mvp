@@ -8,6 +8,14 @@ function statusQualifies(status: Status) {
 	)
 }
 
+function compareTasks(a: TaskNode, b: TaskNode) {
+	if (a.isEvergreen !== b.isEvergreen) return a.isEvergreen ? -1 : 1
+	if (!a.deadline && !b.deadline) return a.name.localeCompare(b.name)
+	if (!a.deadline) return 1
+	if (!b.deadline) return -1
+	return a.deadline.getTime() - b.deadline.getTime()
+}
+
 export default function buildTaskTree(
 	tasks: TaskWithTags[],
 	tagId: number | null = null,
@@ -32,9 +40,7 @@ export default function buildTaskTree(
 		const parent = map.get(task.parentTaskId)
 		if (parent && statusQualifies(task.status)) {
 			parent.subtasks.push(task)
-			parent.subtasks.sort((a, b) =>
-				a.isEvergreen === b.isEvergreen ? 0 : a.isEvergreen ? -1 : 1,
-			)
+			parent.subtasks.sort((a, b) => compareTasks(a, b))
 			parent.agendas.push(...task.agendas)
 		}
 	}
@@ -79,11 +85,7 @@ export default function buildTaskTree(
 					{
 						...task,
 						subtasks: task.subtasks.sort((a, b) =>
-							a.isEvergreen === b.isEvergreen
-								? 0
-								: a.isEvergreen
-									? -1
-									: 1,
+							compareTasks(a, b),
 						),
 					},
 				]
@@ -91,7 +93,5 @@ export default function buildTaskTree(
 
 	return [...map.values()]
 		.filter((task) => !task.parentTaskId && statusQualifies(task.status))
-		.sort((a, b) =>
-			a.isEvergreen === b.isEvergreen ? 0 : a.isEvergreen ? -1 : 1,
-		)
+		.sort((a, b) => compareTasks(a, b))
 }
