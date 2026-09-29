@@ -19,6 +19,7 @@ interface Props {
 
 export default function WeeklyAgenda({ filter }: Props) {
 	const [date, setDate] = useState(new Date())
+	const filterId = "id" in filter ? filter.id : null
 
 	const getWeekKey = useAgendaStore((state) => state.getWeekKey)
 	const loadAgendaWeek = useAgendaStore((state) => state.loadAgendaWeek)
@@ -26,8 +27,14 @@ export default function WeeklyAgenda({ filter }: Props) {
 	const daysByWeek = useAgendaStore((state) => state.daysByWeek)
 	const allTags = useTagsStore((state) => state.tags)
 	const loadTags = useTagsStore((state) => state.loadTags)
-	const tasks =
-		filter.type === "task" ? useTasksStore((state) => state.tasks) : []
+	const loadTasks = useTasksStore((state) => state.loadTasks)
+	const tasks = useTasksStore((state) => state.tasks)
+	const taskIdsByEffectiveTagId = useTasksStore(
+		(state) => state.taskIdsByEffectiveTagId,
+	)
+	const taskIdsByEffectiveTagGroupId = useTasksStore(
+		(state) => state.taskIdsByEffectiveTagGroupId,
+	)
 
 	useEffect(() => {
 		loadAgendaWeek(date)
@@ -35,7 +42,8 @@ export default function WeeklyAgenda({ filter }: Props) {
 
 	useEffect(() => {
 		loadTags()
-	}, [loadTags])
+		loadTasks()
+	}, [loadTags, loadTasks])
 
 	const weekKey = useMemo(() => getWeekKey(date), [getWeekKey, date])
 
@@ -50,38 +58,60 @@ export default function WeeklyAgenda({ filter }: Props) {
 		if (filter.type !== "group") return []
 		return allTags
 			.flatMap((t) => t.children)
-			.filter((tag) => tag.parentId === filter.id)
-	}, [allTags, filter.type, filter.id])
+			.filter((tag) => tag.parentId === filterId)
+	}, [allTags, filter.type, filterId])
+
+	const allowedTaskIds = useMemo(() => {
+		if (filter.type === "tag")
+			return new Set(taskIdsByEffectiveTagId[filter.id] ?? [])
+		if (filter.type === "group")
+			return new Set(taskIdsByEffectiveTagGroupId[filter.id] ?? [])
+		return null
+	}, [
+		filter.type,
+		filterId,
+		taskIdsByEffectiveTagGroupId,
+		taskIdsByEffectiveTagId,
+	])
+
+	const taskIdSetsByTagId = useMemo(() => {
+		return Object.fromEntries(
+			tags.map((tag) => [
+				tag.id,
+				new Set(taskIdsByEffectiveTagId[tag.id] ?? []),
+			]),
+		) as Record<number, Set<number>>
+	}, [tags, taskIdsByEffectiveTagId])
 
 	const taskTree = useMemo(() => {
 		if (filter.type !== "task") return undefined
 		return buildTaskTree(tasks, null, filter.id, null)[0]
-	}, [filter.type, filter.id, tasks])
+	}, [filter.type, filterId, tasks])
 
 	const agendaItems = useMemo(() => {
-		return agenda.filter((item) => {
-			switch (filter.type) {
-				case "tag":
-					return item.task?.tags.some(
-						(tag) => tag.tagId === filter.id,
-					)
-				case "task":
+		switch (filter.type) {
+			case "tag":
+				return agenda.filter((item) =>
+					allowedTaskIds?.has(item.task?.id ?? -1),
+				)
+			case "task":
+				return agenda.filter((item) => {
 					const isInTree = (task: TaskNode | undefined): boolean => {
 						if (!task) return false
 						if (task.id === item.task?.id) return true
 						return task.subtasks.some(isInTree)
 					}
 					return isInTree(taskTree)
-				case "group":
-					return item.task?.tags.some((tag) =>
-						tags.some((groupTag) => groupTag.id === tag.tagId),
-					)
-				case "all":
-				default:
-					return true
-			}
-		})
-	}, [agenda, filter, tags, taskTree])
+				})
+			case "group":
+				return agenda.filter((item) =>
+					allowedTaskIds?.has(item.task?.id ?? -1),
+				)
+			case "all":
+			default:
+				return agenda
+		}
+	}, [agenda, allowedTaskIds, filter.type, taskTree])
 
 	return (
 		<>
@@ -162,9 +192,8 @@ export default function WeeklyAgenda({ filter }: Props) {
 									items={agendaItems.filter(
 										(item) =>
 											isSameDay(item.date, day.date) &&
-											item.task?.tags.some(
-												(taskTag) =>
-													taskTag.tagId === tag.id,
+											taskIdSetsByTagId[tag.id]?.has(
+												item.task?.id ?? -1,
 											),
 									)}
 								/>

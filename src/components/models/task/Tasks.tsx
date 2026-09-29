@@ -25,9 +25,14 @@ export default function Tasks({ filter }: Props) {
 	const openSideTray = useTasksStore((state) => state.openSideTray)
 	const loadTasks = useTasksStore((state) => state.loadTasks)
 	const allTasks = useTasksStore((state) => state.tasks)
+	const taskIdsByEffectiveTagId = useTasksStore(
+		(state) => state.taskIdsByEffectiveTagId,
+	)
+	const taskIdsByEffectiveTagGroupId = useTasksStore(
+		(state) => state.taskIdsByEffectiveTagGroupId,
+	)
+	const untaggedTaskIds = useTasksStore((state) => state.untaggedTaskIds)
 	const [isAddingTask, setIsAddingTask] = useState(false)
-	const [evergreenTasks, setEvergreenTasks] = useState<TaskNode[]>([])
-	const [otherTasks, setOtherTasks] = useState<TaskNode[]>([])
 
 	const loadTags = useTagsStore((state) => state.loadTags)
 
@@ -38,20 +43,40 @@ export default function Tasks({ filter }: Props) {
 
 	const tasks: TaskNode[] = useMemo(() => {
 		let filteredTasks = allTasks
-		if (filter.type === "untagged")
-			filteredTasks = allTasks.filter((task) => task.tags.length === 0)
+		let allowedTaskIds: Set<number> | null = null
+		if (filter.type === "untagged") {
+			const untaggedIds = new Set(untaggedTaskIds)
+			filteredTasks = allTasks.filter((task) =>
+				untaggedIds.has(task.id),
+			)
+		} else if (filter.type === "tag")
+			allowedTaskIds = new Set(taskIdsByEffectiveTagId[filter.id] ?? [])
+		else if (filter.type === "group")
+			allowedTaskIds = new Set(
+				taskIdsByEffectiveTagGroupId[filter.id] ?? [],
+			)
 		const tree = buildTaskTree(
 			filteredTasks,
 			filter.type === "tag" ? filter.id : null,
 			filter.type === "task" ? filter.id : null,
 			filter.type === "group" ? filter.id : null,
+			allowedTaskIds,
 		)
-		return filter.type === "task" ? tree[0].subtasks : tree
-	}, [allTasks, filter])
+		return filter.type === "task" ? (tree[0]?.subtasks ?? []) : tree
+	}, [
+		allTasks,
+		filter,
+		taskIdsByEffectiveTagGroupId,
+		taskIdsByEffectiveTagId,
+		untaggedTaskIds,
+	])
 
-	useMemo(() => {
-		setEvergreenTasks(tasks.filter((task) => task.isEvergreen))
-		setOtherTasks(tasks.filter((task) => !task.isEvergreen))
+	const evergreenTasks = useMemo(
+		() => tasks.filter((task) => task.isEvergreen),
+		[tasks],
+	)
+	const otherTasks = useMemo(() => {
+		return tasks.filter((task) => !task.isEvergreen)
 	}, [tasks])
 
 	return (

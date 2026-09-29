@@ -23,7 +23,6 @@ interface Props {
 }
 
 export default function Task({ task, depth = 0 }: Props) {
-	const updateTask = useTasksStore((state) => state.updateTask)
 	const removeTask = useTasksStore((state) => state.removeTask)
 	const [addTaskParentId, setAddTaskParentId] = React.useState<number | null>(
 		null,
@@ -202,7 +201,6 @@ export default function Task({ task, depth = 0 }: Props) {
 					>
 						<CreateTaskForm
 							parentId={task.id}
-							tags={task.tags.map((tag) => tag.tag.id)}
 							onCreated={() => setAddTaskParentId(null)}
 						/>
 					</td>

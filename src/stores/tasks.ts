@@ -15,11 +15,10 @@ type TasksStore = {
 	closeSideTray: () => void
 
 	// indices
-	// tasksMap: Record<number, TaskWithTags>
-	// rootTaskIds: number[]
-	// childrenByParentId: Record<number, number[]>
-	// taskIdsByTagId: Record<number, number[]>
-	// untaggedTaskIds: number[]
+	effectiveTagIdsByTaskId: Record<number, number[]>
+	taskIdsByEffectiveTagId: Record<number, number[]>
+	taskIdsByEffectiveTagGroupId: Record<number, number[]>
+	untaggedTaskIds: number[]
 
 	// setting
 	loadTasks: () => void
@@ -40,6 +39,96 @@ type TasksStore = {
 		id: number,
 		patch: Parameters<typeof actions.task.update>[0],
 	) => Promise<TaskNode | undefined>
+}
+
+function buildTaskIndexes(tasks: TaskWithTags[]): {
+	effectiveTagIdsByTaskId: Record<number, number[]>
+	taskIdsByEffectiveTagId: Record<number, number[]>
+	taskIdsByEffectiveTagGroupId: Record<number, number[]>
+	untaggedTaskIds: number[]
+} {
+	const byId = new Map(tasks.map((task) => [task.id, task]))
+	const effectiveTagIdsByTaskId: Record<number, number[]> = {}
+	const effectiveTagGroupIdsByTaskId: Record<number, number[]> = {}
+	const taskIdsByEffectiveTagId: Record<number, number[]> = {}
+	const taskIdsByEffectiveTagGroupId: Record<number, number[]> = {}
+	const untaggedTaskIds: number[] = []
+
+	const resolve = (
+		task: TaskWithTags,
+		seen = new Set<number>(),
+	): number[] => {
+		const cached = effectiveTagIdsByTaskId[task.id]
+		if (cached) return cached
+
+		if (seen.has(task.id)) {
+			effectiveTagIdsByTaskId[task.id] = []
+			effectiveTagGroupIdsByTaskId[task.id] = []
+			return []
+		}
+
+		if (task.tags.length > 0) {
+			const tagIds = Array.from(
+				new Set(task.tags.map((tag) => tag.tagId)),
+			)
+			effectiveTagIdsByTaskId[task.id] = tagIds
+			effectiveTagGroupIdsByTaskId[task.id] = Array.from(
+				new Set(
+					task.tags
+						.map((tag) => tag.tag.parentId)
+						.filter((id): id is number => id !== null),
+				),
+			)
+			return tagIds
+		}
+
+		const parent = task.parentTaskId
+			? byId.get(task.parentTaskId)
+			: undefined
+		if (!parent) {
+			effectiveTagIdsByTaskId[task.id] = []
+			effectiveTagGroupIdsByTaskId[task.id] = []
+			return []
+		}
+
+		seen.add(task.id)
+		effectiveTagIdsByTaskId[task.id] = resolve(parent, seen)
+		effectiveTagGroupIdsByTaskId[task.id] =
+			effectiveTagGroupIdsByTaskId[parent.id] ?? []
+		return effectiveTagIdsByTaskId[task.id]
+	}
+
+	for (const task of tasks) {
+		const tagIds = resolve(task)
+		if (tagIds.length === 0) {
+			untaggedTaskIds.push(task.id)
+			continue
+		}
+		for (const tagId of tagIds) {
+			if (!taskIdsByEffectiveTagId[tagId])
+				taskIdsByEffectiveTagId[tagId] = []
+			taskIdsByEffectiveTagId[tagId].push(task.id)
+		}
+		for (const tagGroupId of effectiveTagGroupIdsByTaskId[task.id] ?? []) {
+			if (!taskIdsByEffectiveTagGroupId[tagGroupId])
+				taskIdsByEffectiveTagGroupId[tagGroupId] = []
+			taskIdsByEffectiveTagGroupId[tagGroupId].push(task.id)
+		}
+	}
+
+	return {
+		effectiveTagIdsByTaskId,
+		taskIdsByEffectiveTagId,
+		taskIdsByEffectiveTagGroupId,
+		untaggedTaskIds,
+	}
+}
+
+function getTasksState(tasks: TaskWithTags[]) {
+	return {
+		tasks,
+		...buildTaskIndexes(tasks),
+	}
 }
 
 export const useTasksStore = create<TasksStore>((set, get) => ({
@@ -65,11 +154,10 @@ export const useTasksStore = create<TasksStore>((set, get) => ({
 	// ===================================
 	// Indices
 	// ===================================
-	// tasksMap: {},
-	// rootTaskIds: [],
-	// childrenByParentId: {},
-	// taskIdsByTagId: {},
-	// untaggedTaskIds: [],
+	effectiveTagIdsByTaskId: {},
+	taskIdsByEffectiveTagId: {},
+	taskIdsByEffectiveTagGroupId: {},
+	untaggedTaskIds: [],
 
 	// ===================================
 	// Setting
@@ -85,47 +173,9 @@ export const useTasksStore = create<TasksStore>((set, get) => ({
 			return
 		}
 		set({
-			tasks: res.data ?? [],
+			...getTasksState(res.data ?? []),
 			isLoaded: true,
 			isLoading: false,
-			// tasksMap: (res.data ?? []).reduce(
-			// 	(acc, task) => {
-			// 		acc[task.id] = task
-			// 		return acc
-			// 	},
-			// 	{} as Record<number, TaskWithTags>,
-			// ),
-			// rootTaskIds:
-			// 	res.data
-			// 		?.filter((task) => !task.parentTaskId)
-			// 		.map((task) => task.id) ?? [],
-			// childrenByParentId:
-			// 	res.data?.reduce(
-			// 		(acc, task) => {
-			// 			if (task.parentTaskId) {
-			// 				if (!acc[task.parentTaskId])
-			// 					acc[task.parentTaskId] = []
-			// 				acc[task.parentTaskId].push(task.id)
-			// 			}
-			// 			return acc
-			// 		},
-			// 		{} as Record<number, number[]>,
-			// 	) ?? {},
-			// taskIdsByTagId:
-			// 	res.data?.reduce(
-			// 		(acc, task) => {
-			// 			for (const tag of task.tags) {
-			// 				if (!acc[tag.tagId]) acc[tag.tagId] = []
-			// 				acc[tag.tagId].push(task.id)
-			// 			}
-			// 			return acc
-			// 		},
-			// 		{} as Record<number, number[]>,
-			// 	) ?? {},
-			// untaggedTaskIds:
-			// 	res.data
-			// 		?.filter((task) => task.tags.length === 0)
-			// 		.map((task) => task.id) ?? [],
 		})
 	},
 	refetchTaskById: async (id) => {
@@ -135,11 +185,13 @@ export const useTasksStore = create<TasksStore>((set, get) => ({
 			return undefined
 		}
 		if (!res.data) return undefined
-		set((state) => ({
-			tasks: state.tasks.map((task) =>
-				task.id === id ? { ...task, ...res.data } : task,
+		set((state) =>
+			getTasksState(
+				state.tasks.map((task) =>
+					task.id === id ? { ...task, ...res.data } : task,
+				),
 			),
-		}))
+		)
 		return res.data
 	},
 
@@ -168,9 +220,7 @@ export const useTasksStore = create<TasksStore>((set, get) => ({
 			return undefined
 		}
 
-		set((state) => ({
-			tasks: [...state.tasks, res.data],
-		}))
+		set((state) => getTasksState([...state.tasks, res.data]))
 
 		// return new task
 		return {
@@ -184,9 +234,9 @@ export const useTasksStore = create<TasksStore>((set, get) => ({
 			console.error("Failed to delete task:", res.error)
 			return undefined
 		}
-		set((state) => ({
-			tasks: state.tasks.filter((task) => task.id !== id),
-		}))
+		set((state) =>
+			getTasksState(state.tasks.filter((task) => task.id !== id)),
+		)
 		return res.data
 	},
 	updateTask: async (id, patch) => {
@@ -196,11 +246,13 @@ export const useTasksStore = create<TasksStore>((set, get) => ({
 			return undefined
 		}
 
-		set((state) => ({
-			tasks: state.tasks.map((task) =>
-				task.id === id ? { ...task, ...res.data } : task,
+		set((state) =>
+			getTasksState(
+				state.tasks.map((task) =>
+					task.id === id ? { ...task, ...res.data } : task,
+				),
 			),
-		}))
+		)
 
 		// return new task
 		return {

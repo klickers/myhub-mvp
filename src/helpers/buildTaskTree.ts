@@ -21,6 +21,7 @@ export default function buildTaskTree(
 	tagId: number | null = null,
 	taskId: number | null = null,
 	tagGroupId: number | null = null,
+	allowedTaskIds: Set<number> | null = null,
 ): TaskNode[] {
 	const map = new Map<number, TaskNode>()
 
@@ -37,8 +38,13 @@ export default function buildTaskTree(
 	// Connect all valid tasks to their parents
 	for (const task of map.values()) {
 		if (!task.parentTaskId || task.parentTaskId === task.id) continue
+		if (allowedTaskIds && !allowedTaskIds.has(task.id)) continue
 		const parent = map.get(task.parentTaskId)
-		if (parent && statusQualifies(task.status)) {
+		if (
+			parent &&
+			statusQualifies(task.status) &&
+			(!allowedTaskIds || allowedTaskIds.has(parent.id))
+		) {
 			parent.subtasks.push(task)
 			parent.subtasks.sort((a, b) => compareTasks(a, b))
 			parent.agendas.push(...task.agendas)
@@ -47,17 +53,19 @@ export default function buildTaskTree(
 
 	if (tagId !== null || tagGroupId !== null) {
 		// Find tasks directly containing this tag
-		const taggedIds = new Set(
-			tasks
-				.filter((task) =>
-					task.tags.some((tag) =>
-						tagId !== null
-							? tag.tagId === tagId
-							: tag.tag.parentId === tagGroupId,
-					),
-				)
-				.map((task) => task.id),
-		)
+		const taggedIds =
+			allowedTaskIds ??
+			new Set(
+				tasks
+					.filter((task) =>
+						task.tags.some((tag) =>
+							tagId !== null
+								? tag.tagId === tagId
+								: tag.tag.parentId === tagGroupId,
+						),
+					)
+					.map((task) => task.id),
+			)
 
 		// Keep only tagged tasks that don't have a tagged ancestor
 		return [...taggedIds]
