@@ -156,8 +156,21 @@
 			@apply !h-10;
 		}
 		.fc-event {
-			@apply !rounded-lg !p-1 !bg-blue-100 !border-blue-300;
+			@apply !rounded-lg !p-1;
 
+			&.event--session {
+				@apply !bg-blue-100 !border-blue-300;
+			}
+			&.event--task {
+				@apply !bg-gray-100;
+
+				&.event--status-inprogress {
+					@apply !bg-yellow-100;
+				}
+				&.event--status-completed {
+					@apply !bg-green-100;
+				}
+			}
 			.fc-event-main {
 				@apply !text-xs !text-black !font-medium;
 			}
