@@ -1,10 +1,10 @@
+import { useCallback } from "react"
+import { actions } from "astro:actions"
 import FullCalendar from "@fullcalendar/react"
 import timeGridPlugin from "@fullcalendar/timegrid"
 import interactionPlugin from "@fullcalendar/interaction"
-import { actions } from "astro:actions"
-import { useCallback, useState } from "react"
-import SideTray from "../SideTray"
 import type { Task } from "@/generated/prisma/browser"
+import { useTasksStore } from "@/stores/tasks"
 
 type CalendarEvent = {
 	id: string
@@ -13,14 +13,12 @@ type CalendarEvent = {
 	end?: Date | string
 	extendedProps: {
 		type: "task" | "session"
-		name: string
-		slug?: string
 		task?: Task
 	}
 }
 
-export default function TasksCalendar() {
-	const [selectedTask, setSelectedTask] = useState<Task | null>(null)
+export default function SessionCalendar() {
+	const openSideTray = useTasksStore((state) => state.openSideTray)
 
 	const loadEvents = useCallback(
 		async (
@@ -38,10 +36,6 @@ export default function TasksCalendar() {
 
 				const found = sources.find(({ key }) => session[key])
 				const item = found ? session[found.key] : null
-				const slug =
-					item && found?.type !== "task" && "slug" in item
-						? item.slug
-						: undefined
 
 				return {
 					id: `session-${session.id}`,
@@ -50,76 +44,57 @@ export default function TasksCalendar() {
 					end: session.endTime ?? undefined,
 					extendedProps: {
 						type: found?.type ?? "session",
-						name: item?.name ?? "",
-						...(slug && { slug }),
 						...(found?.type === "task" && session.task
 							? { task: session.task }
 							: {}),
 					},
 				}
 			})
+
 			successCallback(events)
 		},
 		[],
 	)
 
 	return (
-		<>
-			<div className="calendar-shell calendar-shell--sessions">
-				<FullCalendar
-					plugins={[interactionPlugin, timeGridPlugin]}
-					initialView="timeGridWeek"
-					allDaySlot={false}
-					height="auto"
-					initialEvents={[]}
-					headerToolbar={{
-						left: "timeGridDay,timeGridWeek",
-						center: "title",
-						right: "today prev,next",
-					}}
-					nowIndicator
-					slotMinTime="06:00:00"
-					events={loadEvents}
-					eventClassNames={["calendar-session"]}
-					/* ===============================
-               Custom event rendering
-               =============================== */
-					eventContent={(arg) => {
-						const { event } = arg
-						const { type, slug } = event.extendedProps
-
-						let url = "#!"
-
-						return (
-							<div className="calendar-event-card flex gap-1 px-2 py-1.5">
-								<div className={`leading-tight`}>
-									{event.extendedProps.task ? (
-										<span
-											className="cursor-pointer"
-											onClick={() =>
-												setSelectedTask(
-													event.extendedProps.task,
-												)
-											}
-										>
-											{event.title}
-										</span>
-									) : (
-										<a href={url}>{event.title}</a>
-									)}
-								</div>
-							</div>
-						)
-					}}
-				/>
-			</div>
-			{selectedTask && (
-				<SideTray
-					type="task"
-					selected={selectedTask}
-					setSelected={setSelectedTask}
-				/>
-			)}
-		</>
+		<div className="calendar calendar--sessions">
+			<FullCalendar
+				plugins={[interactionPlugin, timeGridPlugin]}
+				initialView="timeGridWeek"
+				allDaySlot={false}
+				height="auto"
+				initialEvents={[]}
+				headerToolbar={{
+					left: "timeGridDay,timeGridWeek",
+					center: "title",
+					right: "today prev,next",
+				}}
+				nowIndicator
+				slotMinTime="08:00:00"
+				events={loadEvents}
+				eventClassNames={["event--session"]}
+				eventContent={(arg) => {
+					const { event } = arg
+					return (
+						<div>
+							{event.extendedProps.task ? (
+								<span
+									className="cursor-pointer"
+									onClick={() =>
+										openSideTray(
+											event.extendedProps.task.id ?? -1,
+										)
+									}
+								>
+									{event.title}
+								</span>
+							) : (
+								<span>Error loading task</span>
+							)}
+						</div>
+					)
+				}}
+			/>
+		</div>
 	)
 }

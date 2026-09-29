@@ -133,6 +133,37 @@
 		@apply transition-none;
 	}
 
+	.calendar {
+		.fc-toolbar-title {
+			@apply !text-sm;
+		}
+		.fc-button {
+			@apply !text-xs !rounded-lg !bg-white !text-black !border !border-gray-300 hover:!bg-gray-100 focus:!ring-0 focus:!outline-none;
+
+			&.fc-button-active {
+				@apply !bg-gray-100;
+			}
+		}
+		.fc-scrollgrid,
+		th,
+		td {
+			@apply !border-gray-200;
+		}
+		.fc-timegrid-slot-label-cushion {
+			@apply !text-xs;
+		}
+		.fc-timegrid-slot {
+			@apply !h-10;
+		}
+		.fc-event {
+			@apply !rounded-lg !p-1 !bg-blue-100 !border-blue-300;
+
+			.fc-event-main {
+				@apply !text-xs !text-black !font-medium;
+			}
+		}
+	}
+
 	.task {
 		@apply relative;
 		&:hover {
@@ -143,212 +174,6 @@
 		.button-add-subtask {
 			@apply absolute left-0 -bottom-2 z-10 hidden;
 		}
-	}
-
-	.side-tray input,
-	.side-tray select {
-		@apply max-w-full rounded-md border border-gray-300 bg-white/80 px-2 py-1 text-sm  transition-[background-color,border-color,box-shadow] duration-150 focus:border-gray-500 focus:bg-white focus:outline-none;
-	}
-
-	.side-tray dl button {
-		@apply rounded-md px-2 py-1 text-left transition-colors duration-150 hover:bg-white/80 hover:no-underline focus-visible:outline-none;
-	}
-
-	.calendar-page {
-		@apply flex flex-col gap-4;
-	}
-
-	.calendar-tabs {
-		@apply inline-flex w-fit rounded-lg border border-gray-300/70 bg-white/60 p-1  backdrop-blur-xl;
-	}
-
-	.calendar-tabs__link {
-		@apply rounded-md px-3 py-1.5 text-sm font-semibold text-gray-600 transition-colors duration-150 hover:bg-white/70 hover:text-gray-950 focus-visible:outline-none;
-	}
-
-	.calendar-tabs__link--active {
-		@apply bg-gray-900 text-white  hover:bg-gray-900 hover:text-white;
-	}
-
-	.calendar-shell {
-		@apply overflow-hidden rounded-lg border border-gray-300/70 bg-white/65 p-3   backdrop-blur-2xl backdrop-saturate-150;
-	}
-
-	.calendar-shell--home {
-		@apply bg-white/70;
-	}
-
-	.calendar-shell .fc {
-		@apply text-sm text-gray-800;
-	}
-
-	.calendar-shell .fc-header-toolbar {
-		@apply !mb-3 flex-wrap gap-2;
-	}
-
-	.calendar-shell .fc-toolbar-title {
-		@apply !text-lg !font-semibold !leading-tight !text-gray-950;
-	}
-
-	.calendar-shell .fc-button-primary {
-		@apply !rounded-lg !border-gray-300/80 !bg-white/70 !px-3 !py-1.5 !text-sm !font-semibold !text-gray-700  !transition-colors !duration-150 hover:!border-gray-400/80 hover:!bg-white hover:!text-gray-950;
-	}
-
-	.calendar-shell .fc-button-primary:disabled {
-		@apply !border-gray-200 !bg-white/40 !text-gray-400 !opacity-100;
-	}
-
-	.calendar-shell .fc-button-active {
-		@apply !border-gray-900 !bg-gray-900 !text-white hover:!border-gray-900 hover:!bg-gray-900 hover:!text-white;
-	}
-
-	.calendar-shell .fc-scrollgrid {
-		@apply !border-0;
-	}
-
-	.calendar-shell .fc-theme-standard td,
-	.calendar-shell .fc-theme-standard th {
-		@apply !border-gray-200/70;
-	}
-
-	.calendar-shell .fc-col-header-cell {
-		@apply !bg-white/45;
-	}
-
-	.calendar-shell .fc-col-header-cell-cushion {
-		@apply !py-2 !text-xs !font-semibold !uppercase !text-gray-500;
-	}
-
-	.calendar-shell .fc-daygrid-day,
-	.calendar-shell .fc-timegrid-col {
-		@apply !bg-white/35;
-	}
-
-	.calendar-shell .fc-day-today {
-		@apply !bg-blue-50/70;
-	}
-
-	.calendar-shell .fc-daygrid-day-frame {
-		@apply !p-1.5;
-	}
-
-	.calendar-shell .fc-daygrid-day-number {
-		@apply !text-xs !font-semibold !text-gray-500;
-	}
-
-	.calendar-shell .fc-timegrid-slot-label,
-	.calendar-shell .fc-timegrid-axis-cushion {
-		@apply !text-xs !font-medium !text-gray-500;
-	}
-
-	.calendar-shell .fc-timegrid-slot {
-		@apply !h-10;
-	}
-
-	.calendar-shell .fc-timegrid-now-indicator-line {
-		@apply !border-brand;
-	}
-
-	.calendar-shell .fc-timegrid-now-indicator-arrow {
-		@apply !border-r-brand;
-	}
-
-	.calendar-shell .fc-event {
-		@apply !overflow-hidden !rounded-md !border;
-	}
-
-	.calendar-shell .fc-daygrid-event {
-		@apply !my-1 !whitespace-normal;
-	}
-
-	.calendar-event-card {
-		@apply text-xs font-semibold leading-tight text-gray-800;
-	}
-
-	.calendar-event-card__meta {
-		@apply mb-0.5 text-gray-500 no-underline hover:text-gray-700;
-	}
-
-	.calendar-highlight-input {
-		@apply w-full min-h-10 resize-none rounded-md border border-gray-300/70 bg-white/65 px-2 py-1 text-xs leading-snug text-gray-800  transition-[background-color,border-color,box-shadow] duration-150 placeholder:text-gray-400 focus:border-gray-500 focus:bg-white focus:outline-none;
-	}
-
-	.calendar-highlight-input--filled {
-		@apply border-amber-300/80 bg-amber-50/85;
-	}
-
-	.calendar-day-cell-content {
-		@apply relative z-10;
-	}
-
-	.calendar-day-cell-topline {
-		@apply text-gray-500;
-	}
-
-	.calendar-shell .calendar-session {
-		@apply !border-blue-300/80 !bg-blue-50/95;
-	}
-
-	.calendar-shell .calendar-session div {
-		@apply text-blue-950;
-	}
-
-	.calendar-shell .calendar-home-event {
-		@apply !border-blue-300/80 !bg-blue-50/95;
-	}
-
-	.calendar-shell .calendar-home-event .fc-event-main,
-	.calendar-shell .calendar-home-event .fc-event-time,
-	.calendar-shell .calendar-home-event .fc-event-title {
-		@apply !text-blue-950;
-	}
-
-	.calendar-shell .calendar-task {
-		@apply !border-gray-300/80 !bg-white/90;
-	}
-
-	.calendar-shell .calendar-task div {
-		@apply text-gray-800;
-	}
-
-	.calendar-shell .calendar-highlight {
-		@apply !border-amber-300/90 !bg-amber-100/95;
-	}
-
-	.calendar-shell .calendar-highlight div {
-		@apply text-amber-950;
-	}
-
-	.calendar-shell .calendar-batch {
-		@apply !border-blue-300/90 !bg-blue-100/95;
-	}
-
-	.calendar-shell .calendar-batch div {
-		@apply text-blue-950;
-	}
-
-	.calendar-shell .calendar-inprogress {
-		@apply !border-yellow-300/90 !bg-yellow-100/95;
-	}
-
-	.calendar-shell .calendar-inprogress div {
-		@apply text-yellow-950;
-	}
-
-	.calendar-shell .calendar-onhold {
-		@apply !border-gray-300/90 !bg-gray-200/95;
-	}
-
-	.calendar-shell .calendar-onhold div {
-		@apply text-gray-700;
-	}
-
-	.calendar-shell .calendar-completed {
-		@apply !border-emerald-300/90 !bg-emerald-100/95;
-	}
-
-	.calendar-shell .calendar-completed div {
-		@apply text-emerald-950;
 	}
 
 	.agenda-task-list {
@@ -544,14 +369,6 @@
 		.app-breadcrumbs {
 			@apply pr-[min(14rem,48vw)];
 		}
-
-		/* .app-main {
-			@apply pb-6 pl-5 pr-4 pt-[5.75rem];
-		}
-
-		.sidebar {
-			@apply px-2;
-		} */
 	}
 }
 
