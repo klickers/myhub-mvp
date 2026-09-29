@@ -2,7 +2,6 @@ import { useCallback } from "react"
 import { actions } from "astro:actions"
 import FullCalendar from "@fullcalendar/react"
 import timeGridPlugin from "@fullcalendar/timegrid"
-import interactionPlugin from "@fullcalendar/interaction"
 import type { Task } from "@/generated/prisma/browser"
 import { useTasksStore } from "@/stores/tasks"
 
@@ -59,7 +58,7 @@ export default function SessionCalendar() {
 	return (
 		<div className="calendar calendar--sessions">
 			<FullCalendar
-				plugins={[interactionPlugin, timeGridPlugin]}
+				plugins={[timeGridPlugin]}
 				initialView="timeGridWeek"
 				allDaySlot={false}
 				height="auto"
