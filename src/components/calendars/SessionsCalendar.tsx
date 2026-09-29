@@ -66,7 +66,7 @@ export default function SessionCalendar() {
 				headerToolbar={{
 					left: "timeGridDay,timeGridWeek",
 					center: "title",
-					right: "today prev,next",
+					right: "prev today next",
 				}}
 				nowIndicator
 				slotMinTime="08:00:00"
