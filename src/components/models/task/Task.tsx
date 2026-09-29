@@ -201,6 +201,7 @@ export default function Task({ task, depth = 0 }: Props) {
 					>
 						<CreateTaskForm
 							parentId={task.id}
+							tags={task.tags.map((tag) => tag.tagId)}
 							onCreated={() => setAddTaskParentId(null)}
 						/>
 					</td>

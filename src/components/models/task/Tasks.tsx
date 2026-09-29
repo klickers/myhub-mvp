@@ -46,9 +46,7 @@ export default function Tasks({ filter }: Props) {
 		let allowedTaskIds: Set<number> | null = null
 		if (filter.type === "untagged") {
 			const untaggedIds = new Set(untaggedTaskIds)
-			filteredTasks = allTasks.filter((task) =>
-				untaggedIds.has(task.id),
-			)
+			filteredTasks = allTasks.filter((task) => untaggedIds.has(task.id))
 		} else if (filter.type === "tag")
 			allowedTaskIds = new Set(taskIdsByEffectiveTagId[filter.id] ?? [])
 		else if (filter.type === "group")
@@ -112,7 +110,16 @@ export default function Tasks({ filter }: Props) {
 								tags={
 									filter.type === "tag"
 										? [filter.id]
-										: undefined
+										: filter.type === "task"
+											? (tasks
+													.find(
+														(t) =>
+															t.id === filter.id,
+													)
+													?.tags.map(
+														(tag) => tag.tagId,
+													) ?? undefined)
+											: undefined
 								}
 								onCreated={() => setIsAddingTask(false)}
 							/>
@@ -203,7 +210,18 @@ export default function Tasks({ filter }: Props) {
 											tags={
 												filter.type === "tag"
 													? [filter.id]
-													: undefined
+													: filter.type === "task"
+														? (tasks
+																.find(
+																	(t) =>
+																		t.id ===
+																		filter.id,
+																)
+																?.tags.map(
+																	(tag) =>
+																		tag.tagId,
+																) ?? undefined)
+														: undefined
 											}
 											onCreated={() =>
 												setIsAddingTask(false)
