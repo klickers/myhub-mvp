@@ -71,6 +71,13 @@ export const note = {
 		handler: async ({ id }) => {
 			return prisma.note.delete({
 				where: { id },
+				include: {
+					items: {
+						select: {
+							taskId: true,
+						},
+					},
+				},
 			})
 		},
 	}),

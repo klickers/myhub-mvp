@@ -1,4 +1,4 @@
-import type { Prisma, Status } from "@/generated/prisma/client"
+import type { Status } from "@/generated/prisma/client"
 import { toast } from "react-toastify"
 import { actions } from "astro:actions"
 import EditableText from "./form/EditableText"
@@ -18,7 +18,7 @@ import { useTagsStore } from "@/stores/tags"
 import { useNotesStore } from "@/stores/notes"
 import Wrapper from "./Wrapper"
 import EditorWrapper from "./EditorWrapper"
-import debounce from "@/helpers/debounce"
+import TrashButton from "./TrashButton"
 
 type TaskBreadcrumbItem = {
 	type: "area" | "task" | "task-root"
@@ -45,6 +45,7 @@ export default function SideTray() {
 	const loadNotes = useNotesStore((state) => state.loadNotes)
 	const createNote = useNotesStore((state) => state.createNote)
 	const updateNote = useNotesStore((state) => state.updateNote)
+	const removeNote = useNotesStore((state) => state.removeNote)
 	const notes = useNotesStore((state) => state.notes)
 
 	const [breadcrumbs, setBreadcrumbs] = useState<TaskBreadcrumbItem[]>([])
@@ -118,8 +119,11 @@ export default function SideTray() {
 	// 	}
 	// }
 
-	const saveNoteChange = (noteId: number, content: Prisma.JsonArray) => {
-		const res = updateNote(noteId, { id: noteId, content })
+	const saveNoteChange = (
+		noteId: number,
+		patch: Parameters<typeof updateNote>[1],
+	) => {
+		const res = updateNote(noteId, patch)
 		if (res === undefined) toast.error("Failed to save note")
 		else toast.success("Note saved successfully")
 	}
@@ -354,7 +358,10 @@ export default function SideTray() {
 							<button
 								className="button"
 								onClick={async () => {
-									const res = await createNote(task.id)
+									const res = await createNote(
+										task.id,
+										"Note for " + task.name,
+									)
 									if (res === undefined)
 										toast.error("Failed to create note")
 									else
@@ -372,15 +379,49 @@ export default function SideTray() {
 							</button>
 						</div>
 						{task.notes.map(({ noteId }) => (
-							<EditorWrapper
-								key={noteId}
-								noteId={noteId}
-								initialValue={notes[noteId]?.content}
-								onSave={(noteId, content) =>
-									saveNoteChange(noteId, content)
-								}
-								placeholder="Start typing here..."
-							/>
+							<div className="mb-4">
+								<div className="flex items-center gap-2 justify-between">
+									<EditableText
+										value={
+											notes[noteId]?.title ||
+											"Untitled Note"
+										}
+										onSave={async (value) =>
+											saveNoteChange(noteId, {
+												id: noteId,
+												title: value,
+											})
+										}
+										className="text-base font-semibold mb-2"
+										inputClassName="mb-0"
+									/>
+									<TrashButton
+										onClick={() => {
+											const res = removeNote(noteId)
+											if (res === undefined)
+												toast.error(
+													"Failed to delete note",
+												)
+											else
+												toast.success(
+													"Note deleted successfully",
+												)
+										}}
+									/>
+								</div>
+								<EditorWrapper
+									key={noteId}
+									noteId={noteId}
+									initialValue={notes[noteId]?.content}
+									onSave={(noteId, content) =>
+										saveNoteChange(noteId, {
+											id: noteId,
+											content,
+										})
+									}
+									placeholder="Start typing here..."
+								/>
+							</div>
 						))}
 					</div>
 				</div>

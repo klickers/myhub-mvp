@@ -42,6 +42,7 @@ type TasksStore = {
 
 	// relations
 	addNoteToTask: (taskId: number, noteId: number) => void
+	removeNoteFromTask: (taskId: number, noteId: number) => void
 }
 
 function buildTaskIndexes(tasks: TaskWithTags[]): {
@@ -274,6 +275,19 @@ export const useTasksStore = create<TasksStore>((set, get) => ({
 			const updatedTask = {
 				...task,
 				notes: [...task.notes, { noteId }],
+			}
+			return getTasksState(
+				state.tasks.map((t) => (t.id === taskId ? updatedTask : t)),
+			)
+		})
+	},
+	removeNoteFromTask: (taskId: number, noteId: number) => {
+		set((state) => {
+			const task = state.tasks.find((t) => t.id === taskId)
+			if (!task) return state
+			const updatedTask = {
+				...task,
+				notes: task.notes.filter((n) => n.noteId !== noteId),
 			}
 			return getTasksState(
 				state.tasks.map((t) => (t.id === taskId ? updatedTask : t)),

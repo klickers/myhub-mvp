@@ -21,7 +21,7 @@ export default function EditorWrapper({
 		() =>
 			debounce((value: Prisma.JsonArray) => {
 				onSave(noteId, value)
-			}, 500),
+			}, 700),
 		[noteId, onSave],
 	)
 

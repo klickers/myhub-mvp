@@ -9,11 +9,12 @@ type NotesStore = {
 	loadNotes: () => void
 	// loadNote: (id: number) => void
 
-	createNote: (taskId: number) => Promise<Note | undefined> // requires taskId
+	createNote: (taskId: number, title?: string) => Promise<Note | undefined> // requires taskId
 	updateNote: (
 		id: number,
 		patch: Parameters<typeof actions.note.update>[0],
 	) => Promise<Note | undefined>
+	removeNote: (id: number) => Promise<Note | undefined>
 }
 
 export const useNotesStore = create<NotesStore>((set, get) => ({
@@ -52,9 +53,10 @@ export const useNotesStore = create<NotesStore>((set, get) => ({
 	// ===================================
 	// Updating
 	// ===================================
-	createNote: async (taskId) => {
+	createNote: async (taskId, title) => {
 		const res = await actions.note.create({
 			taskId,
+			title,
 		})
 		if (res.error) {
 			console.error("Failed to create note:", res.error)
@@ -77,6 +79,25 @@ export const useNotesStore = create<NotesStore>((set, get) => ({
 		}
 		if (!res.data) return
 		set({ notes: { ...get().notes, [id]: res.data } })
+		return res.data
+	},
+	removeNote: async (id) => {
+		const res = await actions.note.delete({ id })
+		if (res.error) {
+			console.error("Failed to remove note:", res.error)
+			return
+		}
+		set(({ notes }) => {
+			const { [id]: _, ...remainingNotes } = notes
+			return { notes: remainingNotes }
+		})
+
+		// update task
+		const removeNoteFromTask = useTasksStore.getState().removeNoteFromTask
+		res.data.items.forEach((item) => {
+			if (item.taskId) removeNoteFromTask(item.taskId, id)
+		})
+
 		return res.data
 	},
 }))
