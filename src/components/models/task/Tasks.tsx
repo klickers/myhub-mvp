@@ -83,7 +83,7 @@ export default function Tasks({ filter }: Props) {
 				<>
 					{/* Add task button */}
 					<button
-						className="text-xs px-1 rounded-3xl border border-gray-400"
+						className="button"
 						onClick={() => setIsAddingTask(!isAddingTask)}
 					>
 						{isAddingTask ? (
@@ -166,7 +166,7 @@ export default function Tasks({ filter }: Props) {
 
 					{/* Add task button */}
 					<button
-						className="text-xs px-1 rounded-3xl border border-gray-400"
+						className="button"
 						onClick={() => setIsAddingTask(!isAddingTask)}
 					>
 						{isAddingTask ? (

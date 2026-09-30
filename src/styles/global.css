@@ -86,23 +86,7 @@
 	}
 
 	.button {
-		@apply inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg text-sm font-semibold duration-200;
-
-		&.button--primary {
-			@apply border border-gray-400/80 bg-white/75 px-4 py-2 text-gray-800  backdrop-blur-md;
-
-			&:hover {
-				@apply -translate-y-px bg-white text-gray-950;
-			}
-
-			&:focus-visible {
-				@apply outline-none;
-			}
-
-			&:disabled {
-				@apply border-gray-600 text-gray-600 cursor-not-allowed;
-			}
-		}
+		@apply inline-flex cursor-pointer items-center justify-center gap-1 rounded-full text-xs px-2 py-1 border border-gray-300;
 	}
 
 	.editor {
