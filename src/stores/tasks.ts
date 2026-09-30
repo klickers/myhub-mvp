@@ -39,6 +39,9 @@ type TasksStore = {
 		id: number,
 		patch: Parameters<typeof actions.task.update>[0],
 	) => Promise<TaskNode | undefined>
+
+	// relations
+	addNoteToTask: (taskId: number, noteId: number) => void
 }
 
 function buildTaskIndexes(tasks: TaskWithTags[]): {
@@ -259,5 +262,22 @@ export const useTasksStore = create<TasksStore>((set, get) => ({
 			...res.data,
 			subtasks: [],
 		}
+	},
+
+	// ===================================
+	// Relations
+	// ===================================
+	addNoteToTask: (taskId: number, noteId: number) => {
+		set((state) => {
+			const task = state.tasks.find((t) => t.id === taskId)
+			if (!task) return state
+			const updatedTask = {
+				...task,
+				notes: [...task.notes, { noteId }],
+			}
+			return getTasksState(
+				state.tasks.map((t) => (t.id === taskId ? updatedTask : t)),
+			)
+		})
 	},
 }))

@@ -14,6 +14,11 @@ export type TaskWithTags = Prisma.TaskGetPayload<{
 			}
 		}
 		agendas: true
+		notes: {
+			select: {
+				noteId: true
+			}
+		}
 	}
 }>
 

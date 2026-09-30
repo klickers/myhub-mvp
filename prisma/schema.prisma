@@ -92,6 +92,7 @@ model Task {
     tags     TaskTag[]
     sessions Session[]
     agendas  Agenda[]
+    notes    NoteAndItem[]
 
     // ARCHIVED
     makeTimeType MakeTimeType?
@@ -136,6 +137,31 @@ model Session {
     // ARCHIVED
     objectiveId Int?
     objective   Objective? @relation(fields: [objectiveId], references: [id])
+}
+
+model Note {
+    id        Int      @id @default(autoincrement())
+    title     String?
+    content   Json?
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    order    Int?
+    parentId Int?
+    parent   Note?  @relation("NoteHierarchy", fields: [parentId], references: [id])
+    children Note[] @relation("NoteHierarchy")
+
+    items NoteAndItem[]
+}
+
+model NoteAndItem {
+    noteId Int
+    taskId Int
+
+    note Note @relation(fields: [noteId], references: [id], onDelete: Cascade)
+    task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+    @@id([noteId, taskId])
 }
 
 // ================================================

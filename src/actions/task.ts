@@ -373,6 +373,11 @@ export const task = {
 						},
 					},
 					agendas: true,
+					notes: {
+						select: {
+							noteId: true,
+						},
+					},
 				},
 			})
 		},
@@ -609,6 +614,11 @@ export const task = {
 						},
 					},
 					agendas: true,
+					notes: {
+						select: {
+							noteId: true,
+						},
+					},
 				},
 				orderBy: { deadline: "asc" },
 			})

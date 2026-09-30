@@ -9,6 +9,7 @@ import { dailyHighlight } from "./dailyHighlight"
 import { search } from "./search"
 import { tag } from "./tag"
 import { agenda } from "./agenda"
+import { note } from "./note"
 
 export const server = {
 	task,
@@ -17,6 +18,7 @@ export const server = {
 	search,
 	tag,
 	agenda,
+	note,
 	// ===============================
 	// Objective
 	// ===============================

@@ -87,6 +87,9 @@
 
 	.button {
 		@apply inline-flex cursor-pointer items-center justify-center gap-1 rounded-full text-xs px-2 py-1 border border-gray-300;
+		&:hover {
+			@apply bg-gray-50;
+		}
 	}
 
 	.editor {
