@@ -50,8 +50,9 @@ export default function Task({ task, depth = 0 }: Props) {
 			if (
 				task.agendas.some(
 					(agenda) =>
-						agenda.status === "inprogress" ||
-						agenda.status === "notstarted",
+						(agenda.status === "inprogress" ||
+							agenda.status === "notstarted") &&
+						agenda.date >= new Date(),
 				)
 			)
 				color = "text-yellow-400"
