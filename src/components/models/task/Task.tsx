@@ -118,7 +118,7 @@ export default function Task({ task, depth = 0 }: Props) {
 						className="p-0 -ml-1 text-xs bg-transparent border-0"
 					/>
 				</td>
-				<td className="font-mono text-right">
+				{/* <td className="font-mono text-right">
 					{!task.isEvergreen && (
 						<EditableNumber
 							value={task.estimatedTime}
@@ -131,7 +131,7 @@ export default function Task({ task, depth = 0 }: Props) {
 							className="px-1 py-0 w-12 bg-transparent"
 						/>
 					)}
-				</td>
+				</td> */}
 				<td className="font-mono text-right">
 					{!task.isEvergreen && (
 						<EditableDate

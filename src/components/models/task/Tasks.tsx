@@ -189,7 +189,7 @@ export default function Tasks({ filter }: Props) {
 								{/* Controls */}
 								<th></th>
 								<th>Status</th>
-								<th>Est. Time</th>
+								{/* <th>Est. Time</th> */}
 								<th>Deadline</th>
 								<th>Tags</th>
 								{/* Delete */}
