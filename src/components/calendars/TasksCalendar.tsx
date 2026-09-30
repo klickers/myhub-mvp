@@ -1,9 +1,14 @@
-import { useCallback, useEffect } from "react"
+import { useEffect } from "react"
+import { Icon } from "@iconify/react"
 import FullCalendar from "@fullcalendar/react"
-import dayGridPlugin from "@fullcalendar/daygrid"
-import interactionPlugin from "@fullcalendar/interaction"
+import dayGridPlugin from "@fullcalendar/react/daygrid"
+import interactionPlugin from "@fullcalendar/react/interaction"
+import themePlugin from "@fullcalendar/react/themes/classic"
 import { useTasksStore } from "@/stores/tasks"
 import saveTaskChange from "@/helpers/saveTaskChange"
+
+import "@fullcalendar/react/skeleton.css"
+import { format } from "date-fns"
 
 export default function TasksCalendar() {
 	const openSideTray = useTasksStore((state) => state.openSideTray)
@@ -17,17 +22,28 @@ export default function TasksCalendar() {
 	return (
 		<div className="calendar calendar--tasks">
 			<FullCalendar
-				plugins={[dayGridPlugin, interactionPlugin]}
+				plugins={[dayGridPlugin, interactionPlugin, themePlugin]}
 				initialView="dayGridMonth"
 				height="auto"
 				initialEvents={[]}
 				headerToolbar={{
 					left: "dayGridWeek,dayGridMonth",
 					center: "title",
-					right: "today prev,next",
+					right: "prev,today,next",
 				}}
 				nowIndicator
 				editable
+				buttons={{
+					next: {
+						iconContent: <Icon icon="mingcute:right-fill" />,
+					},
+					prev: {
+						iconContent: <Icon icon="mingcute:left-fill" />,
+					},
+				}}
+				// ===========================
+				// Events
+				// ===========================
 				events={tasks
 					.filter((task) => task.deadline)
 					.map((task) => ({
@@ -38,10 +54,8 @@ export default function TasksCalendar() {
 							type: "task",
 							task,
 						},
-						classNames: [
-							"event--task",
-							`event--status-${task.status}`,
-						],
+						className:
+							"event--task" + ` event--status-${task.status}`,
 					}))}
 				eventContent={(arg) => {
 					const { event } = arg
@@ -71,6 +85,33 @@ export default function TasksCalendar() {
 							deadline: info.event.start,
 						})
 				}}
+				// ===========================
+				// Styling
+				// ===========================
+				toolbarClass="flex justify-between items-center mb-4"
+				toolbarTitleClass="text-base font-semibold"
+				buttonGroupClass="flex items-center gap-1"
+				buttonClass={(info) =>
+					"uppercase text-xs px-1 py-1 rounded-lg border border-gray-300 hover:bg-gray-100" +
+					(info.isDisabled || info.isSelected ? " bg-gray-100" : "")
+				}
+				dayHeaderRowClass="font-semibold uppercase text-sm"
+				dayHeaderAlign="start"
+				dayHeaderClass="!px-1"
+				dayHeaderContent={(info) => (
+					<span>{format(info.date, "EEE")}</span>
+				)}
+				dayHeaderDividerClass="border-b border-gray-300"
+				dayRowClass="!border-b !border-gray-300"
+				dayCellClass={(info) =>
+					"!p-1 border-r border-gray-300 text-sm" +
+					(info.isToday ? " bg-blue-100" : "") +
+					(info.isPast ? " opacity-70" : "") +
+					(info.isFuture ? " text-gray-800" : "")
+				}
+				dayCellTopInnerClass="font-medium"
+				dayCellInnerClass="text-xs"
+				listItemEventClass="rounded-md bg-gray-50 p-1 mb-0.5"
 			/>
 		</div>
 	)

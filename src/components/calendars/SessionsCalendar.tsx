@@ -1,9 +1,14 @@
 import { useCallback } from "react"
 import { actions } from "astro:actions"
+import { Icon } from "@iconify/react"
+import { format } from "date-fns"
 import FullCalendar from "@fullcalendar/react"
-import timeGridPlugin from "@fullcalendar/timegrid"
+import timeGridPlugin from "@fullcalendar/react/timegrid"
+import themePlugin from "@fullcalendar/react/themes/classic"
 import type { Task } from "@/generated/prisma/browser"
 import { useTasksStore } from "@/stores/tasks"
+
+import "@fullcalendar/react/skeleton.css"
 
 type CalendarEvent = {
 	id: string
@@ -47,6 +52,7 @@ export default function SessionCalendar() {
 							? { task: session.task }
 							: {}),
 					},
+					classNames: ["event--session"],
 				}
 			})
 
@@ -58,7 +64,7 @@ export default function SessionCalendar() {
 	return (
 		<div className="calendar calendar--sessions">
 			<FullCalendar
-				plugins={[timeGridPlugin]}
+				plugins={[timeGridPlugin, themePlugin]}
 				initialView="timeGridWeek"
 				allDaySlot={false}
 				height="auto"
@@ -66,12 +72,19 @@ export default function SessionCalendar() {
 				headerToolbar={{
 					left: "timeGridDay,timeGridWeek",
 					center: "title",
-					right: "prev today next",
+					right: "prev,today,next",
 				}}
 				nowIndicator
 				slotMinTime="08:00:00"
+				buttons={{
+					next: {
+						iconContent: <Icon icon="mingcute:right-fill" />,
+					},
+					prev: {
+						iconContent: <Icon icon="mingcute:left-fill" />,
+					},
+				}}
 				events={loadEvents}
-				eventClassNames={["event--session"]}
 				eventContent={(arg) => {
 					const { event } = arg
 					return (
@@ -93,6 +106,28 @@ export default function SessionCalendar() {
 						</div>
 					)
 				}}
+				// ===========================
+				// Styling
+				// ===========================
+				toolbarClass="flex justify-between items-center mb-4"
+				toolbarTitleClass="text-base font-semibold"
+				buttonGroupClass="flex items-center gap-1"
+				buttonClass={(info) =>
+					"uppercase text-xs px-1 py-1 rounded-lg border border-gray-300 hover:bg-gray-100" +
+					(info.isDisabled || info.isSelected ? " bg-gray-100" : "")
+				}
+				dayHeaderRowClass="font-semibold uppercase text-sm"
+				dayHeaderAlign="start"
+				dayHeaderClass="!px-1"
+				dayHeaderContent={(info) => (
+					<span>{format(info.date, "EEE")}</span>
+				)}
+				dayHeaderDividerClass="border-b border-gray-300"
+				slotHeaderClass="text-sm font-medium"
+				slotHeaderDividerClass="border-l border-gray-300"
+				slotLaneClass="!border-b !border-gray-300"
+				dayLaneClass="!border-r !border-gray-300"
+				columnEventClass="text-xs rounded-md border border-blue-200 bg-blue-50 p-1 mb-0.5"
 			/>
 		</div>
 	)
