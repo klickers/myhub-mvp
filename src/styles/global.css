@@ -145,6 +145,10 @@
 		}
 	}
 
+	.Toastify__toast {
+		@apply !rounded-lg !shadow-lg !text-sm !text-black !font-default;
+	}
+
 	.agenda-task-list {
 		@apply flex flex-col gap-1.5;
 	}

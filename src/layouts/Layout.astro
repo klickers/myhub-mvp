@@ -49,6 +49,9 @@ const breadcrumbs = Astro.props.breadcrumbs || [{ name: "Home", href: "/" }]
 				client:load
 				transition:animate="none"
 				transition:persist
+				autoClose={1000}
+				newestOnTop
+				pauseOnHover
 			/>
 			<Sidebar
 				path={path}
