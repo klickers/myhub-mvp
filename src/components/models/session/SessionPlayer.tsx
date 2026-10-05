@@ -5,6 +5,8 @@ import { useStore } from "@nanostores/react"
 import { playingSession } from "@/stores/playingSession"
 import { secondsToDots } from "@/helpers/time/secondsToDots"
 import { differenceInSeconds } from "date-fns"
+import { useTasksStore } from "@/stores/tasks"
+import SideTrayOpenButton from "@/components/SideTrayOpenButton"
 
 import { Plate, usePlateEditor } from "platejs/react"
 import { Editor, EditorContainer } from "@/components/editor/ui/editor"
@@ -40,6 +42,8 @@ const SessionPlayer: React.FC<Props> = ({}) => {
 	const $playingSession = useStore(playingSession)
 	const autosaveTimer = useRef<NodeJS.Timeout | null>(null)
 	const lastSentNotes = useRef<Prisma.JsonArray>([])
+
+	const openSideTray = useTasksStore((state) => state.openSideTray)
 
 	// ---------------------------------------------------
 	// Load existing session (itemType, itemId, notes)
@@ -139,8 +143,11 @@ const SessionPlayer: React.FC<Props> = ({}) => {
 			<div>
 				{itemId && (
 					<div>
-						<p className="text-sm">
-							<a href={href}>{$playingSession.title}</a>
+						<p className="text-sm flex items-center gap-1">
+							{$playingSession.title}
+							<SideTrayOpenButton
+								onClick={() => itemId && openSideTray(itemId)}
+							/>
 						</p>
 						<div className="flex items-center gap-2">
 							<p className="text-xs font-mono">{usedTime}</p>
