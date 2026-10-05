@@ -52,7 +52,8 @@ export default function Task({ task, depth = 0 }: Props) {
 					(agenda) =>
 						(agenda.status === "inprogress" ||
 							agenda.status === "notstarted") &&
-						agenda.date >= new Date().setHours(0, 0, 0, 0),
+						agenda.date.getTime() >=
+							new Date().setHours(0, 0, 0, 0),
 				)
 			)
 				color = "text-yellow-400"
