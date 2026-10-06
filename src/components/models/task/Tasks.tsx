@@ -79,7 +79,7 @@ export default function Tasks({ filter }: Props) {
 
 	return (
 		<>
-			{otherTasks.length === 0 && (
+			{otherTasks.length === 0 && evergreenTasks.length === 0 && (
 				<>
 					{/* Add task button */}
 					<button
@@ -164,8 +164,8 @@ export default function Tasks({ filter }: Props) {
 			</div>
 
 			{/* Non-evergreen tasks */}
-			{otherTasks.length > 0 && (
-				<>
+			{(otherTasks.length > 0 || evergreenTasks.length > 0) && (
+				<div>
 					{evergreenTasks.length > 0 && (
 						<p className="font-semibold">Other Tasks</p>
 					)}
@@ -247,7 +247,7 @@ export default function Tasks({ filter }: Props) {
 							))}
 						</tbody>
 					</table>
-				</>
+				</div>
 			)}
 		</>
 	)
