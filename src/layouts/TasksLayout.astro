@@ -29,10 +29,7 @@ const initialTagGroups = await prisma.tag.findMany({
 <Layout breadcrumbs={[TasksBreadcrumb]}>
 	<div class="flex gap-12 w-full items-start">
 		<!-- TODO: make transition persist -->
-		<aside
-			class="sticky top-20 w-40 flex-none"
-			transition:persist
-		>
+		<aside class="sticky top-20 w-40 flex-none">
 			<!-- <div id="tooltipTagGroups">
 					<Icon
 						name="mingcute:information-fill"
@@ -58,6 +55,7 @@ const initialTagGroups = await prisma.tag.findMany({
 			<TagGroupHeader
 				client:load
 				initialGroups={initialTagGroups}
+				path={path}
 				transition:persist
 			/>
 		</aside>

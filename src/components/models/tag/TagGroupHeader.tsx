@@ -7,8 +7,10 @@ import type { Tag } from "@/generated/prisma/client"
 
 export default function TagGroupHeader({
 	initialGroups,
+	path,
 }: {
 	initialGroups: (Tag | TagWithChildren)[]
+	path: string
 }) {
 	const [showInput, setShowInput] = useState(false)
 	const [groups, setGroups] =
@@ -47,6 +49,7 @@ export default function TagGroupHeader({
 					<TagGroup
 						group={group}
 						key={group.id}
+						path={path}
 					/>
 				))}
 			</div>
