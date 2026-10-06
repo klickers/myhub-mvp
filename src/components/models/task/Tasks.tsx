@@ -54,7 +54,7 @@ export default function Tasks({ filter }: Props) {
 				taskIdsByEffectiveTagGroupId[filter.id] ?? [],
 			)
 		const tree = buildTaskTree(
-			filteredTasks,
+			allTasks,
 			filter.type === "tag" ? filter.id : null,
 			filter.type === "task" ? filter.id : null,
 			filter.type === "group" ? filter.id : null,

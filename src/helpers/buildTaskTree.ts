@@ -1,7 +1,6 @@
 import type { Status } from "@/generated/prisma/enums"
 import type { TaskWithTags, TaskNode } from "@/types/prisma-custom"
 
-
 function statusQualifies(status: Status) {
 	return (
 		status !== "archived" && status !== "completed" && status !== "onhold"
@@ -38,12 +37,12 @@ export default function buildTaskTree(
 	// Connect all valid tasks to their parents
 	for (const task of map.values()) {
 		if (!task.parentTaskId || task.parentTaskId === task.id) continue
-		if (allowedTaskIds && !allowedTaskIds.has(task.id)) continue
+		// if (allowedTaskIds && !allowedTaskIds.has(task.id)) continue
 		const parent = map.get(task.parentTaskId)
 		if (
 			parent &&
-			statusQualifies(task.status) &&
-			(!allowedTaskIds || allowedTaskIds.has(parent.id))
+			statusQualifies(task.status) //&&
+			//(!allowedTaskIds || allowedTaskIds.has(parent.id))
 		) {
 			parent.subtasks.push(task)
 			parent.subtasks.sort((a, b) => compareTasks(a, b))
