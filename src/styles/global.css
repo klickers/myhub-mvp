@@ -235,9 +235,9 @@
 			@apply left-[calc(var(--sidebar-width)+1rem)] right-3 top-3 gap-2 px-2.5;
 		}
 
-		.global-search {
+		/* .global-search {
 			@apply right-5 top-[1.125rem] w-[min(13rem,45vw)] min-w-[9rem];
-		}
+		} */
 
 		.app-breadcrumbs {
 			@apply pr-[min(14rem,48vw)];

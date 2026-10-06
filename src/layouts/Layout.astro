@@ -109,11 +109,11 @@ const { title = null, breadcrumbs = [{ name: "Home", href: "/" }] } =
 							})
 						}
 					</nav>
+					<GlobalSearch
+						client:load
+						transition:persist
+					/>
 				</header>
-				<GlobalSearch
-					client:load
-					transition:persist
-				/>
 				<main class="px-8 pb-8 pl-10 pt-20"><slot /></main>
 				<SideTray client:load />
 			</div>

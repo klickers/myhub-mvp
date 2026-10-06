@@ -1,12 +1,12 @@
 import { actions } from "astro:actions"
-import { ArrowUpRight, Loader2, Search, X } from "lucide-react"
+import { ArrowUpRight, Loader2 } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import type { KeyboardEvent } from "react"
-import SideTray from "@/components/SideTray"
+import { Icon } from "@iconify/react"
 import { useDebounce } from "@/hooks/use-debounce"
 import { cn } from "@/lib/utils"
-import type { Task } from "@/generated/prisma/client"
 import type { GlobalSearchResult } from "@/actions/search"
+import { useTasksStore } from "@/stores/tasks"
 
 const MIN_QUERY_LENGTH = 1
 
@@ -48,6 +48,8 @@ function getTypeLabel(type: GlobalSearchResult["type"]) {
 }
 
 export default function GlobalSearch() {
+	const openSideTray = useTasksStore((state) => state.openSideTray)
+
 	const [query, setQuery] = useState("")
 	const debouncedQuery = useDebounce(query, 180)
 	const [results, setResults] = useState<GlobalSearchResult[]>([])
@@ -55,7 +57,7 @@ export default function GlobalSearch() {
 	const [isLoading, setIsLoading] = useState(false)
 	const [error, setError] = useState<string | null>(null)
 	const [activeIndex, setActiveIndex] = useState(0)
-	const [selectedTask, setSelectedTask] = useState<Task | null>(null)
+	// const [selectedTask, setSelectedTask] = useState<Task | null>(null)
 	const wrapperRef = useRef<HTMLDivElement | null>(null)
 	const requestIdRef = useRef(0)
 
@@ -124,11 +126,10 @@ export default function GlobalSearch() {
 
 	const selectResult = (result: GlobalSearchResult) => {
 		if (result.type === "task") {
-			setSelectedTask(result.task)
+			openSideTray(result.task.id)
 			setIsOpen(false)
 			return
 		}
-
 		window.location.href = result.href
 	}
 
@@ -165,173 +166,150 @@ export default function GlobalSearch() {
 	const showPanel = isOpen && hasSearchableQuery
 
 	return (
-		<>
-			<div
-				ref={wrapperRef}
-				className="global-search fixed right-7 top-[1.125rem] z-40 w-[min(22rem,36vw)] min-w-[12rem]"
+		<div
+			ref={wrapperRef}
+			className="global-search fixed right-3 w-[min(22rem,36vw)] min-w-[12rem]"
+		>
+			<label
+				htmlFor="global-search"
+				className="sr-only"
 			>
-				<label
-					htmlFor="global-search"
-					className="sr-only"
-				>
-					Search tasks
-				</label>
-				<div className="flex h-8 items-center gap-2 rounded-lg border border-gray-300/80 bg-white/70 px-2.5 text-gray-700 shadow-sm transition-[background-color,border-color,box-shadow] duration-150 focus-within:border-gray-500 focus-within:bg-white">
-					<Search
-						className="size-3.5 flex-none text-gray-400"
-						aria-hidden="true"
+				Search tasks
+			</label>
+			<div className="flex h-8 items-center gap-2 text-gray-700 focus-within:border-gray-500 focus-within:bg-white">
+				<input
+					id="global-search"
+					type="search"
+					value={query}
+					onChange={(event) => {
+						setQuery(event.target.value)
+						if (event.target.value.trim()) setIsOpen(true)
+					}}
+					onFocus={() => {
+						if (query.trim()) setIsOpen(true)
+					}}
+					onKeyDown={handleKeyDown}
+					placeholder="Search..."
+					autoComplete="off"
+					className="min-w-0 flex-1 bg-transparent text-sm text-gray-950 outline-none placeholder:text-gray-400"
+					role="combobox"
+					aria-autocomplete="list"
+					aria-controls="global-search-results"
+					aria-expanded={showPanel}
+				/>
+				{/* {isLoading ? (
+					<Loader2
+						className="size-3.5 flex-none animate-spin text-gray-400"
+						aria-label="Searching"
 					/>
-					<input
-						id="global-search"
-						type="search"
-						value={query}
-						onChange={(event) => {
-							setQuery(event.target.value)
-							if (event.target.value.trim()) setIsOpen(true)
-						}}
-						onFocus={() => {
-							if (query.trim()) setIsOpen(true)
-						}}
-						onKeyDown={handleKeyDown}
-						placeholder="Search..."
-						autoComplete="off"
-						className="min-w-0 flex-1 bg-transparent text-sm text-gray-950 outline-none placeholder:text-gray-400"
-						role="combobox"
-						aria-autocomplete="list"
-						aria-controls="global-search-results"
-						aria-expanded={showPanel}
-					/>
-					{isLoading ? (
-						<Loader2
-							className="size-3.5 flex-none animate-spin text-gray-400"
-							aria-label="Searching"
-						/>
-					) : query ? (
-						<button
-							type="button"
-							onClick={clearSearch}
-							className="inline-flex size-5 flex-none items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700 focus-visible:outline-none"
-							aria-label="Clear search"
-						>
-							<X
-								className="size-3.5"
-								aria-hidden="true"
-							/>
-						</button>
-					) : null}
-				</div>
-
-				{showPanel && (
-					<div
-						id="global-search-results"
-						role="listbox"
-						className="absolute right-0 top-[calc(100%+0.5rem)] z-50 w-[min(28rem,calc(100vw-2rem))] overflow-hidden rounded-lg border border-gray-300/75 bg-white/95 shadow-2xl shadow-slate-900/15 backdrop-blur-xl"
+				) : query ? (
+					<button
+						type="button"
+						onClick={clearSearch}
+						className="inline-flex size-5 flex-none items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700 focus-visible:outline-none"
+						aria-label="Clear search"
 					>
-						{error ? (
-							<p className="px-3 py-4 text-sm text-rose-700">
-								{error}
-							</p>
-						) : results.length > 0 ? (
-							<ul className="max-h-[22rem] overflow-y-auto p-1.5">
-								{results.map((result, index) => {
-									const isSelected = index === activeIndex
-									const content = (
-										<>
-											<div className="min-w-0 flex items-center gap-3">
-												<p className="truncate text-sm font-semibold text-gray-950">
-													{result.title}
-												</p>
-												<span
-													className={cn(
-														"rounded-md border px-1.5 py-0.5 text-[0.68rem] font-semibold",
-														getStatusClass(
-															result.status,
-														),
-													)}
-												>
-													{formatStatus(
-														result.status,
-													)}
-												</span>
-											</div>
-											{result.type !== "task" && (
-												<ArrowUpRight
-													className="size-3.5 flex-none text-gray-400"
-													aria-hidden="true"
-												/>
-											)}
-										</>
-									)
-
-									return (
-										<li
-											key={`${result.type}-${result.id}`}
-											role="option"
-											aria-selected={isSelected}
-										>
-											{result.type === "task" ? (
-												<button
-													type="button"
-													onClick={() =>
-														selectResult(result)
-													}
-													onMouseEnter={() =>
-														setActiveIndex(index)
-													}
-													className={cn(
-														"flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left transition-colors focus-visible:outline-none",
-														isSelected
-															? "bg-gray-100"
-															: "hover:bg-gray-50",
-													)}
-												>
-													{content}
-												</button>
-											) : (
-												<a
-													href={result.href}
-													onClick={() =>
-														setIsOpen(false)
-													}
-													onMouseEnter={() =>
-														setActiveIndex(index)
-													}
-													className={cn(
-														"flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left transition-colors focus-visible:outline-none",
-														isSelected
-															? "bg-gray-100"
-															: "hover:bg-gray-50",
-													)}
-												>
-													{content}
-												</a>
-											)}
-										</li>
-									)
-								})}
-							</ul>
-						) : isLoading ? (
-							<p className="px-3 py-4 text-sm text-gray-500">
-								Searching...
-							</p>
-						) : (
-							<p className="px-3 py-4 text-sm text-gray-500">
-								No results found.
-							</p>
-						)}
-					</div>
-				)}
+						<Icon icon="mingcute:close-fill" />
+					</button>
+				) : null} */}
 			</div>
 
-			{selectedTask && (
-				<div className="fixed inset-0 z-[100]">
-					<SideTray
-						type="task"
-						selected={selectedTask}
-						setSelected={setSelectedTask}
-					/>
+			{showPanel && (
+				<div
+					id="global-search-results"
+					role="listbox"
+					className="absolute right-0 top-[calc(100%+0.5rem)] z-50 w-[min(28rem,calc(100vw-2rem))] overflow-hidden rounded-lg border border-gray-300/75 bg-white/95 shadow-2xl shadow-slate-900/15 backdrop-blur-xl"
+				>
+					{error ? (
+						<p className="px-3 py-4 text-sm text-rose-700">
+							{error}
+						</p>
+					) : results.length > 0 ? (
+						<ul className="max-h-[22rem] overflow-y-auto p-1.5">
+							{results.map((result, index) => {
+								const isSelected = index === activeIndex
+								const content = (
+									<>
+										<div className="min-w-0 flex items-center gap-3">
+											<p className="truncate text-sm font-semibold text-gray-950">
+												{result.title}
+											</p>
+											<span
+												className={cn(
+													"rounded-md border px-1.5 py-0.5 text-[0.68rem] font-semibold",
+													getStatusClass(
+														result.status,
+													),
+												)}
+											>
+												{formatStatus(result.status)}
+											</span>
+										</div>
+										{result.type !== "task" && (
+											<ArrowUpRight
+												className="size-3.5 flex-none text-gray-400"
+												aria-hidden="true"
+											/>
+										)}
+									</>
+								)
+
+								return (
+									<li
+										key={`${result.type}-${result.id}`}
+										role="option"
+										aria-selected={isSelected}
+									>
+										{result.type === "task" ? (
+											<button
+												type="button"
+												onClick={() =>
+													selectResult(result)
+												}
+												onMouseEnter={() =>
+													setActiveIndex(index)
+												}
+												className={cn(
+													"flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left transition-colors focus-visible:outline-none",
+													isSelected
+														? "bg-gray-100"
+														: "hover:bg-gray-50",
+												)}
+											>
+												{content}
+											</button>
+										) : (
+											<a
+												href={result.href}
+												onClick={() => setIsOpen(false)}
+												onMouseEnter={() =>
+													setActiveIndex(index)
+												}
+												className={cn(
+													"flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left transition-colors focus-visible:outline-none",
+													isSelected
+														? "bg-gray-100"
+														: "hover:bg-gray-50",
+												)}
+											>
+												{content}
+											</a>
+										)}
+									</li>
+								)
+							})}
+						</ul>
+					) : isLoading ? (
+						<p className="px-3 py-4 text-sm text-gray-500">
+							Searching...
+						</p>
+					) : (
+						<p className="px-3 py-4 text-sm text-gray-500">
+							No results found.
+						</p>
+					)}
 				</div>
 			)}
-		</>
+		</div>
 	)
 }
