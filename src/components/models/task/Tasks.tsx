@@ -140,6 +140,12 @@ export default function Tasks({ filter }: Props) {
 								}
 								className="w-auto text-base font-semibold"
 							/>
+							{task.notes.length != 0 && (
+								<Icon
+									icon="mingcute:document-line"
+									className="text-indigo-700"
+								/>
+							)}
 							<SideTrayOpenButton
 								onClick={() => openSideTray(task.id)}
 							/>

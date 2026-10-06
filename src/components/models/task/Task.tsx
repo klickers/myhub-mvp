@@ -89,6 +89,12 @@ export default function Task({ task, depth = 0 }: Props) {
 						value={task.name}
 						onSave={(name) => saveTaskChange({ id: task.id, name })}
 					/>
+					{task.notes.length != 0 && (
+						<Icon
+							icon="mingcute:document-line"
+							className="text-indigo-700"
+						/>
+					)}
 					{task.isEvergreen && (
 						<Icon
 							icon="mingcute:tree-fill"
