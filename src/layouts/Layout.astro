@@ -16,11 +16,13 @@ type Breadcrumb = {
 }
 
 interface Props {
+	title?: string
 	breadcrumbs?: Breadcrumb[]
 }
 
 const path = Astro.url.pathname
-const breadcrumbs = Astro.props.breadcrumbs || [{ name: "Home", href: "/" }]
+const { title = null, breadcrumbs = [{ name: "Home", href: "/" }] } =
+	Astro.props
 ---
 
 <!doctype html>
@@ -40,7 +42,7 @@ const breadcrumbs = Astro.props.breadcrumbs || [{ name: "Home", href: "/" }]
 			name="generator"
 			content={Astro.generator}
 		/>
-		<title>My Hub</title>
+		<title>{title ? `${title} | My Hub` : "My Hub"}</title>
 		<ClientRouter />
 	</head>
 	<body class="min-h-screen">
