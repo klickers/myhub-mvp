@@ -10,15 +10,13 @@ import EditableBoolean from "./form/EditableBoolean"
 import SessionPlayButton from "./models/session/SessionPlayButton"
 import { useEffect, useMemo, useState } from "react"
 import { Icon } from "@iconify/react"
-// import TrashButton from "@/components/TrashButton"
 import { dateKeyToUtcDate, getUtcDateKey } from "@/helpers/dateOnly"
 import saveTaskChange from "@/helpers/saveTaskChange"
 import { useTasksStore } from "@/stores/tasks"
 import { useTagsStore } from "@/stores/tags"
 import { useNotesStore } from "@/stores/notes"
 import Wrapper from "./Wrapper"
-import EditorWrapper from "./EditorWrapper"
-import TrashButton from "./TrashButton"
+import Note from "./models/note/Note"
 
 type TaskBreadcrumbItem = {
 	type: "area" | "task" | "task-root"
@@ -118,15 +116,6 @@ export default function SideTray() {
 	// 		closeSideTray()
 	// 	}
 	// }
-
-	const saveNoteChange = (
-		noteId: number,
-		patch: Parameters<typeof updateNote>[1],
-	) => {
-		const res = updateNote(noteId, patch)
-		if (res === undefined) toast.error("Failed to save note")
-		else toast.success("Note saved successfully")
-	}
 
 	if (!selectedTaskId || !isSideTrayOpen || !task) {
 		closeSideTray()
@@ -379,49 +368,7 @@ export default function SideTray() {
 							</button>
 						</div>
 						{task.notes.map(({ noteId }) => (
-							<div className="mb-4">
-								<div className="flex items-center gap-2 justify-between">
-									<EditableText
-										value={
-											notes[noteId]?.title ||
-											"Untitled Note"
-										}
-										onSave={async (value) =>
-											saveNoteChange(noteId, {
-												id: noteId,
-												title: value,
-											})
-										}
-										className="text-base font-semibold mb-2"
-										inputClassName="mb-0"
-									/>
-									<TrashButton
-										onClick={() => {
-											const res = removeNote(noteId)
-											if (res === undefined)
-												toast.error(
-													"Failed to delete note",
-												)
-											else
-												toast.success(
-													"Note deleted successfully",
-												)
-										}}
-									/>
-								</div>
-								<EditorWrapper
-									key={noteId}
-									noteId={noteId}
-									initialValue={notes[noteId]?.content}
-									onSave={(noteId, content) =>
-										saveNoteChange(noteId, {
-											id: noteId,
-											content,
-										})
-									}
-									placeholder="Start typing here..."
-								/>
-							</div>
+							<Note id={noteId} />
 						))}
 					</div>
 				</div>
