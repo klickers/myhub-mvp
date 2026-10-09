@@ -38,8 +38,10 @@ export default function EditableText({
 		const next = draft.trim()
 		skipNextBlurSave.current = true
 		setEditing(false)
-		if (next) setDraft(next)
-		if (next && next !== value) await onSave(next)
+		if (next !== value) {
+			setDraft(next)
+			await onSave(next)
+		}
 	}
 
 	const cancel = () => {
