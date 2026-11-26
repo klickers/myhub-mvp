@@ -1,7 +1,7 @@
 import { useCallback } from "react"
 import { actions } from "astro:actions"
 import { Icon } from "@iconify/react"
-import { format } from "date-fns"
+import { format, differenceInMinutes } from "date-fns"
 import FullCalendar from "@fullcalendar/react"
 import timeGridPlugin from "@fullcalendar/react/timegrid"
 import themePlugin from "@fullcalendar/react/themes/classic"
@@ -22,6 +22,7 @@ type CalendarEvent = {
 }
 
 export default function SessionCalendar() {
+	const dailyTotals: Record<string, number> = {}
 	const openSideTray = useTasksStore((state) => state.openSideTray)
 
 	const loadEvents = useCallback(
@@ -29,6 +30,9 @@ export default function SessionCalendar() {
 			info: any,
 			successCallback: (events: CalendarEvent[]) => void,
 		) => {
+			for (const key in dailyTotals)
+				if (Object.hasOwn(dailyTotals, key)) delete dailyTotals[key]
+
 			const res = await actions.session.list({
 				from: info.start,
 				to: info.end,
@@ -37,9 +41,18 @@ export default function SessionCalendar() {
 
 			const events: CalendarEvent[] = (res.data ?? []).map((session) => {
 				const sources = [{ key: "task", type: "task" }] as const
-
 				const found = sources.find(({ key }) => session[key])
 				const item = found ? session[found.key] : null
+
+				if (session.startTime && session.endTime) {
+					const dateKey = format(session.startTime, "yyyy-MM-dd")
+					const duration = differenceInMinutes(
+						session.endTime,
+						session.startTime,
+					)
+					dailyTotals[dateKey] =
+						(dailyTotals[dateKey] || 0) + duration
+				}
 
 				return {
 					id: `session-${session.id}`,
@@ -120,7 +133,16 @@ export default function SessionCalendar() {
 				dayHeaderAlign="start"
 				dayHeaderClass="!px-1"
 				dayHeaderContent={(info) => (
-					<span>{format(info.date, "EEE")}</span>
+					<div className="flex items-center gap-1">
+						<span>{format(info.date, "EEE")}</span>
+						<span className="text-xs text-gray-500">
+							{(
+								(dailyTotals[format(info.date, "yyyy-MM-dd")] ||
+									0) / 60
+							).toFixed(2)}
+							h
+						</span>
+					</div>
 				)}
 				dayHeaderDividerClass="border-b border-gray-300"
 				slotHeaderClass="text-sm font-medium"
