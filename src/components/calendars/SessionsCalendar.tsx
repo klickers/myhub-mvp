@@ -89,6 +89,7 @@ export default function SessionCalendar() {
 				}}
 				nowIndicator
 				slotMinTime="08:00:00"
+				weekNumbers
 				buttons={{
 					next: {
 						iconContent: <Icon icon="mingcute:right-fill" />,
