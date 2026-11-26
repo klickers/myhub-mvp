@@ -25,6 +25,7 @@ export default function TasksCalendar() {
 				plugins={[dayGridPlugin, interactionPlugin, themePlugin]}
 				initialView="dayGridMonth"
 				height="auto"
+				timeZone="UTC"
 				initialEvents={[]}
 				headerToolbar={{
 					left: "dayGridWeek,dayGridMonth",
